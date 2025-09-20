@@ -1,18 +1,21 @@
 {
-    "name": "batteryincluded/batteryincluded-php-sdk",
-    "description": "The official php sdk for batteryincluded.ai",
-    "license": "MIT",
-    "autoload": {
-        "psr-4": {
-            "Batteryincluded\\BatteryincludedPhpSdk\\": "src/"
-        }
-    },
-    "authors": [
-        {
-            "name": "teiling88",
-            "email": "teiling88@gmail.com"
-        }
-    ],
-    "minimum-stability": "stable",
-    "require": {}
+  "name": "batteryincluded/batteryincluded-php-sdk",
+  "description": "The official php sdk for batteryincluded.ai",
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {
+      "BatteryIncludedSdk\\": "src/"
+    }
+  },
+  "authors": [
+    {
+      "name": "Thomas Eiling",
+      "email": "teiling88@gmail.com"
+    }
+  ],
+  "minimum-stability": "stable",
+  "require": {
+    "php": "^8.0",
+    "ext-curl": "*"
+  }
 }
