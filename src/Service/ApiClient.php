@@ -14,9 +14,34 @@ class ApiClient
     {
         $url = $this->baseUrl . $this->collection . $urlPart;
 
+        return $this->send($url, 'POST', $data);
+    }
+
+    public function delete(string $urlPart, string $data): Response
+    {
+        $url = $this->baseUrl . $this->collection . $urlPart;
+
+        return $this->send($url, 'DELETE', $data);
+    }
+
+    public function send(string $url, string $method, string $data): Response
+    {
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POST, true);
+        switch ($method) {
+            case 'POST':
+                curl_setopt($ch, CURLOPT_POST, true);
+                break;
+            case 'DELETE':
+                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
+                break;
+            case 'PATCH':
+                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PATCH');
+                break;
+            default:
+                throw new \InvalidArgumentException("Unsupported method: $method");
+        }
+
         curl_setopt($ch, CURLOPT_HTTPHEADER, $this->getHeaders());
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
 

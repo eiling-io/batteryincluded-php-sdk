@@ -57,10 +57,17 @@ $apiClient = new ApiClient(
     $apiKey
 );
 
+$transactionId = 'Transaction_' . time();
 $syncService = new SyncService($apiClient);
 
-$result = $syncService->syncProducts(...$products);
+foreach (array_chunk($products, 10) as $productSlice) {
+    $result = $syncService->syncFullBatch($transactionId, false, ...$productSlice);
+    echo '<pre>';
+    var_dump($result->getBody());
+    echo '</pre>';
+}
 
+$result = $syncService->syncFullBatch($transactionId, true, ...$productSlice);
 echo '<pre>';
 var_dump($result->getBody());
 echo '</pre>';
