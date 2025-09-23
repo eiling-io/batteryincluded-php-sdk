@@ -54,6 +54,13 @@ class SyncService extends AbstractService
         return $this->apiClient->postNDJson($apiUrl, $json);
     }
 
+    public function partialUpdateOneOrManyProducts(ProductBaseDto ...$products): Response
+    {
+        $json = $this->generateNDJSON($products);
+
+        return $this->apiClient->patchNDJson('/documents/update', $json);
+    }
+
     public function deleteProductsByIds(string ...$productIds): Response
     {
         return $this->apiClient->deleteJson('/documents/delete', json_encode($productIds));

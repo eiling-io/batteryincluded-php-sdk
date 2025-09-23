@@ -21,7 +21,14 @@ class ApiClient
     {
         $url = $this->baseUrl . $this->collection . $urlPart;
 
-        return $this->send($url, 'POST', 'ndjson', $data);
+        return $this->send($url, 'POST', 'x-ndjson', $data);
+    }
+
+    public function patchNDJson(string $urlPart, string $data): Response
+    {
+        $url = $this->baseUrl . $this->collection . $urlPart;
+
+        return $this->send($url, 'PATCH', 'x-ndjson', $data);
     }
 
     public function deleteJson(string $urlPart, string $data): Response
@@ -46,7 +53,7 @@ class ApiClient
                 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PATCH');
                 break;
             default:
-                throw new \InvalidArgumentException("Unsupported method: $method");
+                throw new \InvalidArgumentException('Unsupported method: ' . $method);
         }
 
         curl_setopt($ch, CURLOPT_HTTPHEADER, $this->getHeaders($contentType));
