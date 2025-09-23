@@ -6,8 +6,6 @@ use BatteryIncludedSdk\Service\SyncService;
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/credentials.php';
 
-
-
 $apiClient = new ApiClient(
     'https://api.batteryincluded.io/api/v1/collections/',
     $collection,

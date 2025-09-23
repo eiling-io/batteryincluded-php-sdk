@@ -16,7 +16,7 @@ class SyncService extends AbstractService
     {
         $json = $this->generateNDJSON($products);
 
-        return $this->apiClient->post('/documents/import', $json);
+        return $this->apiClient->postNDJson('/documents/import', $json);
     }
 
     /**
@@ -29,7 +29,7 @@ class SyncService extends AbstractService
     {
         $json = $this->generateNDJSON($products);
 
-        return $this->apiClient->post('/documents/import?full=1', $json);
+        return $this->apiClient->postNDJson('/documents/import?full=1', $json);
     }
 
     /**
@@ -48,14 +48,14 @@ class SyncService extends AbstractService
         $apiUrl = '/documents/import?transactionId=' . $transactionId;
 
         if ($finished) {
-            return $this->apiClient->post($apiUrl . '&transactionCompleted=1', $json);
+            return $this->apiClient->postNDJson($apiUrl . '&transactionCompleted=1', $json);
         }
 
-        return $this->apiClient->post($apiUrl, $json);
+        return $this->apiClient->postNDJson($apiUrl, $json);
     }
 
     public function deleteProductsByIds(string ...$productIds): Response
     {
-        return $this->apiClient->delete('/documents/delete', json_encode($productIds));
+        return $this->apiClient->deleteJson('/documents/delete', json_encode($productIds));
     }
 }

@@ -10,21 +10,28 @@ class ApiClient
     {
     }
 
-    public function post(string $urlPart, string $data): Response
+    public function postJson(string $urlPart, string $data): Response
     {
         $url = $this->baseUrl . $this->collection . $urlPart;
 
-        return $this->send($url, 'POST', $data);
+        return $this->send($url, 'POST', 'json', $data);
     }
 
-    public function delete(string $urlPart, string $data): Response
+    public function postNDJson(string $urlPart, string $data): Response
     {
         $url = $this->baseUrl . $this->collection . $urlPart;
 
-        return $this->send($url, 'DELETE', $data);
+        return $this->send($url, 'POST', 'ndjson', $data);
     }
 
-    public function send(string $url, string $method, string $data): Response
+    public function deleteJson(string $urlPart, string $data): Response
+    {
+        $url = $this->baseUrl . $this->collection . $urlPart;
+
+        return $this->send($url, 'DELETE', 'json', $data);
+    }
+
+    public function send(string $url, string $method, string $contentType, string $data): Response
     {
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -42,7 +49,7 @@ class ApiClient
                 throw new \InvalidArgumentException("Unsupported method: $method");
         }
 
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $this->getHeaders());
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $this->getHeaders($contentType));
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
 
         $response = curl_exec($ch);
@@ -54,10 +61,10 @@ class ApiClient
         return new Response($response);
     }
 
-    private function getHeaders()
+    private function getHeaders(string $contentType): array
     {
         return [
-            "Content-Type: application/x-ndjson",
+            "Content-Type: application/" . $contentType,
             "X-BI-API-KEY: " . $this->apiKey,
         ];
     }
