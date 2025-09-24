@@ -1,7 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BatteryIncludedSdkTests;
 
+use BatteryIncludedSdk\Client\ApiClient;
+use BatteryIncludedSdk\Client\CurlHttpClient;
 use BatteryIncludedSdk\Product\CategoryDto;
 use BatteryIncludedSdk\Product\ProductBaseDto;
 use BatteryIncludedSdk\Product\ProductPropertyDto;
@@ -11,7 +15,7 @@ class Helper
     public static function generateProducts(
         int $iterations,
         array $colours = ['Blau', 'Rosa', 'Gold', 'Schwarz'],
-        array $storages = ['128GB', '256GB', '512GB']
+        array $storages = ['128GB', '256GB', '512GB'],
     ): array {
         $products = [];
         $id = 0;
@@ -24,7 +28,7 @@ class Helper
                     $product->setDescription(
                         'The latest iPhone with advanced features. Color: ' . $color . ', Storage: ' . $storage . '.'
                     );
-                    $product->setId($id);
+                    $product->setId((string) $id);
                     $product->setOrdernumber('AP-00' . $i . '-' . $color . '-' . $storage);
                     $product->setPrice(999.99);
                     $product->setInstock(50);
@@ -53,6 +57,17 @@ class Helper
                 }
             }
         }
+
         return $products;
+    }
+
+    public static function getApiClient(): ApiClient
+    {
+        return new ApiClient(
+            'https://api.batteryincluded.io/api/v1/collections/',
+            getenv('COLLECTION'),
+            getenv('APIKEY'),
+            new CurlHttpClient()
+        );
     }
 }
