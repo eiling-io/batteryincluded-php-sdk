@@ -7,6 +7,11 @@
       "BatteryIncludedSdk\\": "src/"
     }
   },
+  "autoload-dev": {
+    "psr-4": {
+      "BatteryIncludedSdkTests\\": "tests/"
+    }
+  },
   "authors": [
     {
       "name": "Thomas Eiling",
@@ -17,5 +22,8 @@
   "require": {
     "php": "^8.0",
     "ext-curl": "*"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^12"
   }
 }
