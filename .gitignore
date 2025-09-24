@@ -1,2 +1,6 @@
 /vendor/
 /examples/credentials.php
+/phpunit.xml
+/composer.lock
+/.php-cs-fixer.cache
+/.phpunit.result.cache
