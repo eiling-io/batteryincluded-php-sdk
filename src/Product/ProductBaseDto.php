@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace BatteryIncludedSdk\Product;
 
-use JsonSerializable;
-
-class ProductBaseDto implements JsonSerializable
+class ProductBaseDto implements \JsonSerializable
 {
     private ?string $id;
 
@@ -149,6 +147,7 @@ class ProductBaseDto implements JsonSerializable
         if (count(array_values(array_unique($this->categories))) === 0) {
             return null;
         }
+
         return array_values(array_unique($this->categories));
     }
 

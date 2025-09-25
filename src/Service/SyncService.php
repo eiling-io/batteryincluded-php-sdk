@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BatteryIncludedSdk\Service;
 
+use BatteryIncludedSdk\Client\ApiClient;
 use BatteryIncludedSdk\Product\ProductBaseDto;
 
 class SyncService extends AbstractService
@@ -21,8 +22,6 @@ class SyncService extends AbstractService
 
     /**
      * not included products will be deleted from the index
-     * @param ProductBaseDto ...$products
-     * @return Response
      * @throws \Exception
      */
     public function syncFull(ProductBaseDto ...$products): Response
@@ -36,10 +35,8 @@ class SyncService extends AbstractService
      * you send several batches with the identical transactionId
      * after all products are synced you need to finish your batch sync with $finished = true
      * and the same transactionId from the beginning
-     * @param string $transactionId A unique identifier used to group multiple related batch updates.
+     * @param string $transactionId a unique identifier used to group multiple related batch updates
      * @param bool $finished If 1, drop all data that is not related to the given transactionId
-     * @param ProductBaseDto ...$products
-     * @return Response
      * @throws \Exception
      */
     public function syncFullBatch(string $transactionId, bool $finished = false, ProductBaseDto ...$products): Response

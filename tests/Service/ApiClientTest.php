@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Service;
+namespace BatteryIncludedSdkTests\Service;
 
 use BatteryIncludedSdk\Client\ApiClient;
 use BatteryIncludedSdk\Client\CurlHttpClient;
@@ -17,7 +17,7 @@ class ApiClientTest extends TestCase
 {
     public function testPostJson()
     {
-        $apiClient = new ApiClient('https://aaa', 'collection', 'apikey', new CurlHttpClient());
+        $apiClient = new ApiClient(new CurlHttpClient(), 'https://aaa', 'collection', 'apikey');
         $this->expectException(\Exception::class);
         $apiClient->postJson('/clear', 'INVALID_ARGUMENT');
     }

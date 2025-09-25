@@ -8,7 +8,7 @@ abstract class AbstractService
 {
     public function generateNDJSON(array $data): string
     {
-        // @TODO make configurable
+        /** @TODO make configurable */
         $jsonFlags = 0;
         $jsonFlags &= ~JSON_PRETTY_PRINT;
 

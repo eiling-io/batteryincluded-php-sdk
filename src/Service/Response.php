@@ -14,4 +14,9 @@ class Response
     {
         return json_decode($this->responseRaw, true);
     }
+
+    public function getRawResponse(): string
+    {
+        return $this->responseRaw;
+    }
 }

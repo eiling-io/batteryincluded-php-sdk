@@ -64,10 +64,10 @@ class Helper
     public static function getApiClient(): ApiClient
     {
         return new ApiClient(
+            new CurlHttpClient(),
             'https://api.batteryincluded.io/api/v1/collections/',
             getenv('COLLECTION'),
-            getenv('APIKEY'),
-            new CurlHttpClient()
+            getenv('APIKEY')
         );
     }
 }

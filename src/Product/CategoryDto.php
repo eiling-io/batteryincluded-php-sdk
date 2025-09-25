@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace BatteryIncludedSdk\Product;
 
-use JsonSerializable;
-
-class CategoryDto implements JsonSerializable
+class CategoryDto implements \JsonSerializable
 {
     private array $categories;
 
@@ -20,6 +18,7 @@ class CategoryDto implements JsonSerializable
         $this->lastCategoryTreeString .= str_replace('>', '', $category);
 
         $this->categories[] = $this->lastCategoryTreeString;
+
         return $this;
     }
 
