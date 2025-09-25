@@ -9,9 +9,11 @@ use BatteryIncludedSdk\Client\CurlHttpClient;
 use BatteryIncludedSdk\Service\BrowseSearchStruct;
 use BatteryIncludedSdk\Service\BrowseService;
 use BatteryIncludedSdk\Service\Response;
+use BatteryIncludedSdk\Service\SyncService;
 use BatteryIncludedSdkTests\Helper;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\TextUI\Help;
 
 #[CoversClass(BrowseService::class)]
 #[CoversClass(ApiClient::class)]
@@ -54,7 +56,13 @@ class BrowseServiceTest extends TestCase
 
     public function testBrowseMethodAgainstLiveApi()
     {
-        $syncService = new BrowseService(Helper::getApiClient());
+        $products = Helper::generateProducts(20);
+        $apiClient = Helper::getApiClient();
+        $syncService = new SyncService($apiClient);
+
+        $result = $syncService->syncOneOrManyProducts(...$products);
+        $this->assertCount(240, $result->getBody());
+        $browseService = new BrowseService(Helper::getApiClient());
         $searchStruct = new BrowseSearchStruct();
         $searchStruct->addFilter('properties.Speicherkapazität', '512GB');
         $searchStruct->setSort('price:asc');
@@ -62,7 +70,7 @@ class BrowseServiceTest extends TestCase
         $searchStruct->addFilter('properties.Farbe', 'Schwarz');
         $searchStruct->addFilter('properties.Farbe', 'Blau');
         $searchStruct->setQuery('iPhone');
-        $result = $syncService->browse($searchStruct);
+        $result = $browseService->browse($searchStruct);
 
         $this->assertInstanceOf(Response::class, $result);
         $this->assertEquals($result->getBody()['found'], 2);
