@@ -6,12 +6,17 @@ namespace Service;
 
 use BatteryIncludedSdk\Client\ApiClient;
 use BatteryIncludedSdk\Client\CurlHttpClient;
+use BatteryIncludedSdk\Product\CategoryDto;
+use BatteryIncludedSdk\Product\ProductBaseDto;
+use BatteryIncludedSdk\Product\ProductPropertyDto;
+use BatteryIncludedSdk\Service\AbstractService;
 use BatteryIncludedSdk\Service\BrowseSearchStruct;
 use BatteryIncludedSdk\Service\BrowseService;
 use BatteryIncludedSdk\Service\Response;
 use BatteryIncludedSdk\Service\SyncService;
 use BatteryIncludedSdkTests\Helper;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(BrowseService::class)]
@@ -19,6 +24,11 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(CurlHttpClient::class)]
 #[CoversClass(BrowseSearchStruct::class)]
 #[CoversClass(Response::class)]
+#[UsesClass(CategoryDto::class)]
+#[UsesClass(ProductBaseDto::class)]
+#[UsesClass(ProductPropertyDto::class)]
+#[UsesClass(AbstractService::class)]
+#[UsesClass(SyncService::class)]
 class BrowseServiceTest extends TestCase
 {
     public function testBrowseCallsApiClientWithCorrectParameters()
