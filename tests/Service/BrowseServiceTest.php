@@ -13,7 +13,6 @@ use BatteryIncludedSdk\Service\SyncService;
 use BatteryIncludedSdkTests\Helper;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use PHPUnit\TextUI\Help;
 
 #[CoversClass(BrowseService::class)]
 #[CoversClass(ApiClient::class)]
