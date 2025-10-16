@@ -31,7 +31,8 @@ $browseService = new BrowseService($apiClient);
 $searchStruct = new BrowseSearchStruct();
 $searchStruct->setPerPage($_GET['per_page']);
 $searchStruct->setPage($_GET['page']);
-$searchStruct->addFilters($_GET['f'] ?? []); // f[][]=Gold
+$searchStruct->addFilters($_GET['f'] ?? []);
+$searchStruct->setQuery($_GET['q'] ?? ''); // f[][]=Gold
 $result = $browseService->browse($searchStruct);
 
 ?>
@@ -41,6 +42,7 @@ $result = $browseService->browse($searchStruct);
     <div class="row">
         <div class="col-md-3">
             <form method="get" action="index.php">
+                <input class="form-control" type="text" name="q" value="<?php echo $_GET['q']; ?>" />
                 <select class="form-select" aria-label="Default select example" name="per_page" onchange="this.form.submit()">
                     <option value="10">Pro Seite</option>
                     <option value="10" <?php echo $_GET['per_page'] === 10 ? 'selected' : ''; ?>>10</option>

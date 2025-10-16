@@ -13,6 +13,8 @@ use BatteryIncludedSdk\Service\AbstractService;
 use BatteryIncludedSdk\Service\BrowseResponse;
 use BatteryIncludedSdk\Service\BrowseSearchStruct;
 use BatteryIncludedSdk\Service\BrowseService;
+use BatteryIncludedSdk\Service\FacetDto;
+use BatteryIncludedSdk\Service\FacetValueDto;
 use BatteryIncludedSdk\Service\Response;
 use BatteryIncludedSdk\Service\SyncService;
 use BatteryIncludedSdkTests\Helper;
@@ -27,6 +29,8 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(BrowseSearchStruct::class)]
 #[CoversClass(Response::class)]
 #[UsesClass(CategoryDto::class)]
+#[UsesClass(FacetDto::class)]
+#[UsesClass(FacetValueDto::class)]
 #[UsesClass(ProductBaseDto::class)]
 #[UsesClass(ProductPropertyDto::class)]
 #[UsesClass(AbstractService::class)]
@@ -45,13 +49,18 @@ class BrowseServiceTest extends TestCase
         $searchStruct = new BrowseSearchStruct();
         $searchStruct->addFilter('properties.Speicherkapazität', '512GB');
         $searchStruct->setSort('price:asc');
-        $searchStruct->addFilter('categories', 'Apple > iPhone > iPhone 20 Pro');
+        $searchStruct->addFilter('categories', 'Apple > iPhone > iPhone 18 Pro');
         $searchStruct->addFilter('properties.Farbe', 'Schwarz');
         $searchStruct->addFilter('properties.Farbe', 'Blau');
-        // $searchStruct->setQuery('iPhone');
+        $searchStruct->setQuery('iPhone');
         $result = $browseService->browse($searchStruct);
 
+        $this->assertContainsOnlyInstancesOf(FacetDto::class, $result->getFacets());
+
         $this->assertInstanceOf(BrowseResponse::class, $result);
-        $this->assertEquals($result->getBody()['found'], 2);
+        $this->assertCount(2, $result->getHits());
+
+        $this->assertEquals($result->getPage(), 1);
+        $this->assertEquals($result->getPages(), 1);
     }
 }

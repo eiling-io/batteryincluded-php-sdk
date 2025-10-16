@@ -41,6 +41,23 @@ class BrowseSearchStructTest extends TestCase
         $this->assertSame($expected, $struct->getFilters());
     }
 
+    public function testAddFiltersAndGetFilters()
+    {
+        $struct = new BrowseSearchStruct();
+        $struct->addFilters(
+            [
+                'color' => ['red', 'blue'],
+                'size' => ['L'],
+            ]
+        );
+
+        $expected = [
+            'color' => ['red', 'blue'],
+            'size' => ['L'],
+        ];
+        $this->assertSame($expected, $struct->getFilters());
+    }
+
     public function testSetAndGetPerPage()
     {
         $struct = new BrowseSearchStruct();
