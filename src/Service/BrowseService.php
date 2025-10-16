@@ -12,7 +12,7 @@ class BrowseService
     {
     }
 
-    public function browse(BrowseSearchStruct $searchStruct): Response
+    public function browse(BrowseSearchStruct $searchStruct): BrowseResponse
     {
         $query = http_build_query(
             [
@@ -24,9 +24,11 @@ class BrowseService
             ]
         );
 
-        return $this->apiClient->getJson(
+        $response = $this->apiClient->getJson(
             '/documents/browse?' . $query,
             []
         );
+
+        return new BrowseResponse($response->getRawResponse(), $searchStruct);
     }
 }

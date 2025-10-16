@@ -16,8 +16,8 @@ class BrowseSearchStructTest extends TestCase
         $struct = new BrowseSearchStruct();
         $this->assertSame('', $struct->getQuery());
         $this->assertSame([], $struct->getFilters());
-        $this->assertSame(20, $struct->getPerPage());
-        $this->assertSame(0, $struct->getPage());
+        $this->assertSame(10, $struct->getPerPage());
+        $this->assertSame(1, $struct->getPage());
         $this->assertSame('price:desc', $struct->getSort());
     }
 

@@ -10,9 +10,9 @@ class BrowseSearchStruct
 
     protected string $query = '';
 
-    protected int $perPage = 20;
+    protected int $perPage = 10;
 
-    protected int $page = 0;
+    protected int $page = 1;
 
     protected string $sort = 'price:desc';
 
@@ -29,6 +29,15 @@ class BrowseSearchStruct
     public function addFilter(string $key, string $value): void
     {
         $this->filters[$key][] = $value;
+    }
+
+    public function addFilters(array $filters): void
+    {
+        foreach ($filters as $key => $values) {
+            foreach ($values as $value) {
+                $this->filters[$key][] = $value;
+            }
+        }
     }
 
     public function getFilters(): array

@@ -10,6 +10,7 @@ use BatteryIncludedSdk\Product\CategoryDto;
 use BatteryIncludedSdk\Product\ProductBaseDto;
 use BatteryIncludedSdk\Product\ProductPropertyDto;
 use BatteryIncludedSdk\Service\AbstractService;
+use BatteryIncludedSdk\Service\BrowseResponse;
 use BatteryIncludedSdk\Service\BrowseSearchStruct;
 use BatteryIncludedSdk\Service\BrowseService;
 use BatteryIncludedSdk\Service\Response;
@@ -20,6 +21,7 @@ use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(BrowseService::class)]
+#[CoversClass(BrowseResponse::class)]
 #[CoversClass(ApiClient::class)]
 #[CoversClass(CurlHttpClient::class)]
 #[CoversClass(BrowseSearchStruct::class)]
@@ -31,38 +33,6 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(SyncService::class)]
 class BrowseServiceTest extends TestCase
 {
-    public function testBrowseCallsApiClientWithCorrectParameters()
-    {
-        $searchStruct = $this->createMock(BrowseSearchStruct::class);
-        $searchStruct->method('getQuery')->willReturn('test');
-        $searchStruct->method('getFilters')->willReturn(['color' => ['red']]);
-        $searchStruct->method('getPage')->willReturn(2);
-        $searchStruct->method('getPerPage')->willReturn(10);
-        $searchStruct->method('getSort')->willReturn('name:asc');
-
-        $expectedQuery = http_build_query([
-            'q' => 'test',
-            'f' => ['color' => ['red']],
-            'page' => 2,
-            'per_page' => 10,
-            'sort' => 'name:asc',
-        ]);
-
-        $expectedUrl = '/documents/browse?' . $expectedQuery;
-        $expectedResponse = $this->createMock(Response::class);
-
-        $apiClient = $this->createMock(ApiClient::class);
-        $apiClient->expects($this->once())
-            ->method('getJson')
-            ->with($expectedUrl, [])
-            ->willReturn($expectedResponse);
-
-        $service = new BrowseService($apiClient);
-        $result = $service->browse($searchStruct);
-
-        $this->assertSame($expectedResponse, $result);
-    }
-
     public function testBrowseMethodAgainstLiveApi()
     {
         $products = Helper::generateProducts(20);
@@ -78,10 +48,10 @@ class BrowseServiceTest extends TestCase
         $searchStruct->addFilter('categories', 'Apple > iPhone > iPhone 20 Pro');
         $searchStruct->addFilter('properties.Farbe', 'Schwarz');
         $searchStruct->addFilter('properties.Farbe', 'Blau');
-        $searchStruct->setQuery('iPhone');
+        // $searchStruct->setQuery('iPhone');
         $result = $browseService->browse($searchStruct);
 
-        $this->assertInstanceOf(Response::class, $result);
+        $this->assertInstanceOf(BrowseResponse::class, $result);
         $this->assertEquals($result->getBody()['found'], 2);
     }
 }

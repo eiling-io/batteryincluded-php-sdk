@@ -43,7 +43,7 @@ class Helper
                         (new ProductPropertyDto())
                             ->addProperty('Farbe', $color)
                             ->addProperty('Speicherkapazität', $storage)
-                            ->addProperty('Displaygröße', '6,1 Zoll')
+                            ->addProperty('Displaygröße', '6,1')
                     );
                     $product->addCategory(
                         (new CategoryDto())->addCategoryNode('Apple')->addCategoryNode('iPhone')->addCategoryNode(
