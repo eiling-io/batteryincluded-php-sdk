@@ -97,6 +97,7 @@ foreach ($result->getHits() as $hit) {
           <div class="card-body">
             <h5 class="card-title">' . $data['name'] . '</h5>
             <p class="card-text">' . $data['description'] . '</p>
+            <p class="card-text">' . $data['price'] . ' €</p>
             <a href="#" class="btn btn-primary">Zum Artikel</a>
           </div>
         </div>
