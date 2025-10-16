@@ -51,6 +51,7 @@ class SyncServiceTest extends TestCase
         $apiClient = Helper::getApiClient();
         $syncService = new SyncService($apiClient);
         $transactionId = 'Transaction_' . time();
+        $productSlice = [];
 
         foreach (array_chunk($products, 10) as $productSlice) {
             $result = $syncService->syncFullBatch($transactionId, false, ...$productSlice);

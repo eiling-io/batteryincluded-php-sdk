@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Service;
+namespace BatteryIncludedSdkTests\Shop;
 
 use BatteryIncludedSdk\Client\ApiClient;
 use BatteryIncludedSdk\Client\CurlHttpClient;
@@ -10,13 +10,13 @@ use BatteryIncludedSdk\Product\CategoryDto;
 use BatteryIncludedSdk\Product\ProductBaseDto;
 use BatteryIncludedSdk\Product\ProductPropertyDto;
 use BatteryIncludedSdk\Service\AbstractService;
-use BatteryIncludedSdk\Service\BrowseResponse;
-use BatteryIncludedSdk\Service\BrowseSearchStruct;
-use BatteryIncludedSdk\Service\BrowseService;
-use BatteryIncludedSdk\Service\FacetDto;
-use BatteryIncludedSdk\Service\FacetValueDto;
 use BatteryIncludedSdk\Service\Response;
 use BatteryIncludedSdk\Service\SyncService;
+use BatteryIncludedSdk\Shop\BrowseResponse;
+use BatteryIncludedSdk\Shop\BrowseSearchStruct;
+use BatteryIncludedSdk\Shop\BrowseService;
+use BatteryIncludedSdk\Shop\FacetDto;
+use BatteryIncludedSdk\Shop\FacetValueDto;
 use BatteryIncludedSdkTests\Helper;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;

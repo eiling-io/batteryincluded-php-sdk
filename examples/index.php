@@ -12,8 +12,8 @@
 
 use BatteryIncludedSdk\Client\ApiClient;
 use BatteryIncludedSdk\Client\CurlHttpClient;
-use BatteryIncludedSdk\Service\BrowseSearchStruct;
-use BatteryIncludedSdk\Service\BrowseService;
+use BatteryIncludedSdk\Shop\BrowseSearchStruct;
+use BatteryIncludedSdk\Shop\BrowseService;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/credentials.php';

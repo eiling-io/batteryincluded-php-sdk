@@ -12,7 +12,7 @@ help:
 ddev-quality:     ## executes all quality scripts in the running ddev container
 ddev-quality:
 	ddev exec -s web "PHP_CS_FIXER_IGNORE_ENV=true ./tools/php-cs-fixer fix --config=.php-cs-fixer.php"
-	ddev exec -s web "./tools/phpstan analyse -l 5 ./src/"
+	ddev exec -s web "./tools/phpstan analyse -l 5 ./src/ ./tests/"
 	ddev exec -s web "./vendor/bin/phpunit --stop-on-failure --stop-on-error --coverage-html=./build/artifacts/html-coverage"
 
 
@@ -24,7 +24,7 @@ ddev-cs:
 .PHONY: ddev-phpstan
 ddev-phpstan:     ## executes phpstan scripts in the running ddev container
 ddev-phpstan:
-	ddev exec -s web "./tools/phpstan analyse -l 5 ./src/"
+	ddev exec -s web "./tools/phpstan analyse -l 5 ./src/ ./tests/"
 
 .PHONY: ddev-unit
 ddev-unit:     ## executes php unit in the running ddev container

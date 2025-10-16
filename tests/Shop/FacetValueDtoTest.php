@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Service;
+namespace BatteryIncludedSdkTests\Shop;
 
-use BatteryIncludedSdk\Service\FacetValueDto;
+use BatteryIncludedSdk\Shop\FacetValueDto;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 

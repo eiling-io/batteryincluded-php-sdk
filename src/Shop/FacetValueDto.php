@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace BatteryIncludedSdk\Service;
+namespace BatteryIncludedSdk\Shop;
 
 class FacetValueDto
 {

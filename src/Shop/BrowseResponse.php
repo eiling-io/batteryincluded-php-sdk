@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
-namespace BatteryIncludedSdk\Service;
+namespace BatteryIncludedSdk\Shop;
+
+use BatteryIncludedSdk\Service\Response;
 
 class BrowseResponse extends Response
 {

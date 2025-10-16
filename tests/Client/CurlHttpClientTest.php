@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Service;
+namespace BatteryIncludedSdkTests\Client;
 
 use BatteryIncludedSdk\Client\CurlHttpClient;
 use BatteryIncludedSdk\Service\Response;
