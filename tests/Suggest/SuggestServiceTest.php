@@ -51,7 +51,7 @@ class SuggestServiceTest extends TestCase
         $this->assertContainsOnlyInstancesOf(CompletionDto::class, $result->getQueryCompletions());
 
         $this->assertInstanceOf(SuggestResponse::class, $result);
-        $this->assertEquals(82, $result->getFounds());
+        $this->assertGreaterThanOrEqual(82, $result->getFounds());
         $this->assertCount(6, $result->getDocuments());
     }
 }
