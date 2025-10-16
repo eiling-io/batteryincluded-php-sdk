@@ -33,10 +33,10 @@ class BrowseResponse extends Response
                 case 'select':
                     $result[] = new FacetSelectDto($facet, $this->searchStruct->getFilters());
                     break;
-                // @codeCoverageIgnoreStart
+                    // @codeCoverageIgnoreStart
                 default:
                     throw new \RuntimeException($facet['type'] . ' facets are not implemented yet.');
-                // @codeCoverageIgnoreEnd
+                    // @codeCoverageIgnoreEnd
             }
         }
 
