@@ -60,6 +60,8 @@ class BrowseServiceTest extends TestCase
         $this->assertInstanceOf(BrowseResponse::class, $result);
         $this->assertCount(2, $result->getHits());
 
+        $this->assertEquals(2, $result->getFound());
+
         $this->assertEquals($result->getPage(), 1);
         $this->assertEquals($result->getPages(), 1);
     }

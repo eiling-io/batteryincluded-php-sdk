@@ -32,9 +32,14 @@ class BrowseResponse extends Response
         return $result;
     }
 
+    public function getFound(): int
+    {
+        return (int)$this->getBody()['found'];
+    }
+
     public function getPages(): int
     {
-        return (int) ceil($this->getBody()['found'] / $this->searchStruct->getPerPage());
+        return (int)ceil($this->getBody()['found'] / $this->searchStruct->getPerPage());
     }
 
     public function getPage(): int
