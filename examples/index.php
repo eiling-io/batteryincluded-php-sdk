@@ -38,7 +38,7 @@ $result = $browseService->browse($searchStruct);
 ?>
 <div class="container-fluid">
 
-    <h1>BatteryIncludedSdk (<?= $result->getFound() ?>)</h1>
+    <h1>BatteryIncludedSdk (<?php echo $result->getFound(); ?>)</h1>
     <div class="row">
         <div class="col-md-3">
             <form method="get" action="index.php">
