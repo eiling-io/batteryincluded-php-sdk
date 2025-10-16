@@ -26,7 +26,18 @@ class BrowseResponse extends Response
         $result = [];
         $facets = $this->getBody()['facet_counts'];
         foreach ($facets as $facet) {
-            $result[] = new FacetDto($facet, $this->searchStruct->getFilters());
+            switch ($facet['type']) {
+                case 'range':
+                    $result[] = new FacetRangeDto($facet, $this->searchStruct->getFilters());
+                    break;
+                case 'select':
+                    $result[] = new FacetSelectDto($facet, $this->searchStruct->getFilters());
+                    break;
+                // @codeCoverageIgnoreStart
+                default:
+                    throw new \RuntimeException($facet['type'] . ' facets are not implemented yet.');
+                // @codeCoverageIgnoreEnd
+            }
         }
 
         return $result;

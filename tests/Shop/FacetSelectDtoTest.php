@@ -2,16 +2,18 @@
 
 declare(strict_types=1);
 
-namespace BatteryIncludedSdkTests\Shop;
+namespace Shop;
 
 use BatteryIncludedSdk\Shop\FacetDto;
+use BatteryIncludedSdk\Shop\FacetSelectDto;
 use BatteryIncludedSdk\Shop\FacetValueDto;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(FacetDto::class)]
+#[CoversClass(FacetSelectDto::class)]
 #[CoversClass(FacetValueDto::class)]
-class FacetDtoTest extends TestCase
+class FacetSelectDtoTest extends TestCase
 {
     public function testFacetDtoInitialization()
     {
@@ -28,14 +30,18 @@ class FacetDtoTest extends TestCase
         ];
         $appliedFilterValues = ['properties.Farbe' => ['Rosa']];
 
-        $facetDto = new FacetDto($data, $appliedFilterValues);
+        $facetDto = new FacetSelectDto($data, $appliedFilterValues);
 
         $this->assertEquals('Farbe', $facetDto->getFieldLabel());
         $this->assertEquals('', $facetDto->getFieldUnit());
         $this->assertEquals('properties.Farbe', $facetDto->getFieldName());
         $this->assertEquals(['total_values' => 2], $facetDto->getStats());
         $this->assertTrue($facetDto->isChecked());
-        $this->assertEquals('select', $facetDto->getType());
+
+        $values = $facetDto->getValues();
+        $this->assertArrayHasKey('Rosa', $values);
+        $this->assertArrayHasKey('Blau', $values);
+        $this->assertCount(2, $values);
     }
 
     public function testSetChecked()
@@ -49,7 +55,7 @@ class FacetDtoTest extends TestCase
             'field_unit' => '',
         ];
 
-        $facetDto = new FacetDto($data);
+        $facetDto = new FacetSelectDto($data);
         $this->assertFalse($facetDto->isChecked());
 
         $this->assertEquals('properties.Farbe', $facetDto->getFieldLabel());

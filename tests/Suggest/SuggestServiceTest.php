@@ -13,6 +13,8 @@ use BatteryIncludedSdk\Service\AbstractService;
 use BatteryIncludedSdk\Service\Response;
 use BatteryIncludedSdk\Service\SyncService;
 use BatteryIncludedSdk\Shop\FacetDto;
+use BatteryIncludedSdk\Shop\FacetRangeDto;
+use BatteryIncludedSdk\Shop\FacetSelectDto;
 use BatteryIncludedSdk\Shop\FacetValueDto;
 use BatteryIncludedSdk\Suggest\CompletionDto;
 use BatteryIncludedSdk\Suggest\SuggestResponse;
@@ -30,6 +32,8 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(Response::class)]
 #[UsesClass(CategoryDto::class)]
 #[UsesClass(FacetDto::class)]
+#[UsesClass(FacetRangeDto::class)]
+#[UsesClass(FacetSelectDto::class)]
 #[UsesClass(FacetValueDto::class)]
 #[UsesClass(ProductBaseDto::class)]
 #[UsesClass(ProductPropertyDto::class)]
