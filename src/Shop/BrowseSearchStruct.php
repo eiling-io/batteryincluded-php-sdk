@@ -34,8 +34,8 @@ class BrowseSearchStruct
     public function addFilters(array $filters): void
     {
         foreach ($filters as $key => $values) {
-            foreach ($values as $value) {
-                $this->filters[$key][] = $value;
+            foreach ($values as $arrayKey => $value) {
+                $this->filters[$key][$arrayKey] = $value;
             }
         }
     }
