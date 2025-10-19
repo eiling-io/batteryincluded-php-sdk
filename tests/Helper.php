@@ -31,7 +31,8 @@ class Helper
                     $product->setId((string) $id);
                     $product->setOrdernumber('AP-00' . $i . '-' . $color . '-' . $storage);
                     $product->setPrice(1000 + $id);
-                    $product->setInstock(50);
+                    $product->setInstock(rand(0, 50));
+                    $product->setRating((float) (mt_rand(1, 10) / 2));
                     $product->setManufacture('Apple');
                     $product->setManufactureNumber('A' . $i . '-' . $color . '-' . $storage);
                     $product->setEan('195950639292');

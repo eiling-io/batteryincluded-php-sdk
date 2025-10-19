@@ -35,7 +35,7 @@ class BrowseResponse extends Response
                     break;
                     // @codeCoverageIgnoreStart
                 default:
-                    throw new \RuntimeException($facet['type'] . ' facets are not implemented yet.');
+                    $result[] = new FacetRatingDto($facet, $this->searchStruct->getFilters());
                     // @codeCoverageIgnoreEnd
             }
         }

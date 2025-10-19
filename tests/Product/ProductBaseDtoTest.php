@@ -28,7 +28,7 @@ class ProductBaseDtoTest extends TestCase
         $dto->setShopUrl('http://shop');
         $dto->setPrice(9.99);
         $dto->setInstock(5);
-
+        $dto->setRating(2.5);
         $this->assertSame('123', $dto->getId());
         $this->assertSame('Testprodukt', $dto->getName());
         $this->assertSame('Beschreibung', $dto->getDescription());
@@ -40,6 +40,7 @@ class ProductBaseDtoTest extends TestCase
         $this->assertSame('http://shop', $dto->getShopUrl());
         $this->assertSame(9.99, $dto->getPrice());
         $this->assertSame(5, $dto->getInstock());
+        $this->assertSame(2.5, $dto->getRating());
     }
 
     public function testCategories()

@@ -26,13 +26,14 @@ $apiClient = new ApiClient(
 
 $_GET['per_page'] = (int) ($_GET['per_page'] ?? 10);
 $_GET['page'] = (int) ($_GET['page'] ?? 10);
+$_GET['q'] = $_GET['q'] ?? '';
 
 $browseService = new BrowseService($apiClient);
 $searchStruct = new BrowseSearchStruct();
 $searchStruct->setPerPage($_GET['per_page']);
 $searchStruct->setPage($_GET['page']);
 $searchStruct->addFilters($_GET['f'] ?? []);
-$searchStruct->setQuery($_GET['q'] ?? ''); // f[][]=Gold
+$searchStruct->setQuery($_GET['q']); // f[][]=Gold
 $result = $browseService->browse($searchStruct);
 
 ?>
@@ -42,7 +43,7 @@ $result = $browseService->browse($searchStruct);
     <div class="row">
         <div class="col-md-3">
             <form method="get" action="index.php">
-                <input class="form-control" type="text" name="q" value="<?php echo $_GET['q']; ?>" />
+                <input class="form-control" type="text" name="q" value="<?php echo $_GET['q']; ?>" onchange="this.form.submit()"/>
                 <select class="form-select" aria-label="Default select example" name="per_page" onchange="this.form.submit()">
                     <option value="10">Pro Seite</option>
                     <option value="10" <?php echo $_GET['per_page'] === 10 ? 'selected' : ''; ?>>10</option>
@@ -61,15 +62,26 @@ $result = $browseService->browse($searchStruct);
 foreach ($result->getFacets() as $facet) {
     echo '<h3>' . $facet->getFieldLabel() . '</h3>';
     if ($facet->getType() === 'range') {
-        // [price][from]=990&f[price][till]=1000
         echo '<div class="form-check">';
         echo '<input class="form-control" type="input" name="f[' . $facet->getFieldName() . '][from]" value="' . $facet->getSelectedMin() . '" onchange="this.form.submit()">';
         echo '</div>';
         echo '<div class="form-check">';
         echo '<input class="form-control" type="input" name="f[' . $facet->getFieldName() . '][till]" value="' . $facet->getSelectedMax() . '" onchange="this.form.submit()">';
         echo '</div>';
-    } else {
+    } elseif ($facet->getType() === 'select') {
         foreach ($facet->getValues() as $valueName => $valueObject) {
+            $isChecked = $valueObject->isChecked();
+            $count = $valueObject->getCount();
+            $value = $valueObject->getName();
+            echo '<div class="form-check">';
+            echo '<input class="form-check-input" type="checkbox" name="f[' . $facet->getFieldName() . '][]" value="' . $value . '" id="' . $facet->getFieldName() . '_' . $value . '" ' . ($isChecked ? 'checked' : '') . ' onchange="this.form.submit()">';
+            echo '<label class="form-check-label" for="' . $facet->getFieldName() . '_' . $value . '">';
+            echo $value . ' ' . $facet->getFieldUnit() . ' (' . $count . ')';
+            echo '</label>';
+            echo '</div>';
+        }
+    } elseif ($facet->getType() === 'rating') {
+        foreach ($facet->getRatings() as $valueName => $valueObject) {
             $isChecked = $valueObject->isChecked();
             $count = $valueObject->getCount();
             $value = $valueObject->getName();

@@ -28,6 +28,8 @@ class ProductBaseDto implements \JsonSerializable
 
     private ?int $instock = null;
 
+    private ?float $rating = null;
+
     private array $categories = [];
 
     private ?ProductPropertyDto $properties = null;
@@ -142,6 +144,16 @@ class ProductBaseDto implements \JsonSerializable
         $this->instock = $instock;
     }
 
+    public function getRating(): ?float
+    {
+        return $this->rating;
+    }
+
+    public function setRating(?float $rating): void
+    {
+        $this->rating = $rating;
+    }
+
     public function getCategories(): ?array
     {
         if (count(array_values(array_unique($this->categories))) === 0) {
@@ -180,6 +192,7 @@ class ProductBaseDto implements \JsonSerializable
             'shopUrl' => $this->getShopUrl(),
             'price' => $this->getPrice(),
             'instock' => $this->getInstock(),
+            'rating' => $this->getRating(),
             'categories' => $this->getCategories(),
             'properties' => $this->getProperties(),
         ];
