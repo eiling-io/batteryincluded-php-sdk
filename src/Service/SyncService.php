@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace BatteryIncludedSdk\Service;
 
 use BatteryIncludedSdk\Client\ApiClient;
-use BatteryIncludedSdk\Product\ProductBaseDto;
+use BatteryIncludedSdk\Dto\AbstractDto;
 
 class SyncService extends AbstractService
 {
@@ -13,20 +13,20 @@ class SyncService extends AbstractService
     {
     }
 
-    public function syncOneOrManyProducts(ProductBaseDto ...$products): Response
+    public function syncOneOrManyElements(AbstractDto ...$dto): Response
     {
-        $json = $this->generateNDJSON($products);
+        $json = $this->generateNDJSON($dto);
 
         return $this->apiClient->postNDJson('/documents/import', $json);
     }
 
     /**
-     * not included products will be deleted from the index
+     * not included elements will be deleted from the index
      * @throws \Exception
      */
-    public function syncFull(ProductBaseDto ...$products): Response
+    public function syncFullElements(AbstractDto ...$dto): Response
     {
-        $json = $this->generateNDJSON($products);
+        $json = $this->generateNDJSON($dto);
 
         return $this->apiClient->postNDJson('/documents/import?full=1', $json);
     }
@@ -39,9 +39,9 @@ class SyncService extends AbstractService
      * @param bool $finished If 1, drop all data that is not related to the given transactionId
      * @throws \Exception
      */
-    public function syncFullBatch(string $transactionId, bool $finished = false, ProductBaseDto ...$products): Response
+    public function syncFullBatchElements(string $transactionId, bool $finished = false, AbstractDto ...$dto): Response
     {
-        $json = $this->generateNDJSON($products);
+        $json = $this->generateNDJSON($dto);
         $apiUrl = '/documents/import?transactionId=' . $transactionId;
 
         if ($finished) {
@@ -51,15 +51,15 @@ class SyncService extends AbstractService
         return $this->apiClient->postNDJson($apiUrl, $json);
     }
 
-    public function partialUpdateOneOrManyProducts(ProductBaseDto ...$products): Response
+    public function partialUpdateOneOrManyElements(AbstractDto ...$dto): Response
     {
-        $json = $this->generateNDJSON($products);
+        $json = $this->generateNDJSON($dto);
 
         return $this->apiClient->patchNDJson('/documents/update', $json);
     }
 
-    public function deleteProductsByIds(string ...$productIds): Response
+    public function deleteElementsByIds(string ...$elementIds): Response
     {
-        return $this->apiClient->deleteJson('/documents/delete', json_encode($productIds));
+        return $this->apiClient->deleteJson('/documents/delete', json_encode($elementIds));
     }
 }

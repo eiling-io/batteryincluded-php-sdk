@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace BatteryIncludedSdkTests\Product;
+namespace BatteryIncludedSdkTests\Dto;
 
-use BatteryIncludedSdk\Product\CategoryDto;
-use BatteryIncludedSdk\Product\ProductBaseDto;
-use BatteryIncludedSdk\Product\ProductPropertyDto;
+use BatteryIncludedSdk\Dto\CategoryDto;
+use BatteryIncludedSdk\Dto\ProductBaseDto;
+use BatteryIncludedSdk\Dto\ProductPropertyDto;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -15,7 +15,7 @@ class ProductBaseDtoTest extends TestCase
 {
     public function testSettersAndGetters()
     {
-        $dto = new ProductBaseDto();
+        $dto = new ProductBaseDto('123', 'PRODUCT');
 
         $dto->setId('123');
         $dto->setName('Testprodukt');
@@ -30,6 +30,7 @@ class ProductBaseDtoTest extends TestCase
         $dto->setInstock(5);
         $dto->setRating(2.5);
         $this->assertSame('123', $dto->getId());
+        $this->assertSame('PRODUCT-123', $dto->getIdentifier());
         $this->assertSame('Testprodukt', $dto->getName());
         $this->assertSame('Beschreibung', $dto->getDescription());
         $this->assertSame('A1', $dto->getOrdernumber());
@@ -45,7 +46,7 @@ class ProductBaseDtoTest extends TestCase
 
     public function testCategories()
     {
-        $dto = new ProductBaseDto();
+        $dto = new ProductBaseDto('1', 'PRODUCT');
         $this->assertNull($dto->getCategories());
 
         $cat = $this->createMock(CategoryDto::class);
@@ -57,7 +58,7 @@ class ProductBaseDtoTest extends TestCase
 
     public function testProperties()
     {
-        $dto = new ProductBaseDto();
+        $dto = new ProductBaseDto('id', 'PRODUCT');
         $this->assertNull($dto->getProperties());
 
         $prop = $this->createMock(ProductPropertyDto::class);
@@ -67,8 +68,10 @@ class ProductBaseDtoTest extends TestCase
 
     public function testJsonSerialize()
     {
-        $dto = new ProductBaseDto();
-        $dto->setId('1');
+        $id = '1';
+        $type = 'PRODUCT';
+        $dto = new ProductBaseDto($id, $type);
+        $dto->setId($id);
         $dto->setName('Name');
         $dto->setPrice(1.5);
 
@@ -77,10 +80,14 @@ class ProductBaseDtoTest extends TestCase
         $dto->addCategory($cat);
 
         $expected = [
-            'id' => '1',
-            'name' => 'Name',
-            'price' => 1.5,
-            'categories' => ['A'],
+            'id' => $type . '-' . $id,
+            'type' => $type,
+            '_' . $type => [
+                'id' => '1',
+                'name' => 'Name',
+                'price' => 1.5,
+                'categories' => ['A'],
+            ],
         ];
 
         $this->assertSame($expected, $dto->jsonSerialize());

@@ -6,9 +6,9 @@ namespace BatteryIncludedSdkTests\Shop;
 
 use BatteryIncludedSdk\Client\ApiClient;
 use BatteryIncludedSdk\Client\CurlHttpClient;
-use BatteryIncludedSdk\Product\CategoryDto;
-use BatteryIncludedSdk\Product\ProductBaseDto;
-use BatteryIncludedSdk\Product\ProductPropertyDto;
+use BatteryIncludedSdk\Dto\CategoryDto;
+use BatteryIncludedSdk\Dto\ProductBaseDto;
+use BatteryIncludedSdk\Dto\ProductPropertyDto;
 use BatteryIncludedSdk\Service\AbstractService;
 use BatteryIncludedSdk\Service\Response;
 use BatteryIncludedSdk\Service\SyncService;
@@ -49,15 +49,15 @@ class BrowseServiceTest extends TestCase
         $apiClient = Helper::getApiClient();
         $syncService = new SyncService($apiClient);
 
-        $result = $syncService->syncOneOrManyProducts(...$products);
+        $result = $syncService->syncOneOrManyElements(...$products);
         $this->assertCount(240, $result->getBody());
         $browseService = new BrowseService(Helper::getApiClient());
         $searchStruct = new BrowseSearchStruct();
-        $searchStruct->addFilter('properties.Speicherkapazität', '512GB');
-        $searchStruct->setSort('price:asc');
-        $searchStruct->addFilter('categories', 'Apple > iPhone > iPhone 18 Pro');
-        $searchStruct->addFilter('properties.Farbe', 'Schwarz');
-        $searchStruct->addFilter('properties.Farbe', 'Blau');
+        $searchStruct->addFilter('_PRODUCT.properties.Speicherkapazität', '512GB');
+        $searchStruct->setSort('_PRODUCT.price:asc');
+        $searchStruct->addFilter('_PRODUCT.categories', 'Apple > iPhone > iPhone 18 Pro');
+        $searchStruct->addFilter('_PRODUCT.properties.Farbe', 'Schwarz');
+        $searchStruct->addFilter('_PRODUCT.properties.Farbe', 'Blau');
         $searchStruct->setQuery('iPhone');
         $result = $browseService->browse($searchStruct);
 

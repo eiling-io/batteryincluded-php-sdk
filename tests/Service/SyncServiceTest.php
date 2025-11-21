@@ -6,9 +6,9 @@ namespace BatteryIncludedSdkTests\Service;
 
 use BatteryIncludedSdk\Client\ApiClient;
 use BatteryIncludedSdk\Client\CurlHttpClient;
-use BatteryIncludedSdk\Product\CategoryDto;
-use BatteryIncludedSdk\Product\ProductBaseDto;
-use BatteryIncludedSdk\Product\ProductPropertyDto;
+use BatteryIncludedSdk\Dto\CategoryDto;
+use BatteryIncludedSdk\Dto\ProductBaseDto;
+use BatteryIncludedSdk\Dto\ProductPropertyDto;
 use BatteryIncludedSdk\Service\Response;
 use BatteryIncludedSdk\Service\SyncService;
 use BatteryIncludedSdkTests\Helper;
@@ -31,7 +31,7 @@ class SyncServiceTest extends TestCase
         $apiClient = Helper::getApiClient();
         $syncService = new SyncService($apiClient);
 
-        $result = $syncService->syncOneOrManyProducts(...$products);
+        $result = $syncService->syncOneOrManyElements(...$products);
         $this->assertCount(240, $result->getBody());
     }
 
@@ -41,7 +41,7 @@ class SyncServiceTest extends TestCase
         $apiClient = Helper::getApiClient();
         $syncService = new SyncService($apiClient);
 
-        $result = $syncService->syncFull(...$products);
+        $result = $syncService->syncFullElements(...$products);
         $this->assertCount(240, $result->getBody());
     }
 
@@ -54,24 +54,24 @@ class SyncServiceTest extends TestCase
         $productSlice = [];
 
         foreach (array_chunk($products, 10) as $productSlice) {
-            $result = $syncService->syncFullBatch($transactionId, false, ...$productSlice);
+            $result = $syncService->syncFullBatchElements($transactionId, false, ...$productSlice);
             $this->assertCount(10, $result->getBody());
         }
 
-        $result = $syncService->syncFullBatch($transactionId, true, ...$productSlice);
+        $result = $syncService->syncFullBatchElements($transactionId, true, ...$productSlice);
 
         $this->assertCount(10, $result->getBody());
     }
 
     public function testPartialUpdate()
     {
-        $product = new ProductBaseDto();
+        $product = new ProductBaseDto('239');
         $product->setId('239');
         $product->setPrice(13337.95);
         $apiClient = Helper::getApiClient();
         $syncService = new SyncService($apiClient);
 
-        $result = $syncService->partialUpdateOneOrManyProducts($product);
+        $result = $syncService->partialUpdateOneOrManyElements($product);
 
         $this->assertCount(1, $result->getBody());
     }
@@ -82,7 +82,7 @@ class SyncServiceTest extends TestCase
         $apiClient = Helper::getApiClient();
         $syncService = new SyncService($apiClient);
 
-        $result = $syncService->deleteProductsByIds('240', '2');
+        $result = $syncService->deleteElementsByIds('PRODUCT-240', 'PRODUCT-2');
 
         $this->assertEquals(2, $result->getBody()['num_deleted']);
     }

@@ -52,47 +52,47 @@ $result = $browseService->browse($searchStruct);
                 </select>
                 <select class="form-select" aria-label="Default select example" name="page" onchange="this.form.submit()">
                     <?php
-                        foreach (range(1, $result->getPages()) as $page) {
-                            echo '<option value="' . $page . '" ' . ($result->getPage() === $page ? 'selected' : '') . '>' . $page . '</option>';
-                        }
+                    foreach (range(1, $result->getPages()) as $page) {
+                        echo '<option value="' . $page . '" ' . ($result->getPage() === $page ? 'selected' : '') . '>' . $page . '</option>';
+                    }
 ?>
                 </select>
                 <?php
-foreach ($result->getFacets() as $facet) {
-    echo '<h3>' . $facet->getFieldLabel() . '</h3>';
-    if ($facet->getType() === 'range') {
-        echo '<div class="form-check">';
-        echo '<input class="form-control" type="input" name="f[' . $facet->getFieldName() . '][from]" value="' . $facet->getSelectedMin() . '" onchange="this.form.submit()">';
-        echo '</div>';
-        echo '<div class="form-check">';
-        echo '<input class="form-control" type="input" name="f[' . $facet->getFieldName() . '][till]" value="' . $facet->getSelectedMax() . '" onchange="this.form.submit()">';
-        echo '</div>';
-    } elseif ($facet->getType() === 'select') {
-        foreach ($facet->getValues() as $valueName => $valueObject) {
-            $isChecked = $valueObject->isChecked();
-            $count = $valueObject->getCount();
-            $value = $valueObject->getName();
-            echo '<div class="form-check">';
-            echo '<input class="form-check-input" type="checkbox" name="f[' . $facet->getFieldName() . '][]" value="' . $value . '" id="' . $facet->getFieldName() . '_' . $value . '" ' . ($isChecked ? 'checked' : '') . ' onchange="this.form.submit()">';
-            echo '<label class="form-check-label" for="' . $facet->getFieldName() . '_' . $value . '">';
-            echo $value . ' ' . $facet->getFieldUnit() . ' (' . $count . ')';
-            echo '</label>';
-            echo '</div>';
-        }
-    } elseif ($facet->getType() === 'rating') {
-        foreach ($facet->getRatings() as $valueName => $valueObject) {
-            $isChecked = $valueObject->isChecked();
-            $count = $valueObject->getCount();
-            $value = $valueObject->getName();
-            echo '<div class="form-check">';
-            echo '<input class="form-check-input" type="checkbox" name="f[' . $facet->getFieldName() . '][]" value="' . $value . '" id="' . $facet->getFieldName() . '_' . $value . '" ' . ($isChecked ? 'checked' : '') . ' onchange="this.form.submit()">';
-            echo '<label class="form-check-label" for="' . $facet->getFieldName() . '_' . $value . '">';
-            echo $value . ' ' . $facet->getFieldUnit() . ' (' . $count . ')';
-            echo '</label>';
-            echo '</div>';
-        }
-    }
-}
+                foreach ($result->getFacets() as $facet) {
+                    echo '<h3>' . $facet->getFieldLabel() . '</h3>';
+                    if ($facet->getType() === 'range') {
+                        echo '<div class="form-check">';
+                        echo '<input class="form-control" type="input" name="f[' . $facet->getFieldName() . '][from]" value="' . $facet->getSelectedMin() . '" onchange="this.form.submit()">';
+                        echo '</div>';
+                        echo '<div class="form-check">';
+                        echo '<input class="form-control" type="input" name="f[' . $facet->getFieldName() . '][till]" value="' . $facet->getSelectedMax() . '" onchange="this.form.submit()">';
+                        echo '</div>';
+                    } elseif ($facet->getType() === 'select') {
+                        foreach ($facet->getValues() as $valueName => $valueObject) {
+                            $isChecked = $valueObject->isChecked();
+                            $count = $valueObject->getCount();
+                            $value = $valueObject->getName();
+                            echo '<div class="form-check">';
+                            echo '<input class="form-check-input" type="checkbox" name="f[' . $facet->getFieldName() . '][]" value="' . $value . '" id="' . $facet->getFieldName() . '_' . $value . '" ' . ($isChecked ? 'checked' : '') . ' onchange="this.form.submit()">';
+                            echo '<label class="form-check-label" for="' . $facet->getFieldName() . '_' . $value . '">';
+                            echo $value . ' ' . $facet->getFieldUnit() . ' (' . $count . ')';
+                            echo '</label>';
+                            echo '</div>';
+                        }
+                    } elseif ($facet->getType() === 'rating') {
+                        foreach ($facet->getRatings() as $valueName => $valueObject) {
+                            $isChecked = $valueObject->isChecked();
+                            $count = $valueObject->getCount();
+                            $value = $valueObject->getName();
+                            echo '<div class="form-check">';
+                            echo '<input class="form-check-input" type="checkbox" name="f[' . $facet->getFieldName() . '][]" value="' . $value . '" id="' . $facet->getFieldName() . '_' . $value . '" ' . ($isChecked ? 'checked' : '') . ' onchange="this.form.submit()">';
+                            echo '<label class="form-check-label" for="' . $facet->getFieldName() . '_' . $value . '">';
+                            echo $value . ' ' . $facet->getFieldUnit() . ' (' . $count . ')';
+                            echo '</label>';
+                            echo '</div>';
+                        }
+                    }
+                }
 ?>
             </form>
         </div>

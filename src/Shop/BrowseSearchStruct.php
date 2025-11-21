@@ -14,7 +14,7 @@ class BrowseSearchStruct
 
     protected int $page = 1;
 
-    protected string $sort = 'price:desc';
+    protected string $sort = '_PRODUCT.price:desc';
 
     public function setQuery(string $query): void
     {

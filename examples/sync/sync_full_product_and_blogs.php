@@ -1,13 +1,17 @@
 <?php
+
 declare(strict_types=1);
 
 use BatteryIncludedSdk\Client\ApiClient;
 use BatteryIncludedSdk\Client\CurlHttpClient;
-use BatteryIncludedSdk\Dto\ProductBaseDto;
-use BatteryIncludedSdk\Service\SyncProductService;
+use BatteryIncludedSdk\Service\SyncService;
+use BatteryIncludedSdkTests\Helper;
 
 require_once __DIR__ . '/../../vendor/autoload.php';
 require_once __DIR__ . '/../credentials.php';
+
+$products = Helper::generateProducts(20);
+$blogs = Helper::generateBlogs(10);
 
 $apiClient = new ApiClient(
     new CurlHttpClient(),
@@ -16,13 +20,8 @@ $apiClient = new ApiClient(
     $apiKey
 );
 
-$syncService = new SyncProductService($apiClient);
-
-$product = new ProductBaseDto('239');
-$product->setId('239');
-$product->setPrice(13337.95);
-$result = $syncService->partialUpdateOneOrManyProducts($product);
-
+$syncService = new SyncService($apiClient);
+$result = $syncService->syncFullElements(...array_merge($products, $blogs));
 echo '<pre>';
 var_dump($result->getBody());
 echo '</pre>';

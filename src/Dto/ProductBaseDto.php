@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace BatteryIncludedSdk\Product;
+namespace BatteryIncludedSdk\Dto;
 
-class ProductBaseDto implements \JsonSerializable
+class ProductBaseDto extends AbstractDto
 {
-    private ?string $id;
+    private ?string $id = null;
 
     private ?string $name = null;
 
@@ -33,6 +33,11 @@ class ProductBaseDto implements \JsonSerializable
     private array $categories = [];
 
     private ?ProductPropertyDto $properties = null;
+
+    public function __construct(string $identifier, string $type = 'PRODUCT')
+    {
+        parent::__construct($identifier, $type);
+    }
 
     public function getId(): ?string
     {
@@ -180,7 +185,7 @@ class ProductBaseDto implements \JsonSerializable
 
     public function jsonSerialize(): array
     {
-        $jsonRaw = [
+        $jsonDto = [
             'id' => $this->getId(),
             'name' => $this->getName(),
             'description' => $this->getDescription(),
@@ -197,6 +202,11 @@ class ProductBaseDto implements \JsonSerializable
             'properties' => $this->getProperties(),
         ];
 
-        return array_filter($jsonRaw, fn ($value) => $value !== null);
+        $jsonRaw = array_merge(
+            parent::jsonSerialize(),
+            ['_' . $this->getType() => array_filter($jsonDto, static fn ($value) => $value !== null)]
+        );
+
+        return $jsonRaw;
     }
 }

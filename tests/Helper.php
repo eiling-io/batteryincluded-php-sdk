@@ -6,12 +6,16 @@ namespace BatteryIncludedSdkTests;
 
 use BatteryIncludedSdk\Client\ApiClient;
 use BatteryIncludedSdk\Client\CurlHttpClient;
-use BatteryIncludedSdk\Product\CategoryDto;
-use BatteryIncludedSdk\Product\ProductBaseDto;
-use BatteryIncludedSdk\Product\ProductPropertyDto;
+use BatteryIncludedSdk\Dto\BlogBaseDto;
+use BatteryIncludedSdk\Dto\CategoryDto;
+use BatteryIncludedSdk\Dto\ProductBaseDto;
+use BatteryIncludedSdk\Dto\ProductPropertyDto;
 
 class Helper
 {
+    /**
+     * @return ProductBaseDto[]
+     */
     public static function generateProducts(
         int $iterations,
         array $colours = ['Blau', 'Rosa', 'Gold', 'Schwarz'],
@@ -23,7 +27,7 @@ class Helper
             foreach ($colours as $color) {
                 foreach ($storages as $storage) {
                     $id++;
-                    $product = new ProductBaseDto();
+                    $product = new ProductBaseDto((string) $id);
                     $product->setName('iPhone ' . $i . ' Pro ' . $color . ' - ' . $storage);
                     $product->setDescription(
                         'The latest iPhone with advanced features. Color: ' . $color . ', Storage: ' . $storage . '.'
@@ -70,5 +74,21 @@ class Helper
             getenv('COLLECTION'),
             getenv('APIKEY')
         );
+    }
+
+    public static function generateBlogs(int $int): array
+    {
+        $blogs = [];
+        for ($i = 1; $i <= $int; $i++) {
+            $blog = new BlogBaseDto((string) $i, 'BLOG');
+            $blog->setTitle('Blog Post ' . $i);
+            $blog->setDescription('This is the content of blog post number ' . $i . '.');
+            $blog->setAuthor('Author ' . $i);
+            $blog->setPreviewImage('https://dummyimage.com/600x400/bbb/fff.png&text=Blog ' . $i);
+            $blog->setPublishedAt((new \DateTime())->modify('-' . (30 - $i) . ' days')->format('Y-m-d'));
+            $blogs[] = $blog;
+        }
+
+        return $blogs;
     }
 }

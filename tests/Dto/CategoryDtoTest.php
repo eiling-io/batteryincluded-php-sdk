@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace BatteryIncludedSdkTests\Product;
+namespace BatteryIncludedSdkTests\Dto;
 
-use BatteryIncludedSdk\Product\CategoryDto;
+use BatteryIncludedSdk\Dto\CategoryDto;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 

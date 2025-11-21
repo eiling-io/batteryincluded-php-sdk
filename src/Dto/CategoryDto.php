@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace BatteryIncludedSdk\Product;
+namespace BatteryIncludedSdk\Dto;
 
 class CategoryDto implements \JsonSerializable
 {

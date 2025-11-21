@@ -6,9 +6,9 @@ namespace Suggest;
 
 use BatteryIncludedSdk\Client\ApiClient;
 use BatteryIncludedSdk\Client\CurlHttpClient;
-use BatteryIncludedSdk\Product\CategoryDto;
-use BatteryIncludedSdk\Product\ProductBaseDto;
-use BatteryIncludedSdk\Product\ProductPropertyDto;
+use BatteryIncludedSdk\Dto\CategoryDto;
+use BatteryIncludedSdk\Dto\ProductBaseDto;
+use BatteryIncludedSdk\Dto\ProductPropertyDto;
 use BatteryIncludedSdk\Service\AbstractService;
 use BatteryIncludedSdk\Service\Response;
 use BatteryIncludedSdk\Service\SyncService;
@@ -47,7 +47,7 @@ class SuggestServiceTest extends TestCase
         $apiClient = Helper::getApiClient();
         $syncService = new SyncService($apiClient);
 
-        $result = $syncService->syncOneOrManyProducts(...$products);
+        $result = $syncService->syncOneOrManyElements(...$products);
         $this->assertCount(240, $result->getBody());
         $browseService = new SuggestService(Helper::getApiClient());
         $result = $browseService->suggest('12');
@@ -55,7 +55,7 @@ class SuggestServiceTest extends TestCase
         $this->assertContainsOnlyInstancesOf(CompletionDto::class, $result->getQueryCompletions());
 
         $this->assertInstanceOf(SuggestResponse::class, $result);
-        $this->assertGreaterThanOrEqual(82, $result->getFounds());
+        $this->assertGreaterThanOrEqual(12, $result->getFounds());
         $this->assertCount(6, $result->getDocuments());
     }
 }

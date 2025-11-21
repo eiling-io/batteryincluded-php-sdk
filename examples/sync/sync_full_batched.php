@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 use BatteryIncludedSdk\Client\ApiClient;
 use BatteryIncludedSdk\Client\CurlHttpClient;
-use BatteryIncludedSdk\Service\SyncService;
+use BatteryIncludedSdk\Service\SyncProductService;
 use BatteryIncludedSdkTests\Helper;
 
 require_once __DIR__ . '/../../vendor/autoload.php';
@@ -19,16 +19,16 @@ $apiClient = new ApiClient(
 );
 
 $transactionId = 'Transaction_' . time();
-$syncService = new SyncService($apiClient);
+$syncService = new SyncProductService($apiClient);
 
 foreach (array_chunk($products, 10) as $productSlice) {
-    $result = $syncService->syncFullBatch($transactionId, false, ...$productSlice);
+    $result = $syncService->syncFullBatchProducts($transactionId, false, ...$productSlice);
     echo '<pre>';
     var_dump($result->getBody());
     echo '</pre>';
 }
 
-$result = $syncService->syncFullBatch($transactionId, true, ...$productSlice);
+$result = $syncService->syncFullBatchProducts($transactionId, true, ...$productSlice);
 echo '<pre>';
 var_dump($result->getBody());
 echo '</pre>';
