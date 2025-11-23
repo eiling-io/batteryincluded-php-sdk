@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 use BatteryIncludedSdk\Client\ApiClient;
 use BatteryIncludedSdk\Client\CurlHttpClient;
-use BatteryIncludedSdk\Service\SyncProductService;
+use BatteryIncludedSdk\Service\SyncService;
 use BatteryIncludedSdkTests\Helper;
 
 require_once __DIR__ . '/../../vendor/autoload.php';
@@ -18,9 +18,9 @@ $apiClient = new ApiClient(
     $apiKey
 );
 
-$syncService = new SyncProductService($apiClient);
+$syncService = new SyncService($apiClient);
 
-$result = $syncService->syncOneOrManyProducts(...$products);
+$result = $syncService->syncOneOrManyElements(...$products);
 
 echo '<pre>';
 var_dump($result->getBody());

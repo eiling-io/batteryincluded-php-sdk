@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 use BatteryIncludedSdk\Client\ApiClient;
 use BatteryIncludedSdk\Client\CurlHttpClient;
-use BatteryIncludedSdk\Service\SyncProductService;
+use BatteryIncludedSdk\Service\SyncService;
 
 require_once __DIR__ . '/../../vendor/autoload.php';
 require_once __DIR__ . '/../credentials.php';
@@ -15,9 +15,9 @@ $apiClient = new ApiClient(
     $apiKey
 );
 
-$syncService = new SyncProductService($apiClient);
+$syncService = new SyncService($apiClient);
 
-$result = $syncService->deleteProductsByIds('240', '2');
+$result = $syncService->deleteElementsByIds('240', '2');
 
 echo '<pre>';
 var_dump($result->getBody());
