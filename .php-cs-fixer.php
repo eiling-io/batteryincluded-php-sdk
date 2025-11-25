@@ -63,4 +63,5 @@ return (new Config())
         'strict_param' => true,
     ])
     ->setRiskyAllowed(true)
+    ->setUnsupportedPhpVersionAllowed(true)
     ->setFinder($finder);
