@@ -19,7 +19,7 @@ class FacetRatingDto extends FacetDto
         }
     }
 
-    public function getRatings()
+    public function getRatings(): array
     {
         return $this->ratings;
     }

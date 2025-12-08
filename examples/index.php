@@ -91,6 +91,47 @@ foreach ($result->getFacets() as $facet) {
             echo '</label>';
             echo '</div>';
         }
+    } elseif ($facet->getType() === 'category') {
+        $categories = $facet->getCategories();
+        foreach ($categories as $categoryName => $categoryValues) {
+            $isChecked = $categoryValues['checked'] ?? false;
+            $count = $categoryValues['count'] ?? 0;
+            $value = $categoryName;
+            $childs = $categoryValues['childs'] ?? [];
+            echo '<div class="form-check">';
+            echo '<input class="form-check-input" type="checkbox" name="f[' . $facet->getFieldName() . '][]" value="' . $value . '" id="' . $facet->getFieldName() . '_' . $value . '" ' . ($isChecked ? 'checked' : '') . ' onchange="this.form.submit()">';
+            echo '<label class="form-check-label" for="' . $facet->getFieldName() . '_' . $value . '">';
+            echo $value . ' ' . $facet->getFieldUnit() . ' (' . $count . ')';
+            echo '</label>';
+            echo '</div>';
+            if ($isChecked === true && count($childs) > 0) {
+                foreach ($childs as $childName => $childValues) {
+                    $isChecked1 = $childValues['checked'] ?? false;
+                    $count1 = $childValues['count'] ?? 0;
+                    $value1 = $childName;
+                    $childs1 = $childValues['childs'] ?? [];
+                    echo '<div class="form-check">';
+                    echo '<input class="form-check-input" type="checkbox" name="f[' . $facet->getFieldName() . '][]" value="' . $value . ' > ' . $value1 . '" id="' . $facet->getFieldName() . '_' . $value1 . '" ' . ($isChecked1 ? 'checked' : '') . ' onchange="this.form.submit()">';
+                    echo '<label class="form-check-label" for="' . $facet->getFieldName() . '_' . $value . '">';
+                    echo $value1 . ' ' . $facet->getFieldUnit() . ' (' . $count1 . ')';
+                    echo '</label>';
+                    echo '</div>';
+                    if ($isChecked1 === true && count($childs1) > 0) {
+                        foreach ($childs1 as $childName1 => $childValues1) {
+                            $isChecked2 = $childValues1['checked'] ?? false;
+                            $count2 = $childValues1['count'] ?? 0;
+                            $value2 = $childName1;
+                            echo '<div class="form-check">';
+                            echo '<input class="form-check-input" type="checkbox" name="f[' . $facet->getFieldName() . '][]" value="' . $value . ' > ' . $value1 . ' > ' . $value2 . '" id="' . $facet->getFieldName() . '_' . $value . '" ' . ($isChecked2 ? 'checked' : '') . ' onchange="this.form.submit()">';
+                            echo '<label class="form-check-label" for="' . $facet->getFieldName() . '_' . $value . '">';
+                            echo $value2 . ' ' . $facet->getFieldUnit() . ' (' . $count2 . ')';
+                            echo '</label>';
+                            echo '</div>';
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 ?>

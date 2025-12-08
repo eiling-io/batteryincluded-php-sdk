@@ -10,7 +10,7 @@ class FacetValueDto
 
     private string $name;
 
-    private int $count = 0;
+    private int $count;
 
     public function __construct(array $data, private array $appliedFilterValues = [])
     {

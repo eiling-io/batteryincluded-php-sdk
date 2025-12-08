@@ -6,9 +6,9 @@ namespace BatteryIncludedSdk\Shop;
 
 class FacetRangeDto extends FacetDto
 {
-    private float $min = 0.000;
+    private float $min;
 
-    private float $max = 0.000;
+    private float $max;
 
     public function __construct(array $data, protected array $appliedFilterValues = [])
     {

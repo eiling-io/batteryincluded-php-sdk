@@ -21,22 +21,27 @@ class BrowseResponse extends Response
     /**
      * @return FacetDto[]
      */
-    public function getFacets(): array
+    public function getFacets(string $categoryField = '_PRODUCT.categories'): array
     {
         $result = [];
         $facets = $this->getBody()['facet_counts'];
         foreach ($facets as $facet) {
+            if ($facet['field_name'] === $categoryField) {
+                $facet['type'] = 'category';
+            }
             switch ($facet['type']) {
+                case 'category':
+                    $result[] = new FacetCategoryDto($facet, $this->searchStruct->getFilters());
+                    break;
                 case 'range':
                     $result[] = new FacetRangeDto($facet, $this->searchStruct->getFilters());
                     break;
                 case 'select':
                     $result[] = new FacetSelectDto($facet, $this->searchStruct->getFilters());
                     break;
-                    // @codeCoverageIgnoreStart
-                default:
+                case 'rating':
                     $result[] = new FacetRatingDto($facet, $this->searchStruct->getFilters());
-                    // @codeCoverageIgnoreEnd
+                    break;
             }
         }
 

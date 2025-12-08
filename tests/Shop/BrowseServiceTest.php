@@ -15,6 +15,7 @@ use BatteryIncludedSdk\Service\SyncService;
 use BatteryIncludedSdk\Shop\BrowseResponse;
 use BatteryIncludedSdk\Shop\BrowseSearchStruct;
 use BatteryIncludedSdk\Shop\BrowseService;
+use BatteryIncludedSdk\Shop\FacetCategoryDto;
 use BatteryIncludedSdk\Shop\FacetDto;
 use BatteryIncludedSdk\Shop\FacetRangeDto;
 use BatteryIncludedSdk\Shop\FacetRatingDto;
@@ -37,6 +38,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(FacetRatingDto::class)]
 #[UsesClass(FacetSelectDto::class)]
 #[UsesClass(FacetValueDto::class)]
+#[UsesClass(FacetCategoryDto::class)]
 #[UsesClass(ProductBaseDto::class)]
 #[UsesClass(ProductPropertyDto::class)]
 #[UsesClass(AbstractService::class)]
