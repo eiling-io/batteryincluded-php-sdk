@@ -31,7 +31,6 @@ class FacetCategoryDtoTest extends TestCase
         $dto = new FacetCategoryDto($data, $appliedFilterValues);
         $categories = $dto->getCategories();
 
-
         $this->assertArrayHasKey('A', $categories);
         $this->assertArrayHasKey('B', $categories['A']['childs']);
         $this->assertTrue($categories['A']['checked'] ?? false);

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SimilarSearch;
+namespace BatteryIncludedSdkTests\SimilarSearch;
 
 use BatteryIncludedSdk\Client\ApiClient;
 use BatteryIncludedSdk\Client\CurlHttpClient;
@@ -26,8 +26,8 @@ class SimilarSearchServiceTest extends TestCase
 {
     public function testSimilarSearchMethodAgainstLiveApi()
     {
-        $browseService = new SimilarSearchService(Helper::getApiClient());
-        $result = $browseService->search('iPhone');
+        $similarSearchService = new SimilarSearchService(Helper::getApiClient());
+        $result = $similarSearchService->search('iPhone');
 
         $this->assertContainsOnlyInstancesOf(SimilarSearchDto::class, $result->getSimilarSearches());
 
