@@ -37,7 +37,7 @@ class RecommendationsServiceTest extends TestCase
         $mockApiClient->method('getJson')->willReturn($mockResponse);
 
         $service = new RecommendationsService($mockApiClient);
-        $result = $service->recommendByIdentifier('240');
+        $result = $service->recommendByIdentifier('720');
 
         $this->assertInstanceOf(RecommendationsResponse::class, $result);
         $this->assertSame($expectedData, $result->getRecommendations());

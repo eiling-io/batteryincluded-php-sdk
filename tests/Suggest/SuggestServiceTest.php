@@ -48,7 +48,7 @@ class SuggestServiceTest extends TestCase
         $syncService = new SyncService($apiClient);
 
         $result = $syncService->syncOneOrManyElements(...$products);
-        $this->assertCount(240, $result->getBody());
+        $this->assertCount(720, $result->getBody());
         $browseService = new SuggestService(Helper::getApiClient());
         $result = $browseService->suggest('12');
 

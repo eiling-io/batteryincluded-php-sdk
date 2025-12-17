@@ -32,7 +32,7 @@ class SyncServiceTest extends TestCase
         $syncService = new SyncService($apiClient);
 
         $result = $syncService->syncOneOrManyElements(...$products);
-        $this->assertCount(240, $result->getBody());
+        $this->assertCount(720, $result->getBody());
     }
 
     public function testSyncFull()
@@ -42,7 +42,7 @@ class SyncServiceTest extends TestCase
         $syncService = new SyncService($apiClient);
 
         $result = $syncService->syncFullElements(...$products);
-        $this->assertCount(240, $result->getBody());
+        $this->assertCount(720, $result->getBody());
     }
 
     public function testSyncFullBatched()
@@ -82,7 +82,7 @@ class SyncServiceTest extends TestCase
         $apiClient = Helper::getApiClient();
         $syncService = new SyncService($apiClient);
 
-        $result = $syncService->deleteElementsByIds('PRODUCT-240', 'PRODUCT-2');
+        $result = $syncService->deleteElementsByIds('PRODUCT-720', 'PRODUCT-2');
 
         $this->assertEquals(2, $result->getBody()['num_deleted']);
     }

@@ -52,7 +52,7 @@ class BrowseServiceTest extends TestCase
         $syncService = new SyncService($apiClient);
 
         $result = $syncService->syncOneOrManyElements(...$products);
-        $this->assertCount(240, $result->getBody());
+        $this->assertCount(720, $result->getBody());
         $browseService = new BrowseService(Helper::getApiClient());
         $searchStruct = new BrowseSearchStruct();
         $searchStruct->addFilter('_PRODUCT.properties.Speicherkapazität', '512GB');
@@ -81,7 +81,7 @@ class BrowseServiceTest extends TestCase
         $syncService = new SyncService($apiClient);
 
         $result = $syncService->syncOneOrManyElements(...$products);
-        $this->assertCount(240, $result->getBody());
+        $this->assertCount(720, $result->getBody());
         $browseService = new BrowseService(Helper::getApiClient());
         $searchStruct = new BrowseSearchStruct();
         $searchStruct->addFilter('_PRODUCT.properties.Speicherkapazität', '512GB');
