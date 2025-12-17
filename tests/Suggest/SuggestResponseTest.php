@@ -42,6 +42,18 @@ class SuggestResponseTest extends TestCase
                     ],
                 ],
             ],
+            [
+                'kind' => 'facet._PRODUCT.properties.Gerät',
+                'found' => 1,
+                'field_name' => '_PRODUCT.properties.Gerät',
+                'hits' => [
+                    [
+                        'count' => 240,
+                        'highlighted' => '<mark>Mac</mark>Book',
+                        'value' => 'MacBook',
+                    ],
+                ],
+            ],
         ]);
 
         $suggestResponse = new SuggestResponse($responseRaw);
@@ -56,5 +68,8 @@ class SuggestResponseTest extends TestCase
         $this->assertEquals('<b>Vorschlag 1</b>', $completions[0]->getHighlighted());
         $this->assertEquals(0.9, $completions[0]->getScore());
         $this->assertEquals('testsource', $completions[0]->getSource());
+
+        $this->assertCount(1, $suggestResponse->getFacets());
+        $this->assertEquals('facet._PRODUCT.properties.Gerät', $suggestResponse->getFacets()[0]['kind']);
     }
 }

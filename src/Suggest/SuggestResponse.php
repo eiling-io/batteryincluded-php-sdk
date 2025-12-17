@@ -12,6 +12,8 @@ class SuggestResponse extends Response
 
     private array $queryCompletions = [];
 
+    private array $facets = [];
+
     private int $founds = 0;
 
     public function __construct(string $responseRaw)
@@ -36,6 +38,9 @@ class SuggestResponse extends Response
                         );
                     }
                     break;
+                case str_starts_with($value['kind'], 'facet.'):
+                    $this->facets[] = $value;
+                    break;
             }
         }
     }
@@ -51,6 +56,11 @@ class SuggestResponse extends Response
     public function getQueryCompletions(): array
     {
         return $this->queryCompletions;
+    }
+
+    public function getFacets(): array
+    {
+        return $this->facets;
     }
 
     public function getFounds(): int

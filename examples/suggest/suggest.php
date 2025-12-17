@@ -17,7 +17,7 @@ $apiClient = new ApiClient(
 );
 
 $service = new SuggestService($apiClient);
-$result = $service->suggest('12');
+$result = $service->suggest('Mac');
 
 echo '<pre>';
 print_r($result->getQueryCompletions());
