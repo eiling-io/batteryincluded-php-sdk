@@ -21,6 +21,7 @@ class BrowseService
                 'page' => $searchStruct->getPage(),
                 'per_page' => $searchStruct->getPerPage(),
                 'sort' => $searchStruct->getSort(),
+                'preset' => $searchStruct->getPresetId(),
             ]
         );
 

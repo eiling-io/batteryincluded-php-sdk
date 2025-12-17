@@ -16,6 +16,18 @@ class BrowseSearchStruct
 
     protected string $sort = '';
 
+    protected string $presetId = '';
+
+    public function getPresetId(): string
+    {
+        return $this->presetId;
+    }
+
+    public function setPresetId(string $presetId): void
+    {
+        $this->presetId = $presetId;
+    }
+
     public function setQuery(string $query): void
     {
         $this->query = $query;

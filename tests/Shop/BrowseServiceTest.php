@@ -73,4 +73,34 @@ class BrowseServiceTest extends TestCase
         $this->assertEquals($result->getPage(), 1);
         $this->assertEquals($result->getPages(), 1);
     }
+
+    public function testBrowseMethodWithPresetAgainstLiveApi()
+    {
+        $products = Helper::generateProducts(20);
+        $apiClient = Helper::getApiClient();
+        $syncService = new SyncService($apiClient);
+
+        $result = $syncService->syncOneOrManyElements(...$products);
+        $this->assertCount(240, $result->getBody());
+        $browseService = new BrowseService(Helper::getApiClient());
+        $searchStruct = new BrowseSearchStruct();
+        $searchStruct->addFilter('_PRODUCT.properties.Speicherkapazität', '512GB');
+        $searchStruct->setPresetId('857e117c-3766-494d-a692-d7a23c384c33');
+        $searchStruct->setSort('_PRODUCT.price:asc');
+        $searchStruct->addFilter('_PRODUCT.categories', 'Apple > iPhone > iPhone 18 Pro');
+        $searchStruct->addFilter('_PRODUCT.properties.Farbe', 'Schwarz');
+        $searchStruct->addFilter('_PRODUCT.properties.Farbe', 'Blau');
+        $searchStruct->setQuery('iPhone');
+        $result = $browseService->browse($searchStruct);
+
+        $this->assertContainsOnlyInstancesOf(FacetDto::class, $result->getFacets());
+
+        $this->assertInstanceOf(BrowseResponse::class, $result);
+        $this->assertCount(1, $result->getHits());
+
+        $this->assertEquals(1, $result->getFound());
+
+        $this->assertEquals($result->getPage(), 1);
+        $this->assertEquals($result->getPages(), 1);
+    }
 }

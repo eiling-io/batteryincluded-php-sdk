@@ -24,6 +24,7 @@ $searchStruct->addFilter('_PRODUCT.categories', 'Apple > iPhone > iPhone 20 Pro'
 $searchStruct->addFilter('_PRODUCT.properties.Farbe', 'Schwarz');
 $searchStruct->addFilter('_PRODUCT.properties.Farbe', 'Blau');
 $searchStruct->setQuery('iPhone');
+$searchStruct->setPresetId('857e117c-3766-494d-a692-d7a23c384c33');
 $result = $syncService->browse($searchStruct);
 
 echo '<pre>';
