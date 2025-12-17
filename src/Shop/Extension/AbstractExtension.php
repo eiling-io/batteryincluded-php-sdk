@@ -6,7 +6,14 @@ namespace BatteryIncludedSdk\Shop\Extension;
 
 abstract class AbstractExtension
 {
-    abstract public function getType(): string;
+    public function __construct(protected array $data)
+    {
+    }
 
-    abstract public function getData(): array;
+    public function getData(): array
+    {
+        return $this->data;
+    }
+
+    abstract public function getType(): string;
 }
