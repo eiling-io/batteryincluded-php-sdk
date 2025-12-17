@@ -5,12 +5,36 @@ declare(strict_types=1);
 namespace BatteryIncludedSdk\Shop;
 
 use BatteryIncludedSdk\Service\Response;
+use BatteryIncludedSdk\Shop\Extension\AbstractExtension;
 
 class BrowseResponse extends Response
 {
+    private array $extensions = [];
+    private array $teaserExtensions = [];
+    private array $redirectsExtension = [];
+    private array $codesExtension = [];
+    private array $promotionsExtension = [];
+
     public function __construct(string $responseRaw, private BrowseSearchStruct $searchStruct)
     {
         parent::__construct($responseRaw);
+
+        foreach ($this->getBody()['extensions'] as $extensionData) {
+            switch ($extensionData['type']) {
+                case 'teaser':
+                    $this->teaserExtensions[] = $this->extensions[] = new Extension\TeaserExtension($extensionData['data']);
+                    break;
+                case 'redirects':
+                    $this->redirectsExtension[] = $this->extensions[] = new Extension\RedirectsExtension($extensionData['data']);
+                    break;
+                case 'codes':
+                    $this->codesExtension[] = $this->extensions[] = new Extension\CodesExtension($extensionData['data']);
+                    break;
+                case 'promotions':
+                    $this->promotionsExtension[] = $this->extensions[] = new Extension\PromotionsExtension($extensionData['data']);
+                    break;
+            }
+        }
     }
 
     public function getHits(): array
@@ -46,6 +70,34 @@ class BrowseResponse extends Response
         }
 
         return $result;
+    }
+
+    /**
+     * @return AbstractExtension[]
+     */
+    public function getAllExtensions(): array
+    {
+        return $this->extensions;
+    }
+
+    public function getTeaserExtensions(): array
+    {
+        return $this->teaserExtensions;
+    }
+
+    public function getRedirectsExtensions(): array
+    {
+        return $this->redirectsExtension;
+    }
+
+    public function getCodesExtensions(): array
+    {
+        return $this->codesExtension;
+    }
+
+    public function getPromotionsExtensions(): array
+    {
+        return $this->promotionsExtension;
     }
 
     public function getFound(): int

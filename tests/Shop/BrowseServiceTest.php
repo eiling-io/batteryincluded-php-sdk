@@ -15,6 +15,10 @@ use BatteryIncludedSdk\Service\SyncService;
 use BatteryIncludedSdk\Shop\BrowseResponse;
 use BatteryIncludedSdk\Shop\BrowseSearchStruct;
 use BatteryIncludedSdk\Shop\BrowseService;
+use BatteryIncludedSdk\Shop\Extension\CodesExtension;
+use BatteryIncludedSdk\Shop\Extension\PromotionsExtension;
+use BatteryIncludedSdk\Shop\Extension\RedirectsExtension;
+use BatteryIncludedSdk\Shop\Extension\TeaserExtension;
 use BatteryIncludedSdk\Shop\FacetCategoryDto;
 use BatteryIncludedSdk\Shop\FacetDto;
 use BatteryIncludedSdk\Shop\FacetRangeDto;
@@ -31,6 +35,10 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(ApiClient::class)]
 #[CoversClass(CurlHttpClient::class)]
 #[CoversClass(BrowseSearchStruct::class)]
+#[CoversClass(CodesExtension::class)]
+#[CoversClass(PromotionsExtension::class)]
+#[CoversClass(RedirectsExtension::class)]
+#[CoversClass(TeaserExtension::class)]
 #[CoversClass(Response::class)]
 #[UsesClass(CategoryDto::class)]
 #[UsesClass(FacetDto::class)]
@@ -102,5 +110,34 @@ class BrowseServiceTest extends TestCase
 
         $this->assertEquals($result->getPage(), 1);
         $this->assertEquals($result->getPages(), 1);
+    }
+
+    public function testBrowseMethodWithExtensionsAgainstLiveApi()
+    {
+        $products = Helper::generateProducts(20);
+        $apiClient = Helper::getApiClient();
+        $syncService = new SyncService($apiClient);
+
+        $result = $syncService->syncOneOrManyElements(...$products);
+        $this->assertCount(720, $result->getBody());
+        $browseService = new BrowseService(Helper::getApiClient());
+        $searchStruct = new BrowseSearchStruct();
+        $searchStruct->setQuery('extension');
+        $result = $browseService->browse($searchStruct);
+
+        $this->assertContainsOnlyInstancesOf(FacetDto::class, $result->getFacets());
+
+        $this->assertInstanceOf(BrowseResponse::class, $result);
+        $this->assertCount(0, $result->getHits());
+        $this->assertCount(4, $result->getAllExtensions());
+        $this->assertCount(1, $result->getCodesExtensions());
+        $this->assertCount(1, $result->getRedirectsExtensions());
+        $this->assertCount(1, $result->getPromotionsExtensions());
+        $this->assertCount(1, $result->getTeaserExtensions());
+
+        $this->assertEquals(0, $result->getFound());
+
+        $this->assertEquals(1, $result->getPage());
+        $this->assertEquals(0, $result->getPages());
     }
 }
