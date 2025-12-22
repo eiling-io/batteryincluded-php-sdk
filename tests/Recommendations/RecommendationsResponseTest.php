@@ -14,13 +14,19 @@ class RecommendationsResponseTest extends TestCase
     public function testGetRecommendationsReturnsBody(): void
     {
         $data = [
-            ['id' => 1, 'name' => 'Empfehlung 1'],
-            ['id' => 2, 'name' => 'Empfehlung 2'],
+            ['type' => 'together', 'id' => 1, 'name' => 'Zusammen gekauft 1'],
+            ['type' => 'together', 'id' => 2, 'name' => 'Zusammen gekauft 2'],
+            ['type' => 'also', 'id' => 3, 'name' => 'Auch gekauft 1'],
+            ['type' => 'also', 'id' => 4, 'name' => 'Auch gekauft 2'],
+            ['type' => 'related', 'id' => 5, 'name' => 'Verknüpft 1'],
+            ['type' => 'related', 'id' => 6, 'name' => 'Verknüpft 2'],
         ];
         $responseRaw = json_encode($data);
 
-        $response = new RecommendationsResponse($responseRaw);
+        $recommendations = (new RecommendationsResponse($responseRaw))->getRecommendations();
 
-        $this->assertSame($data, $response->getRecommendations());
+        $this->assertCount(2, $recommendations['together']);
+        $this->assertCount(2, $recommendations['also']);
+        $this->assertCount(2, $recommendations['related']);
     }
 }
