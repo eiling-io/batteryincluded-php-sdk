@@ -13,7 +13,7 @@ class RecommendationsResponse extends Response
     public function __construct(string $responseRaw)
     {
         parent::__construct($responseRaw);
-        foreach( $this->getBody() as $key => $recommendation ) {
+        foreach ($this->getBody() as $key => $recommendation) {
             $this->recommendations[$recommendation['type']][] = $recommendation['document'];
         }
     }
