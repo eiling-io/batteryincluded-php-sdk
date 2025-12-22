@@ -24,11 +24,15 @@ class RecommendationsServiceTest extends TestCase
 {
     public function testRecommendByIdentifierReturnsRecommendationsResponse()
     {
-        $expectedData = [
-            ['id' => 1, 'name' => 'Empfehlung 1'],
-            ['id' => 2, 'name' => 'Empfehlung 2'],
+        $rawData = [
+            ['type' => 'together', 'id' => 1, 'name' => 'Zusammen gekauft 1'],
+            ['type' => 'together', 'id' => 2, 'name' => 'Zusammen gekauft 2'],
+            ['type' => 'also', 'id' => 3, 'name' => 'Auch gekauft 1'],
+            ['type' => 'also', 'id' => 4, 'name' => 'Auch gekauft 2'],
+            ['type' => 'related', 'id' => 5, 'name' => 'Verknüpft 1'],
+            ['type' => 'related', 'id' => 6, 'name' => 'Verknüpft 2'],
         ];
-        $jsonResponse = json_encode($expectedData);
+        $jsonResponse = json_encode($rawData);
 
         $mockResponse = $this->createMock(Response::class);
         $mockResponse->method('getRawResponse')->willReturn($jsonResponse);
@@ -40,6 +44,9 @@ class RecommendationsServiceTest extends TestCase
         $result = $service->recommendByIdentifier('720');
 
         $this->assertInstanceOf(RecommendationsResponse::class, $result);
-        $this->assertSame($expectedData, $result->getRecommendations());
+        $recommendations = $result->getRecommendations();
+        $this->assertCount(2, $recommendations['together']);
+        $this->assertCount(2, $recommendations['also']);
+        $this->assertCount(2, $recommendations['related']);
     }
 }
