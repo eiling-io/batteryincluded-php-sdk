@@ -34,9 +34,11 @@ class BrowseSearchStructTest extends TestCase
         $struct->addFilter('color', 'red');
         $struct->addFilter('color', 'blue');
         $struct->addFilter('size', 'L');
+        $struct->addRangeFilter('price', '10', '50');
         $expected = [
             'color' => ['red', 'blue'],
             'size' => ['L'],
+            'price' => ['from' => '10', 'till' => '50'],
         ];
         $this->assertSame($expected, $struct->getFilters());
     }

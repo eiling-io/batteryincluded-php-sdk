@@ -43,6 +43,12 @@ class BrowseSearchStruct
         $this->filters[$key][] = $value;
     }
 
+    public function addRangeFilter(string $key, string $from, string $till): void
+    {
+        $this->filters[$key]['from'] = $from;
+        $this->filters[$key]['till'] = $till;
+    }
+
     public function addFilters(array $filters): void
     {
         foreach ($filters as $key => $values) {
