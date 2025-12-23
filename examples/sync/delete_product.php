@@ -17,7 +17,7 @@ $apiClient = new ApiClient(
 
 $syncService = new SyncService($apiClient);
 
-$result = $syncService->deleteElementsByIds('240', '2');
+$result = $syncService->deleteElementsByIds('PRODUCT-240', 'BLOG-2');
 
 echo '<pre>';
 var_dump($result->getBody());

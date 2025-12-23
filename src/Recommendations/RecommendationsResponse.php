@@ -8,7 +8,7 @@ use BatteryIncludedSdk\Service\Response;
 
 class RecommendationsResponse extends Response
 {
-    private array $recommendations;
+    private array $recommendations = [];
 
     public function __construct(string $responseRaw)
     {
