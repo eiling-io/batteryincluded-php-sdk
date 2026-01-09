@@ -14,7 +14,7 @@ class SimilarSearchResponse extends Response
     {
         parent::__construct($responseRaw);
         $this->similarSearches = [];
-        foreach ($this->getBody()['searches'] as $similarSearch) {
+        foreach (($this->getBody()['searches'] ?? []) as $similarSearch) {
             $this->similarSearches[] = new SimilarSearchDto(
                 $similarSearch['q'] ?? '',
                 (int) ($similarSearch['count'] ?? 0),
