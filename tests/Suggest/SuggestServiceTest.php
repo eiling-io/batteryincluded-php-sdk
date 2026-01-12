@@ -57,5 +57,6 @@ class SuggestServiceTest extends TestCase
         $this->assertInstanceOf(SuggestResponse::class, $result);
         $this->assertGreaterThanOrEqual(12, $result->getFounds());
         $this->assertCount(6, $result->getDocuments());
+        $this->assertFalse($result->isLLM());
     }
 }

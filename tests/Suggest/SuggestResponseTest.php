@@ -20,6 +20,7 @@ class SuggestResponseTest extends TestCase
             [
                 'kind' => 'document',
                 'found' => 2,
+                'llm' => true,
                 'hits' => [
                     ['highlighted' => '<b>Dokument 1</b>'],
                     ['highlighted' => '<b>Dokument 2</b>'],
@@ -71,5 +72,6 @@ class SuggestResponseTest extends TestCase
 
         $this->assertCount(1, $suggestResponse->getFacets());
         $this->assertEquals('facet._PRODUCT.properties.Gerät', $suggestResponse->getFacets()[0]['kind']);
+        $this->assertTrue($suggestResponse->isLLM());
     }
 }
