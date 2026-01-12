@@ -16,10 +16,15 @@ class SuggestResponse extends Response
 
     private int $founds = 0;
 
+    private bool $llm = false;
+
     public function __construct(string $responseRaw)
     {
         parent::__construct($responseRaw);
         foreach ($this->getBody() as $value) {
+            if ($value['llm'] ?? false) {
+                $this->llm = true;
+            }
             switch ($value['kind']) {
                 case 'document':
                     $this->founds = (int) ($value['found'] ?? 0);
@@ -66,5 +71,10 @@ class SuggestResponse extends Response
     public function getFounds(): int
     {
         return $this->founds;
+    }
+
+    public function isLLM(): bool
+    {
+        return $this->llm;
     }
 }
