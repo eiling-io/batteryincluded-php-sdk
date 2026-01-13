@@ -10,7 +10,7 @@ class ProductPropertyDto implements \JsonSerializable
 
     public function addProperty(string $option, string $value): self
     {
-        $this->properties[$option][] = $value;
+        $this->properties[str_replace('.', '', $option)][] = $value;
 
         return $this;
     }
