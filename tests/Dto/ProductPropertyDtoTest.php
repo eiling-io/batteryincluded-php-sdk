@@ -15,9 +15,10 @@ class ProductPropertyDtoTest extends TestCase
     {
         $dto = new ProductPropertyDto();
 
-        $dto->addProperty('Farbe', 'Rot');
+        // . has to be stripped from option names
+        $dto->addProperty('Farbe.', 'Rot');
         $dto->addProperty('Farbe', 'Blau');
-        $dto->addProperty('Größe', 'L');
+        $dto->addProperty('Größe.', 'L');
 
         $expected = [
             [
