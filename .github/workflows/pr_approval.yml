@@ -1,7 +1,7 @@
 name: PR Approval
 
 on:
-    pull_request:
+    pull_request_target:
         types: [opened, synchronize, reopened, ready_for_review, review_requested, review_request_removed, edited]
 
 jobs:
