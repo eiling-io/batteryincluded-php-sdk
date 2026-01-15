@@ -3,10 +3,8 @@ name: ci
 on:
     push:
         branches: [ main ]
-    workflow_run:
-        workflows: ["PR Approval"]
-        types:
-            - completed
+    pull_request_target:
+        types: [opened, synchronize, reopened]
 
 jobs:
     integration-tests:
@@ -15,9 +13,6 @@ jobs:
             max-parallel: 1
             matrix:
                 php: ['8.2', '8.3', '8.4', '8.5']
-        environment:
-            name: testing
-            # Reviewer werden im GitHub-UI für das Environment konfiguriert
         runs-on: ubuntu-latest
 
         steps:
