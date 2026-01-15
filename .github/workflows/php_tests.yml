@@ -1,0 +1,39 @@
+name: ci
+
+on:
+    push:
+        branches: [ main ]
+    workflow_run:
+        workflows: ["PR Approval"]
+        types:
+            - completed
+
+jobs:
+    integration-tests:
+        if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.merged == false)
+        strategy:
+            max-parallel: 1
+            matrix:
+                php: ['8.2', '8.3', '8.4', '8.5']
+        environment:
+            name: testing
+            # Reviewer werden im GitHub-UI für das Environment konfiguriert
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v2
+
+            - uses: shivammathur/setup-php@v2
+              with:
+                  php-version: ${{ matrix.php }}
+                  tools: composer
+                  coverage: none
+
+            - name: Install dependencies
+              run: composer install --prefer-dist --no-progress
+
+            - name: run tests
+              run: ./vendor/bin/phpunit --stop-on-failure --stop-on-error
+              env:
+                  COLLECTION: ${{ secrets.COLLECTION }}
+                  APIKEY: ${{ secrets.APIKEY }}
