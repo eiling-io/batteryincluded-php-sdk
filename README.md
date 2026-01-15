@@ -14,7 +14,7 @@ The [API documentation](https://www.postman.com/batteryincluded/core/overview) p
 The SDK requires a PHP version of 8.2 or higher. The recommended way to install the SDK is through [Composer](http://getcomposer.org).
 
 ```bash
-composer composer require batteryincluded/batteryincluded-php-sdk
+composer require batteryincluded/batteryincluded-php-sdk
 ```
 
 ### Usage
