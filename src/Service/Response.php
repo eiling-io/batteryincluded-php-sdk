@@ -13,7 +13,10 @@ class Response
     public function getBody(): array
     {
         $responseRaw = $this->getRawResponse();
-        if( !$responseRaw ) return [];
+        if (!$responseRaw) {
+            return [];
+        }
+
         return json_decode($responseRaw, true);
     }
 

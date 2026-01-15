@@ -16,12 +16,13 @@ class RecommendationsResponse extends Response
 
         $body = $this->getBody();
 
-        if (empty($body)){
+        if (empty($body)) {
             $this->recommendations = [
                 'related' => [],
                 'also' => [],
-                'together' => []
+                'together' => [],
             ];
+
             return;
         }
 
