@@ -1,0 +1,32 @@
+name: code-style-and-static-analysis
+
+on:
+    push:
+        branches: [ main ]
+    pull_request:
+        branches: [ main ]
+
+jobs:
+    test-codestyles:
+        strategy:
+            matrix:
+                php: ['8.2']
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - uses: shivammathur/setup-php@v2
+              with:
+                php-version: ${{ matrix.php }}
+                tools: composer
+                coverage: none
+
+            - name: Install dependencies
+              run: composer install --prefer-dist --no-progress
+
+            - name: run code php-cs-fixer
+              run: ./tools/php-cs-fixer fix --config=.php-cs-fixer.php --dry-run
+
+            - name: run phpstan
+              run: ./tools/phpstan analyse -l 5 ./src
