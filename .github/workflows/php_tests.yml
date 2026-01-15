@@ -8,7 +8,7 @@ on:
 
 jobs:
     integration-tests:
-        if: ${{ github.event.workflow_run.conclusion == 'success' }}
+        environment: testing
         strategy:
             max-parallel: 1
             matrix:
