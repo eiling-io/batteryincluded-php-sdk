@@ -1,14 +1,14 @@
-name: ci
+name: integration-tests
 
 on:
     push:
         branches: [ main ]
-    pull_request:
-        types: [opened, synchronize, reopened]
+    pull_request_target:
+        types: [labeled]
 
 jobs:
     integration-tests:
-        environment: testing
+        if: github.event.label.name == 'ready-to-test'
         strategy:
             max-parallel: 1
             matrix:
@@ -17,7 +17,8 @@ jobs:
 
         steps:
             - uses: actions/checkout@v4
-
+              with:
+                ref: ${{ github.event.pull_request.head.sha }}
             - uses: shivammathur/setup-php@v2
               with:
                   php-version: ${{ matrix.php }}

@@ -1,4 +1,4 @@
-name: ci
+name: code-style-and-static-analysis
 
 on:
     push:
