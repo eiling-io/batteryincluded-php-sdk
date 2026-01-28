@@ -31,11 +31,12 @@ class CurlHttpClient implements HttpClientInterface
         curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
 
         $response = curl_exec($ch);
+        $statusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
         if (curl_errno($ch)) {
             throw new \Exception(curl_error($ch));
         }
 
-        return new Response($response);
+        return new Response($response, $statusCode);
     }
 }

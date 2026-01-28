@@ -19,6 +19,6 @@ class PresetsService
             []
         );
 
-        return new PresetsResponse($response->getRawResponse());
+        return new PresetsResponse($response->getRawResponse(), $response->getStatusCode());
     }
 }

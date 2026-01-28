@@ -21,7 +21,7 @@ class PresetsResponseTest extends TestCase
         ];
         $json = json_encode($data);
 
-        $response = new PresetsResponse($json);
+        $response = new PresetsResponse($json, 200);
         $presets = $response->getPresets();
 
         $this->assertCount(2, $presets);

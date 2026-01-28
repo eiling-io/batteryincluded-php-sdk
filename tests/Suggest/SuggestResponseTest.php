@@ -57,7 +57,7 @@ class SuggestResponseTest extends TestCase
             ],
         ]);
 
-        $suggestResponse = new SuggestResponse($responseRaw);
+        $suggestResponse = new SuggestResponse($responseRaw, 200);
 
         $this->assertEquals(2, $suggestResponse->getFounds());
         $this->assertEquals(['<b>Dokument 1</b>', '<b>Dokument 2</b>'], $suggestResponse->getDocuments());

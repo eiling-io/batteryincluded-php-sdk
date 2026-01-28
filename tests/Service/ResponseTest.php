@@ -15,7 +15,7 @@ class ResponseTest extends TestCase
     {
         $data = ['foo' => 'bar', 'baz' => 123];
         $json = json_encode($data);
-        $response = new Response($json);
+        $response = new Response($json, 200);
 
         $this->assertSame($data, $response->getBody());
     }
@@ -23,7 +23,7 @@ class ResponseTest extends TestCase
     public function testGetRawResponseReturnsOriginalString()
     {
         $json = '{"key":"value"}';
-        $response = new Response($json);
+        $response = new Response($json, 200);
 
         $this->assertSame($json, $response->getRawResponse());
     }

@@ -15,9 +15,9 @@ class BrowseResponse extends Response
     private array $codesExtension = [];
     private array $promotionsExtension = [];
 
-    public function __construct(string $responseRaw, private BrowseSearchStruct $searchStruct)
+    public function __construct(string $responseRaw, private BrowseSearchStruct $searchStruct, int $statusCode = 200)
     {
-        parent::__construct($responseRaw);
+        parent::__construct($responseRaw, $statusCode);
 
         foreach ($this->getBody()['extensions'] as $extensionData) {
             switch ($extensionData['type']) {

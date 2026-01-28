@@ -26,6 +26,6 @@ class SimilarSearchService
             []
         );
 
-        return new SimilarSearchResponse($response->getRawResponse());
+        return new SimilarSearchResponse($response->getRawResponse(), $response->getStatusCode());
     }
 }

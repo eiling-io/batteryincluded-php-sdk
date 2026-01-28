@@ -11,9 +11,9 @@ class HighlightsResponse extends Response
     private $querySuggestions;
     private $searches;
 
-    public function __construct(string $responseRaw)
+    public function __construct(string $responseRaw, int $statusCode)
     {
-        parent::__construct($responseRaw);
+        parent::__construct($responseRaw, $statusCode);
         $this->querySuggestions = $this->getBody()['querySuggestions'] ?? [];
         $this->searches = $this->getBody()['searches'] ?? [];
     }

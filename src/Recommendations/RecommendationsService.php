@@ -25,6 +25,6 @@ class RecommendationsService
             []
         );
 
-        return new RecommendationsResponse($response->getRawResponse());
+        return new RecommendationsResponse($response->getRawResponse(), $response->getStatusCode());
     }
 }

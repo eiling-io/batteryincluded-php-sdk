@@ -6,14 +6,14 @@ namespace BatteryIncludedSdk\Service;
 
 class Response
 {
-    public function __construct(private string $responseRaw)
+    public function __construct(private string $responseRaw, private int $statusCode)
     {
     }
 
     public function getBody(): array
     {
         $responseRaw = $this->getRawResponse();
-        if (!$responseRaw) {
+        if (!$responseRaw || $this->getStatusCode() === 404) {
             return [];
         }
 
@@ -23,5 +23,10 @@ class Response
     public function getRawResponse(): string
     {
         return $this->responseRaw;
+    }
+
+    public function getStatusCode(): int
+    {
+        return $this->statusCode;
     }
 }
