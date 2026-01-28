@@ -23,10 +23,19 @@ class RecommendationsResponseTest extends TestCase
         ];
         $responseRaw = json_encode($data);
 
-        $recommendations = (new RecommendationsResponse($responseRaw))->getRecommendations();
+        $recommendations = (new RecommendationsResponse($responseRaw, 200))->getRecommendations();
 
         $this->assertCount(2, $recommendations['together']);
         $this->assertCount(2, $recommendations['also']);
         $this->assertCount(2, $recommendations['related']);
+    }
+
+    public function testGetRecommendationsReturnsEmptyArraysIfBodyIsEmpty(): void
+    {
+        $recommendations = (new RecommendationsResponse('', 404))->getRecommendations();
+
+        $this->assertCount(0, $recommendations['together']);
+        $this->assertCount(0, $recommendations['also']);
+        $this->assertCount(0, $recommendations['related']);
     }
 }

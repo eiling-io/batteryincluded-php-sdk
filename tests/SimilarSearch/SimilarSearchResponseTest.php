@@ -32,7 +32,7 @@ class SimilarSearchResponseTest extends TestCase
             ],
         ]);
 
-        $response = new SimilarSearchResponse($responseRaw);
+        $response = new SimilarSearchResponse($responseRaw, 200);
 
         $similarSearches = $response->getSimilarSearches();
 

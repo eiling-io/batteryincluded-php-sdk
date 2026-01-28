@@ -18,9 +18,9 @@ class SuggestResponse extends Response
 
     private bool $llm = false;
 
-    public function __construct(string $responseRaw)
+    public function __construct(string $responseRaw, int $statusCode)
     {
-        parent::__construct($responseRaw);
+        parent::__construct($responseRaw, $statusCode);
         foreach ($this->getBody() as $value) {
             if ($value['llm'] ?? false) {
                 $this->llm = true;

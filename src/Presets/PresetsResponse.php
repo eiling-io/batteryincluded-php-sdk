@@ -10,9 +10,9 @@ class PresetsResponse extends Response
 {
     private array $presets;
 
-    public function __construct(string $responseRaw)
+    public function __construct(string $responseRaw, int $statusCode)
     {
-        parent::__construct($responseRaw);
+        parent::__construct($responseRaw, $statusCode);
         $this->presets = [];
         foreach ($this->getBody() as $preset) {
             $this->presets[] = new PresetsDto(

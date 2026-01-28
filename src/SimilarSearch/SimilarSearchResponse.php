@@ -10,9 +10,9 @@ class SimilarSearchResponse extends Response
 {
     private array $similarSearches;
 
-    public function __construct(string $responseRaw)
+    public function __construct(string $responseRaw, int $statusCode)
     {
-        parent::__construct($responseRaw);
+        parent::__construct($responseRaw, $statusCode);
         $this->similarSearches = [];
         foreach (($this->getBody()['searches'] ?? []) as $similarSearch) {
             $this->similarSearches[] = new SimilarSearchDto(

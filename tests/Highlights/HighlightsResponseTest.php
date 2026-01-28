@@ -25,7 +25,7 @@ class HighlightsResponseTest extends TestCase
         ];
         $json = json_encode($data);
 
-        $response = new HighlightsResponse($json);
+        $response = new HighlightsResponse($json, 200);
 
         $this->assertSame($data['searches'], $response->getSearches());
         $this->assertSame($data['querySuggestions'], $response->getQuerySuggestions());

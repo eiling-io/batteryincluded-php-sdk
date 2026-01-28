@@ -10,9 +10,9 @@ class RecommendationsResponse extends Response
 {
     private array $recommendations;
 
-    public function __construct(string $responseRaw)
+    public function __construct(string $responseRaw, int $statusCode)
     {
-        parent::__construct($responseRaw);
+        parent::__construct($responseRaw, $statusCode);
 
         $body = $this->getBody();
 

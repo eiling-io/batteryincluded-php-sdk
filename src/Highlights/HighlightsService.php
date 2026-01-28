@@ -19,6 +19,6 @@ class HighlightsService
             []
         );
 
-        return new HighlightsResponse($response->getRawResponse());
+        return new HighlightsResponse($response->getRawResponse(), $response->getStatusCode());
     }
 }
