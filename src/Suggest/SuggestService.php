@@ -12,11 +12,31 @@ class SuggestService
     {
     }
 
+    /**
+     * @deprecated will be removed in 1.0.0, use suggestWithFilter instead
+     */
     public function suggest(string $query): SuggestResponse
     {
         $query = http_build_query(
             [
                 'q' => $query,
+            ]
+        );
+
+        $response = $this->apiClient->getJson(
+            '/documents/suggest?' . $query,
+            []
+        );
+
+        return new SuggestResponse($response->getRawResponse(), $response->getStatusCode());
+    }
+
+    public function suggestWithFilter(SuggestSearchStruct $searchStruct): SuggestResponse
+    {
+        $query = http_build_query(
+            [
+                'q' => $searchStruct->getQuery(),
+                'f' => $searchStruct->getFilters(),
             ]
         );
 
