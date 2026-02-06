@@ -45,6 +45,6 @@ class SuggestService
             []
         );
 
-        return new SuggestResponse($response->getRawResponse());
+        return new SuggestResponse($response->getRawResponse(), $response->getStatusCode());
     }
 }
