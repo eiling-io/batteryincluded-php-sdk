@@ -1,4 +1,4 @@
-![Alt](https://repobeats.axiom.co/api/embed/96ce2691516d9a6a2821e3b67c5280059efe89b2.svg "Repobeats analytics image")
+![Alt](https://repobeats.axiom.co/api/embed/96ce2691516d9a6a2821e3b67c5280059efe89b2.svg "Repobeats analytics image")[![Discord](https://img.shields.io/badge/Discord-Join%20Server-7289DA?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/fAbqNjwG)
 
 [![Latest Stable Version](https://poser.pugx.org/batteryincluded/batteryincluded-php-sdk/v/stable)](https://packagist.org/packages/batteryincluded/batteryincluded-php-sdk) [![Packagist](https://img.shields.io/packagist/dt/batteryincluded/batteryincluded-php-sdk.svg)](https://packagist.org/packages/batteryincluded/batteryincluded-php-sdk)
 
@@ -18,4 +18,8 @@ composer require batteryincluded/batteryincluded-php-sdk
 ```
 
 ### Usage
-You can find for every implemented api action an example file in the examples directory. 
+You can find for every implemented api action an example file in the examples directory.
+
+## Community
+
+Join our community on [Discord](https://discord.gg/fAbqNjwG) to ask questions, give feedback, or connect with other developers.
