@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
+use BatteryIncludedSdk\CartRecommendations\CartRecommendationsService;
 use BatteryIncludedSdk\Client\ApiClient;
 use BatteryIncludedSdk\Client\CurlHttpClient;
-use BatteryIncludedSdk\CartRecommendations\CartRecommendationsService;
 
 require_once __DIR__ . '/../../vendor/autoload.php';
 require_once __DIR__ . '/../credentials.php';
@@ -19,5 +19,5 @@ $apiClient = new ApiClient(
 $cartRecommendationService = new CartRecommendationsService($apiClient);
 
 echo '<pre>';
-print_r(json_encode($cartRecommendationService->recommendByIdentifiers(['3665800','3187241'])->getRecommendations()));
+print_r(json_encode($cartRecommendationService->recommendByIdentifiers(['3665800', '3187241'])->getRecommendations()));
 echo '</pre>';

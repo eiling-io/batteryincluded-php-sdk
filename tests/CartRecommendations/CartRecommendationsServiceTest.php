@@ -2,14 +2,17 @@
 
 declare(strict_types=1);
 
-namespace CartRecommendations;
+namespace BatteryIncludedSdkTests\CartRecommendations;
 
 use BatteryIncludedSdk\CartRecommendations\CartRecommendationsResponse;
 use BatteryIncludedSdk\CartRecommendations\CartRecommendationsService;
 use BatteryIncludedSdk\Client\ApiClient;
 use BatteryIncludedSdk\Service\Response;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(CartRecommendationsResponse::class)]
+#[CoversClass(CartRecommendationsService::class)]
 class CartRecommendationsServiceTest extends TestCase
 {
     public function testRecommendByIdentifiersBuildsCorrectQueryString()
@@ -22,7 +25,7 @@ class CartRecommendationsServiceTest extends TestCase
         $mockApiClient->expects($this->once())
             ->method('getJson')
             ->with(
-                $this->callback(function($url) {
+                $this->callback(function ($url) {
                     return str_contains($url, 'ids%5B0%5D=PRODUCT-1') && str_contains($url, 'ids%5B1%5D=PRODUCT-2');
                 }),
                 []
@@ -34,4 +37,3 @@ class CartRecommendationsServiceTest extends TestCase
         $this->assertInstanceOf(CartRecommendationsResponse::class, $response);
     }
 }
-

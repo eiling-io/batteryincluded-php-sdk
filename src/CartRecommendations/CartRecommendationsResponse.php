@@ -11,8 +11,5 @@ class CartRecommendationsResponse extends Response
     public function __construct(string $responseRaw, int $statusCode)
     {
         parent::__construct($responseRaw, $statusCode);
-
-        // TODO check result with valid data
-        return $this->getBody();
     }
 }
