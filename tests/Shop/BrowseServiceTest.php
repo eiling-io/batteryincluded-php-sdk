@@ -140,4 +140,34 @@ class BrowseServiceTest extends TestCase
         $this->assertEquals(1, $result->getPage());
         $this->assertEquals(0, $result->getPages());
     }
+
+    public function testBrowseMethodWithVariablesAgainstLiveApi()
+    {
+        $products = Helper::generateProducts(20);
+        $apiClient = Helper::getApiClient();
+        $syncService = new SyncService($apiClient);
+
+        $result = $syncService->syncOneOrManyElements(...$products);
+        $this->assertCount(720, $result->getBody());
+        $browseService = new BrowseService(Helper::getApiClient());
+        $searchStruct = new BrowseSearchStruct();
+        $searchStruct->setQuery('extension');
+        $searchStruct->addVariable('locale', 'DE');
+        $result = $browseService->browse($searchStruct);
+
+        $this->assertContainsOnlyInstancesOf(FacetDto::class, $result->getFacets());
+
+        $this->assertInstanceOf(BrowseResponse::class, $result);
+        $this->assertCount(0, $result->getHits());
+        $this->assertCount(4, $result->getAllExtensions());
+        $this->assertCount(1, $result->getCodesExtensions());
+        $this->assertCount(1, $result->getRedirectsExtensions());
+        $this->assertCount(1, $result->getPromotionsExtensions());
+        $this->assertCount(1, $result->getTeaserExtensions());
+
+        $this->assertEquals(0, $result->getFound());
+
+        $this->assertEquals(1, $result->getPage());
+        $this->assertEquals(0, $result->getPages());
+    }
 }

@@ -14,16 +14,17 @@ class BrowseService
 
     public function browse(BrowseSearchStruct $searchStruct): BrowseResponse
     {
-        $query = http_build_query(
-            [
-                'q' => $searchStruct->getQuery(),
-                'f' => $searchStruct->getFilters(),
-                'page' => $searchStruct->getPage(),
-                'per_page' => $searchStruct->getPerPage(),
-                'sort' => $searchStruct->getSort(),
-                'preset' => $searchStruct->getPresetId(),
-            ]
-        );
+        $queryArray = [
+            'q' => $searchStruct->getQuery(),
+            'f' => $searchStruct->getFilters(),
+            'v' => $searchStruct->getVariables(),
+            'page' => $searchStruct->getPage(),
+            'per_page' => $searchStruct->getPerPage(),
+            'sort' => $searchStruct->getSort(),
+            'preset' => $searchStruct->getPresetId(),
+        ];
+
+        $query = http_build_query($queryArray);
 
         $response = $this->apiClient->getJson(
             '/documents/browse?' . $query,
