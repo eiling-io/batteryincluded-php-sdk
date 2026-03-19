@@ -20,7 +20,7 @@ class CartRecommendationsService
         $query = http_build_query(compact('ids'));
 
         $response = $this->apiClient->getJson(
-            '/documents/cart-recommendations?' . $query,
+            '/documents/recommendations/cart?' . $query,
             []
         );
 

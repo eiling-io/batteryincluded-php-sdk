@@ -19,5 +19,5 @@ $apiClient = new ApiClient(
 $cartRecommendationService = new CartRecommendationsService($apiClient);
 
 echo '<pre>';
-print_r(json_encode($cartRecommendationService->recommendByIdentifiers(['3665800', '3187241'])->getRecommendations()));
+print_r(json_encode($cartRecommendationService->recommendByIdentifiers(['n2000002058', 'n1000224412'])->getRecommendations()));
 echo '</pre>';
