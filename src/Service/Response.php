@@ -22,7 +22,7 @@ class Response
 
     public function getRawResponse(): string
     {
-        return $this->responseRaw;
+        return $this->responseRaw ?? '';
     }
 
     public function getStatusCode(): int
