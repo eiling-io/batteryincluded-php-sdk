@@ -80,4 +80,17 @@ class BrowseSearchStructTest extends TestCase
         $struct->setSort('name:asc');
         $this->assertSame('name:asc', $struct->getSort());
     }
+
+    public function testAddAndGetVariables()
+    {
+        $struct = new BrowseSearchStruct();
+        $this->assertSame([], $struct->getVariables());
+        $struct->addVariable('foo', 'bar');
+        $struct->addVariable('baz', 'qux');
+        $expected = [
+            'foo' => 'bar',
+            'baz' => 'qux',
+        ];
+        $this->assertSame($expected, $struct->getVariables());
+    }
 }

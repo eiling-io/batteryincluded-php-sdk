@@ -18,6 +18,8 @@ class BrowseSearchStruct
 
     protected string $presetId = '';
 
+    protected array $variables = [];
+
     public function getPresetId(): string
     {
         return $this->presetId;
@@ -91,5 +93,15 @@ class BrowseSearchStruct
     public function setSort(string $sort): void
     {
         $this->sort = $sort;
+    }
+
+    public function addVariable(string $name, string $value): void
+    {
+        $this->variables[$name] = $value;
+    }
+
+    public function getVariables(): array
+    {
+        return $this->variables;
     }
 }
