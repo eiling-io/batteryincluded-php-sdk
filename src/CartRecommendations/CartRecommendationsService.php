@@ -12,12 +12,12 @@ class CartRecommendationsService
     {
     }
 
-    public function recommendByIdentifiers(array $identifiers, string $type = 'PRODUCT'): CartRecommendationsResponse
+    public function recommendByIdentifiers(array $identifiers, array $f = [], string $type = 'PRODUCT'): CartRecommendationsResponse
     {
         $ids = array_map(static function ($id) use ($type) {
             return $type . '-' . $id;
         }, $identifiers);
-        $query = http_build_query(compact('ids'));
+        $query = http_build_query(compact('ids', 'f'));
 
         $response = $this->apiClient->getJson(
             '/documents/recommendations/cart?' . $query,
