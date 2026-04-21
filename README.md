@@ -20,6 +20,72 @@ composer require batteryincluded/batteryincluded-php-sdk
 ### Usage
 You can find for every implemented api action an example file in the examples directory.
 
+### Extending ProductBaseDto with Custom Fields
+
+`ProductBaseDto` covers the standard product fields (`name`, `description`, `ordernumber`, `price`, `instock`, `rating`, etc.). To sync additional, shop-specific fields (e.g. `keywords`, `material`, `color`), extend the class and override `jsonSerialize()`.
+
+**1. Create a subclass**
+
+```php
+use BatteryIncludedSdk\Dto\ProductBaseDto;
+
+class ProductDto extends ProductBaseDto
+{
+    private ?string $keywords = null;
+
+    public function setKeywords(string $keywords): void
+    {
+        $this->keywords = $keywords;
+    }
+
+    private function getKeywords(): ?string
+    {
+        return $this->keywords;
+    }
+
+    public function jsonSerialize(): array
+    {
+        $jsonDto = [
+            'keywords' => $this->getKeywords(),
+        ];
+
+        return array_merge_recursive(
+            parent::jsonSerialize(),
+            ['_' . $this->getType() => array_filter($jsonDto, static fn($value) => $value !== null)]
+        );
+    }
+}
+```
+
+The custom fields must be nested under the `_PRODUCT` key (i.e. `'_' . $this->getType()`). `array_merge_recursive` merges them into the parent payload without overwriting the base fields. `array_filter` strips `null` values so only populated fields are sent.
+
+**2. Populate and sync**
+
+```php
+use BatteryIncludedSdk\Client\ApiClient;
+use BatteryIncludedSdk\Client\CurlHttpClient;
+use BatteryIncludedSdk\Service\SyncService;
+
+$product = new ProductDto('1');
+$product->setName('iPhone 15 Pro');
+$product->setOrdernumber('AP-001-128GB');
+$product->setPrice(1199.00);
+$product->setInstock(42);
+$product->setKeywords('smartphone apple ios');
+
+$apiClient = new ApiClient(
+    new CurlHttpClient(),
+    'https://api.batteryincluded.io/api/v1/collections/',
+    $collection,
+    $apiKey
+);
+
+$syncService = new SyncService($apiClient);
+$result = $syncService->syncFullElements($product);
+```
+
+Pass multiple products as separate arguments to `syncFullElements()` to sync them in a single request. A full working example is available in [`examples/extension/product.php`](examples/extension/product.php).
+
 ## Community
 
 Join our community on [Discord](https://discord.gg/fAbqNjwG) to ask questions, give feedback, or connect with other developers.
