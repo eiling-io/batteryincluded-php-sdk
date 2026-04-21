@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use BatteryIncludedSdk\Dto\ProductBaseDto;
 use BatteryIncludedSdk\Client\ApiClient;
 use BatteryIncludedSdk\Client\CurlHttpClient;
+use BatteryIncludedSdk\Dto\ProductBaseDto;
 use BatteryIncludedSdk\Service\SyncService;
 
 require_once __DIR__ . '/../../vendor/autoload.php';
@@ -22,7 +22,7 @@ class ProductDto extends ProductBaseDto
 
         $jsonRaw = array_merge_recursive(
             parent::jsonSerialize(),
-            ['_' . $this->getType() => array_filter($jsonDto, static fn($value) => $value !== null)]
+            ['_' . $this->getType() => array_filter($jsonDto, static fn ($value) => $value !== null)]
         );
 
         return $jsonRaw;
@@ -44,16 +44,16 @@ $storages = ['128GB', '256GB', '512GB'];
 $id = 0;
 foreach ($storages as $storage) {
     $id++;
-    $product = new ProductDto((string)$id);
+    $product = new ProductDto((string) $id);
     $product->setName('Storage: ' . $storage);
     $product->setDescription(
         'Storage: ' . $storage . '.'
     );
-    $product->setId((string)$id);
+    $product->setId((string) $id);
     $product->setOrdernumber('AP-00' . $id . '-' . $storage);
     $product->setPrice(1000 + $id);
     $product->setInstock(random_int(0, 50));
-    $product->setRating((float)(random_int(1, 10) / 2));
+    $product->setRating((float) (random_int(1, 10) / 2));
     $product->setManufacture('Apple');
     $product->setManufactureNumber('A' . $id . '-' . $storage);
 
