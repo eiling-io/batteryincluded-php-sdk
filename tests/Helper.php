@@ -78,6 +78,9 @@ class Helper
         );
     }
 
+    /**
+     * @return BlogBaseDto[]
+     */
     public static function generateBlogs(int $int): array
     {
         $blogs = [];

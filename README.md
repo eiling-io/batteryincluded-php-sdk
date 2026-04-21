@@ -86,6 +86,90 @@ $result = $syncService->syncFullElements($product);
 
 Pass multiple products as separate arguments to `syncFullElements()` to sync them in a single request. A full working example is available in [`examples/extension/product.php`](examples/extension/product.php).
 
+### Mixed Index: Products and Blog Posts in a Single Collection
+
+A single collection can hold multiple document types. Each document carries a `type` field and a type-scoped data key (e.g. `_PRODUCT`, `_BLOG`), so the index stores heterogeneous content while still allowing type-specific searches.
+
+**1. Sync products and blogs together**
+
+```php
+use BatteryIncludedSdk\Client\ApiClient;
+use BatteryIncludedSdk\Client\CurlHttpClient;
+use BatteryIncludedSdk\Dto\BlogBaseDto;
+use BatteryIncludedSdk\Dto\ProductBaseDto;
+use BatteryIncludedSdk\Service\SyncService;
+
+$product = new ProductBaseDto('1');
+$product->setName('iPhone 15 Pro');
+$product->setPrice(1199.00);
+
+$blog = new BlogBaseDto('1');
+$blog->setTitle('Top 5 Smartphones 2024');
+$blog->setAuthor('Jane Doe');
+$blog->setPublishedAt('2024-06-01');
+
+$apiClient = new ApiClient(
+    new CurlHttpClient(),
+    'https://api.batteryincluded.io/api/v1/collections/',
+    $collection,
+    $apiKey
+);
+
+$syncService = new SyncService($apiClient);
+$syncService->syncFullElements($product, $blog);
+```
+
+Each document is stored with a prefixed ID (`PRODUCT-1`, `BLOG-1`) and a `type` field, so documents from different types never collide even when their identifiers overlap.
+
+**2. Search all types at once**
+
+```php
+use BatteryIncludedSdk\Shop\BrowseSearchStruct;
+use BatteryIncludedSdk\Shop\BrowseService;
+
+$searchStruct = new BrowseSearchStruct();
+$searchStruct->setQuery('iPhone');
+
+$browseService = new BrowseService($apiClient);
+$result = $browseService->browse($searchStruct); // returns products AND blogs
+```
+
+**3. Filter to a specific type**
+
+Pass `type` as a filter key to restrict results to only products or only blog posts:
+
+```php
+// Only products
+$searchStruct = new BrowseSearchStruct();
+$searchStruct->setQuery('iPhone');
+$searchStruct->addFilter('type', 'PRODUCT');
+
+// Only blog posts
+$searchStruct = new BrowseSearchStruct();
+$searchStruct->setQuery('iPhone');
+$searchStruct->addFilter('type', 'BLOG');
+```
+
+**4. Access type-specific fields in the result**
+
+Each hit contains the type-scoped key, so check `type` first to access the right payload:
+
+```php
+foreach ($result->getHits() as $hit) {
+    $document = $hit['document'];
+
+    if ($document['type'] === 'PRODUCT') {
+        $data = $document['_PRODUCT'];
+        echo $data['name'] . ' – ' . $data['price'] . ' €';
+    } elseif ($document['type'] === 'BLOG') {
+        $data = $document['_BLOG'];
+        echo $data['title'] . ' by ' . $data['author'];
+    }
+}
+```
+
+A full working example is available in [`examples/sync/sync_full_product_and_blogs.php`](examples/sync/sync_full_product_and_blogs.php).
+
 ## Community
 
 Join our community on [Discord](https://discord.gg/fAbqNjwG) to ask questions, give feedback, or connect with other developers.
