@@ -17,7 +17,7 @@ class Response
             return [];
         }
 
-        return (array)json_decode($responseRaw, true) ?? [];
+        return (array) json_decode($responseRaw, true);
     }
 
     public function getRawResponse(): string
