@@ -148,7 +148,7 @@ class BlogBaseDto extends AbstractDto
 
         $jsonRaw = array_merge(
             parent::jsonSerialize(),
-            ['_' . $this->getType() => array_filter($jsonDto, static fn ($value) => $value !== null)]
+            ['_' . $this->getType() => $this->filterJsonValues($jsonDto)]
         );
 
         return $jsonRaw;

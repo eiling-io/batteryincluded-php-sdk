@@ -10,6 +10,8 @@ abstract class AbstractDto implements DtoInterface
 
     protected string $type;
 
+    protected bool $exportNullValues = false;
+
     public function __construct(string $identifier, string $type)
     {
         $this->identifier = $identifier;
@@ -24,6 +26,22 @@ abstract class AbstractDto implements DtoInterface
     final public function getType(): string
     {
         return mb_strtoupper($this->type);
+    }
+
+    public function exportNullValues(bool $export = true): static
+    {
+        $this->exportNullValues = $export;
+
+        return $this;
+    }
+
+    protected function filterJsonValues(array $values): array
+    {
+        if ($this->exportNullValues) {
+            return $values;
+        }
+
+        return array_filter($values, static fn ($value) => $value !== null);
     }
 
     public function jsonSerialize(): array

@@ -92,4 +92,57 @@ class ProductBaseDtoTest extends TestCase
 
         $this->assertSame($expected, $dto->jsonSerialize());
     }
+
+    public function testJsonSerializeExportsNullValuesWhenEnabled()
+    {
+        $id = '1';
+        $type = 'PRODUCT';
+        $dto = new ProductBaseDto($id, $type);
+        $dto->setId($id);
+        $dto->setName('Name');
+        $dto->setPrice(1.5);
+
+        $this->assertSame($dto, $dto->exportNullValues());
+
+        $expected = [
+            'id' => $type . '-' . $id,
+            'type' => $type,
+            '_' . $type => [
+                'id' => '1',
+                'name' => 'Name',
+                'description' => null,
+                'ordernumber' => null,
+                'manufacture' => null,
+                'manufactureNumber' => null,
+                'ean' => null,
+                'imageUrl' => null,
+                'shopUrl' => null,
+                'price' => 1.5,
+                'instock' => null,
+                'rating' => null,
+                'categories' => null,
+                'properties' => null,
+            ],
+        ];
+
+        $this->assertSame($expected, $dto->jsonSerialize());
+    }
+
+    public function testJsonSerializeFiltersNullValuesByDefault()
+    {
+        $dto = new ProductBaseDto('1', 'PRODUCT');
+        $dto->setId('1');
+
+        $this->assertSame(['id' => '1'], $dto->jsonSerialize()['_PRODUCT']);
+    }
+
+    public function testExportNullValuesCanBeDisabledAgain()
+    {
+        $dto = new ProductBaseDto('1', 'PRODUCT');
+        $dto->setId('1');
+        $dto->exportNullValues();
+        $dto->exportNullValues(false);
+
+        $this->assertSame(['id' => '1'], $dto->jsonSerialize()['_PRODUCT']);
+    }
 }

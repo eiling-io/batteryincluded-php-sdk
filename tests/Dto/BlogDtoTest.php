@@ -57,4 +57,29 @@ final class BlogDtoTest extends TestCase
             'active' => true,
         ], $json['_BLOG']);
     }
+
+    public function testJsonSerializeExportsNullValuesWhenEnabled(): void
+    {
+        $dto = new BlogBaseDto('1');
+        $dto->setId('1');
+        $dto->setTitle('Title');
+        $dto->setActive(true);
+
+        $this->assertSame($dto, $dto->exportNullValues());
+
+        $json = $dto->jsonSerialize();
+
+        $this->assertSame([
+            'id' => '1',
+            'title' => 'Title',
+            'author' => null,
+            'publishedAt' => null,
+            'active' => true,
+            'shortDescription' => null,
+            'description' => null,
+            'previewImage' => null,
+            'relatedArticles' => null,
+            'blogUrl' => null,
+        ], $json['_BLOG']);
+    }
 }
