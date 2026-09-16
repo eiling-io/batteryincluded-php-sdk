@@ -7,6 +7,7 @@ namespace BatteryIncludedSdkTests\Dto;
 use BatteryIncludedSdk\Dto\CategoryDto;
 use BatteryIncludedSdk\Dto\ProductBaseDto;
 use BatteryIncludedSdk\Dto\ProductPropertyDto;
+use BatteryIncludedSdk\Dto\AbstractTranslation;
 use BatteryIncludedSdk\Dto\ProductTranslation;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
@@ -14,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 
 #[CoversClass(ProductBaseDto::class)]
 #[UsesClass(ProductTranslation::class)]
+#[UsesClass(AbstractTranslation::class)]
 class ProductBaseDtoTest extends TestCase
 {
     public function testSettersAndGetters()
@@ -151,7 +153,7 @@ class ProductBaseDtoTest extends TestCase
         $dto->setId('1');
         $dto->setName('English name');
         $dto->setShopUrl('https://shop.example/product-1');
-        $dto->addTranslation('de', new ProductTranslation(name: 'Deutscher Name'));
+        $dto->addTranslation(new ProductTranslation(locale: 'de', name: 'Deutscher Name'));
 
         $json = $dto->jsonSerialize();
 

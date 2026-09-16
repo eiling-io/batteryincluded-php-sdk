@@ -10,6 +10,7 @@ use BatteryIncludedSdk\Client\HttpClientInterface;
 use BatteryIncludedSdk\Dto\CategoryDto;
 use BatteryIncludedSdk\Dto\ProductBaseDto;
 use BatteryIncludedSdk\Dto\ProductPropertyDto;
+use BatteryIncludedSdk\Dto\AbstractTranslation;
 use BatteryIncludedSdk\Dto\ProductTranslation;
 use BatteryIncludedSdk\Service\Response;
 use BatteryIncludedSdk\Service\SyncService;
@@ -26,6 +27,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(ProductBaseDto::class)]
 #[UsesClass(ProductPropertyDto::class)]
 #[UsesClass(ProductTranslation::class)]
+#[UsesClass(AbstractTranslation::class)]
 class SyncServiceTest extends TestCase
 {
     public function testSyncOneOrManyUsesApiClientsConfiguredDefaultLocale()
@@ -45,7 +47,7 @@ class SyncServiceTest extends TestCase
 
         $product = new ProductBaseDto('1');
         $product->setName('Widget');
-        $product->addTranslation('de', new ProductTranslation(name: 'Gerät'));
+        $product->addTranslation(new ProductTranslation(locale: 'de', name: 'Gerät'));
 
         $syncService->syncOneOrManyElements($product);
 

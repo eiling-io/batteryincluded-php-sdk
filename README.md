@@ -59,7 +59,7 @@ $searchStruct->addFilter('_PRODUCT.categories', 'Apple > iPhone');
 
 Translatable fields — `name`, `description`, `categories`, `properties` for products; `title`, `shortDescription`, `description` for blogs; plus an optional per-locale `url` — are stored under `_i18n.<locale>._PRODUCT` (or `_BLOG`), mirroring the type-scoped key used at the top level. Everything else (price, stock, EAN, author, publish date, ...) stays structural, under the top-level `_PRODUCT`/`_BLOG` only. A search request naming that same locale via `v[locale]` (see above) is what the API uses to merge the matching translation back into `_PRODUCT`/`_BLOG` on the way out.
 
-The existing setters (`setName()`, `setDescription()`, `addCategory()`, `setProperties()`, `setTitle()`, ...) are unchanged and write into the `ApiClient`'s configured default locale — single-language integrations don't need to change anything. To sync additional languages on the same document, pin the locale the setters write to with `locale()`, then add further languages with `addTranslation()`:
+The existing setters (`setName()`, `setDescription()`, `addCategory()`, `setProperties()`, `setTitle()`, ...) are unchanged and write into the `ApiClient`'s configured default locale — single-language integrations don't need to change anything. To sync additional languages on the same document, pin the locale the setters write to with `locale()`, then add further languages with `addTranslation()` — every `ProductTranslation`/`BlogTranslation` requires its own `locale` (it's the first constructor argument, no default), so a translation can never end up without one:
 
 ```php
 use BatteryIncludedSdk\Dto\ProductBaseDto;
@@ -72,7 +72,8 @@ $product->locale('de');
 $product->setName('Ultra HD HDR LED-TV 75"');
 $product->setDescription('Ultra HD HDR LED-TV 75" (189 cm)');
 
-$product->addTranslation('en', new ProductTranslation(
+$product->addTranslation(new ProductTranslation(
+    locale: 'en',
     name: 'Ultra HD HDR LED TV 75"',
     description: 'Ultra HD HDR LED TV 75" (75 inch)',
 ));

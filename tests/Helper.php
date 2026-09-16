@@ -74,7 +74,8 @@ class Helper
 
                         // en translation alongside the de content above, synced in the same document (see
                         // addTranslation() in ProductBaseDto / the "Localization (i18n)" section of the README)
-                        $product->addTranslation('en', new ProductTranslation(
+                        $product->addTranslation(new ProductTranslation(
+                            locale: 'en',
                             name: $device . ' ' . $i . ' Pro ' . $colorEn . ' - ' . $storage,
                             description: 'The latest ' . $device . ' with advanced features. Color: ' . $colorEn . ', Storage: ' . $storage . '.',
                             categories: array_values(array_unique(array_merge(
@@ -122,7 +123,8 @@ class Helper
             $blog->setPublishedAt((new \DateTime())->modify('-' . (30 - $i) . ' days')->format('Y-m-d'));
 
             // en translation alongside the de content above, synced in the same document
-            $blog->addTranslation('en', new BlogTranslation(
+            $blog->addTranslation(new BlogTranslation(
+                locale: 'en',
                 title: 'Blog Post ' . $i . ' (EN)',
                 description: 'This is the English content of blog post number ' . $i . '.',
             ));

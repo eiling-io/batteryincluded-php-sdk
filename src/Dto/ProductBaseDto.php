@@ -34,9 +34,6 @@ class ProductBaseDto extends AbstractDto
 
     private ?ProductPropertyDto $properties = null;
 
-    /** @var array<string, ProductTranslation> additional locales beyond the one written by the flat setters */
-    private array $translations = [];
-
     public function __construct(string $identifier, string $type = 'PRODUCT')
     {
         parent::__construct($identifier, $type);
@@ -187,32 +184,23 @@ class ProductBaseDto extends AbstractDto
     }
 
     /**
-     * Adds (or replaces) a translation for an additional locale. The locale reached by the flat
-     * setters (setName(), setDescription(), addCategory(), setProperties()) is controlled via locale().
+     * Adds (or replaces) a translation for the locale it carries (ProductTranslation::getLocale()).
+     * The locale reached by the flat setters (setName(), setDescription(), addCategory(), setProperties())
+     * is controlled via locale().
      */
-    public function addTranslation(string $locale, ProductTranslation $translation): void
+    public function addTranslation(ProductTranslation $translation): void
     {
-        $this->translations[$locale] = $translation;
+        $this->storeTranslation($translation);
     }
 
     public function jsonSerialize(): array
     {
-        $translations = [$this->activeLocale() => new ProductTranslation(
+        $primary = new ProductTranslation(
+            $this->activeLocale(),
             $this->getName(),
             $this->getDescription(),
             $this->getCategories() ?? [],
             $this->getProperties(),
-        )];
-
-        foreach ($this->translations as $locale => $translation) {
-            $translations[$locale] = $translation;
-        }
-
-        $i18n = array_map(
-            fn (ProductTranslation $translation) => [
-                '_' . $this->getType() => $this->filterJsonValues($this->withUrlFallback($translation)),
-            ],
-            $translations
         );
 
         $jsonDto = [
@@ -231,21 +219,9 @@ class ProductBaseDto extends AbstractDto
         return array_merge(
             parent::jsonSerialize(),
             [
-                '_i18n' => $i18n,
+                '_i18n' => $this->buildI18n($primary, $this->shopUrl),
                 '_' . $this->getType() => $this->filterJsonValues($jsonDto),
             ]
         );
-    }
-
-    /**
-     * The product URL is often identical across locales, so a translation that doesn't set its own
-     * falls back to shopUrl() rather than forcing every addTranslation() call to repeat it.
-     */
-    private function withUrlFallback(ProductTranslation $translation): array
-    {
-        $payload = $translation->toArray();
-        $payload['url'] ??= $this->shopUrl;
-
-        return $payload;
     }
 }

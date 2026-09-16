@@ -26,9 +26,6 @@ class BlogBaseDto extends AbstractDto
 
     private ?string $blogUrl = null;
 
-    /** @var array<string, BlogTranslation> additional locales beyond the one written by the flat setters */
-    private array $translations = [];
-
     public function __construct(string $identifier, string $type = 'BLOG')
     {
         parent::__construct($identifier, $type);
@@ -135,31 +132,22 @@ class BlogBaseDto extends AbstractDto
     }
 
     /**
-     * Adds (or replaces) a translation for an additional locale. The locale reached by the flat
-     * setters (setTitle(), setShortDescription(), setDescription()) is controlled via locale().
+     * Adds (or replaces) a translation for the locale it carries (BlogTranslation::getLocale()).
+     * The locale reached by the flat setters (setTitle(), setShortDescription(), setDescription())
+     * is controlled via locale().
      */
-    public function addTranslation(string $locale, BlogTranslation $translation): void
+    public function addTranslation(BlogTranslation $translation): void
     {
-        $this->translations[$locale] = $translation;
+        $this->storeTranslation($translation);
     }
 
     public function jsonSerialize(): array
     {
-        $translations = [$this->activeLocale() => new BlogTranslation(
+        $primary = new BlogTranslation(
+            $this->activeLocale(),
             $this->getTitle(),
             $this->getShortDescription(),
             $this->getDescription(),
-        )];
-
-        foreach ($this->translations as $locale => $translation) {
-            $translations[$locale] = $translation;
-        }
-
-        $i18n = array_map(
-            fn (BlogTranslation $translation) => [
-                '_' . $this->getType() => $this->filterJsonValues($this->withUrlFallback($translation)),
-            ],
-            $translations
         );
 
         $jsonDto = [
@@ -175,21 +163,9 @@ class BlogBaseDto extends AbstractDto
         return array_merge(
             parent::jsonSerialize(),
             [
-                '_i18n' => $i18n,
+                '_i18n' => $this->buildI18n($primary, $this->blogUrl),
                 '_' . $this->getType() => $this->filterJsonValues($jsonDto),
             ]
         );
-    }
-
-    /**
-     * The blog URL is often identical across locales, so a translation that doesn't set its own
-     * falls back to blogUrl() rather than forcing every addTranslation() call to repeat it.
-     */
-    private function withUrlFallback(BlogTranslation $translation): array
-    {
-        $payload = $translation->toArray();
-        $payload['url'] ??= $this->blogUrl;
-
-        return $payload;
     }
 }

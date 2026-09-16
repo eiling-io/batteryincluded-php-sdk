@@ -50,13 +50,15 @@ $multiLanguageProduct->addCategory(
     (new CategoryDto())->addCategoryNode('Elektronik')->addCategoryNode('Fernseher')
 );
 
-$multiLanguageProduct->addTranslation('en', new ProductTranslation(
+$multiLanguageProduct->addTranslation(new ProductTranslation(
+    locale: 'en',
     name: 'Ultra HD HDR LED TV 65"',
     description: 'Ultra HD HDR LED TV 65" (65 inch)',
     categories: (new CategoryDto())->addCategoryNode('Electronics')->addCategoryNode('TVs')->jsonSerialize(),
     properties: (new ProductPropertyDto())->addProperty('Colour', 'Black'),
 ));
-$multiLanguageProduct->addTranslation('fr', new ProductTranslation(
+$multiLanguageProduct->addTranslation(new ProductTranslation(
+    locale: 'fr',
     name: 'TV LED HDR Ultra HD 65"',
     description: 'TV LED HDR Ultra HD 65" (165 cm)',
     categories: (new CategoryDto())->addCategoryNode('Électronique')->addCategoryNode('Téléviseurs')->jsonSerialize(),

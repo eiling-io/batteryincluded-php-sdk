@@ -6,6 +6,7 @@ namespace Dto;
 
 use BatteryIncludedSdk\Dto\AbstractDto;
 use BatteryIncludedSdk\Dto\BlogBaseDto;
+use BatteryIncludedSdk\Dto\AbstractTranslation;
 use BatteryIncludedSdk\Dto\BlogTranslation;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
@@ -14,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(BlogBaseDto::class)]
 #[CoversClass(AbstractDto::class)]
 #[UsesClass(BlogTranslation::class)]
+#[UsesClass(AbstractTranslation::class)]
 final class BlogDtoTest extends TestCase
 {
     public function testSettersAndGetters(): void
@@ -102,7 +104,7 @@ final class BlogDtoTest extends TestCase
         $dto->setId('1');
         $dto->setTitle('English title');
         $dto->setBlogUrl('https://blog.example/en/post');
-        $dto->addTranslation('de', new BlogTranslation(title: 'Deutscher Titel'));
+        $dto->addTranslation(new BlogTranslation(locale: 'de', title: 'Deutscher Titel'));
 
         $json = $dto->jsonSerialize();
 
