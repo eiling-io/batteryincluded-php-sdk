@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace BatteryIncludedSdkTests\Dto;
 
+use BatteryIncludedSdk\Dto\AbstractTranslation;
 use BatteryIncludedSdk\Dto\CategoryDto;
 use BatteryIncludedSdk\Dto\ProductBaseDto;
 use BatteryIncludedSdk\Dto\ProductPropertyDto;
-use BatteryIncludedSdk\Dto\AbstractTranslation;
 use BatteryIncludedSdk\Dto\ProductTranslation;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;

@@ -6,10 +6,10 @@ namespace BatteryIncludedSdkTests\Shop;
 
 use BatteryIncludedSdk\Client\ApiClient;
 use BatteryIncludedSdk\Client\CurlHttpClient;
+use BatteryIncludedSdk\Dto\AbstractTranslation;
 use BatteryIncludedSdk\Dto\CategoryDto;
 use BatteryIncludedSdk\Dto\ProductBaseDto;
 use BatteryIncludedSdk\Dto\ProductPropertyDto;
-use BatteryIncludedSdk\Dto\AbstractTranslation;
 use BatteryIncludedSdk\Dto\ProductTranslation;
 use BatteryIncludedSdk\Service\AbstractService;
 use BatteryIncludedSdk\Service\Response;

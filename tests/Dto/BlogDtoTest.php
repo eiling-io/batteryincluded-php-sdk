@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Dto;
 
 use BatteryIncludedSdk\Dto\AbstractDto;
-use BatteryIncludedSdk\Dto\BlogBaseDto;
 use BatteryIncludedSdk\Dto\AbstractTranslation;
+use BatteryIncludedSdk\Dto\BlogBaseDto;
 use BatteryIncludedSdk\Dto\BlogTranslation;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
