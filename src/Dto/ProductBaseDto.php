@@ -34,6 +34,9 @@ class ProductBaseDto extends AbstractDto
 
     private ?ProductPropertyDto $properties = null;
 
+    /** @var array<string, ProductAvailability> */
+    private array $availabilities = [];
+
     public function __construct(string $identifier, string $type = 'PRODUCT')
     {
         parent::__construct($identifier, $type);
@@ -193,6 +196,16 @@ class ProductBaseDto extends AbstractDto
         $this->storeTranslation($translation);
     }
 
+    /**
+     * Adds (or replaces) per-market data for the market it carries (ProductAvailability::getMarket()).
+     * Independent of locale/_i18n: a market like "de" or "at" can each get their own active flag,
+     * stock, price and categories, overriding the structural/default ones below for that market.
+     */
+    public function addAvailability(ProductAvailability $availability): void
+    {
+        $this->availabilities[$availability->getMarket()] = $availability;
+    }
+
     public function jsonSerialize(): array
     {
         $primary = new ProductTranslation(
@@ -216,12 +229,21 @@ class ProductBaseDto extends AbstractDto
             'rating' => $this->getRating(),
         ];
 
-        return array_merge(
+        $result = array_merge(
             parent::jsonSerialize(),
             [
                 '_i18n' => $this->buildI18n($primary, $this->shopUrl),
                 '_' . $this->getType() => $this->filterJsonValues($jsonDto),
             ]
         );
+
+        if ($this->availabilities !== []) {
+            $result['_availability'] = array_map(
+                fn (ProductAvailability $availability) => $this->filterJsonValues($availability->toArray()),
+                $this->availabilities
+            );
+        }
+
+        return $result;
     }
 }

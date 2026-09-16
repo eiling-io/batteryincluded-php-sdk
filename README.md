@@ -97,6 +97,40 @@ This syncs:
 
 `BlogBaseDto` works the same way via `BlogTranslation`/`addTranslation()`. A full working example is available in [`examples/sync/sync_multilingual_products.php`](examples/sync/sync_multilingual_products.php).
 
+**Market availability**
+
+Separate from language: a product can be sold on several markets/domains at once, each with its own availability, stock and — optionally — price and categories. This has nothing to do with `_i18n`/locale (a market code like `de` for the `domain.de` storefront is not the German language, even though it can look identical) — use `addAvailability()` on `ProductBaseDto`:
+
+```php
+use BatteryIncludedSdk\Dto\ProductAvailability;
+use BatteryIncludedSdk\Dto\ProductBaseDto;
+
+$product = new ProductBaseDto('1');
+$product->setId('1');
+$product->setPrice(699.0); // fallback/base price, used wherever no market override exists
+
+$product->addAvailability(new ProductAvailability(market: 'de', active: true, instock: 14, price: 699.0));
+$product->addAvailability(new ProductAvailability(market: 'at', active: true, instock: 3, price: 729.0));
+$product->addAvailability(new ProductAvailability(market: 'ch', active: false)); // not sold there right now
+
+(new SyncService($apiClient))->syncOneOrManyElements($product);
+```
+
+This syncs a `_availability.<market>` block alongside `_PRODUCT`/`_i18n` (omitted entirely when no `addAvailability()` call was made):
+
+```json
+{
+  "_PRODUCT": {"id": "1", "price": 699},
+  "_availability": {
+    "de": {"active": true, "instock": 14, "price": 699},
+    "at": {"active": true, "instock": 3, "price": 729},
+    "ch": {"active": false}
+  }
+}
+```
+
+Like `ProductTranslation`, every `ProductAvailability` requires its own `market` (first constructor argument, no default). A full working example is available in [`examples/sync/sync_product_availability.php`](examples/sync/sync_product_availability.php).
+
 ### Extending ProductBaseDto with Custom Fields
 
 `ProductBaseDto` covers the standard product fields (`name`, `description`, `ordernumber`, `price`, `instock`, `rating`, etc.). Translatable ones (`name`, `description`, `categories`, `properties`) are synced under `_i18n.<locale>` (see [Localization](#localization-i18n)); the rest stay under `_PRODUCT`. To sync additional, shop-specific structural fields (e.g. `keywords`, `material`, `color`), extend the class and override `jsonSerialize()`.

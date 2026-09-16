@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace BatteryIncludedSdkTests\Dto;
 
+use BatteryIncludedSdk\Dto\AbstractAvailability;
 use BatteryIncludedSdk\Dto\AbstractTranslation;
 use BatteryIncludedSdk\Dto\CategoryDto;
+use BatteryIncludedSdk\Dto\ProductAvailability;
 use BatteryIncludedSdk\Dto\ProductBaseDto;
 use BatteryIncludedSdk\Dto\ProductPropertyDto;
 use BatteryIncludedSdk\Dto\ProductTranslation;
@@ -16,6 +18,8 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(ProductBaseDto::class)]
 #[UsesClass(ProductTranslation::class)]
 #[UsesClass(AbstractTranslation::class)]
+#[UsesClass(ProductAvailability::class)]
+#[UsesClass(AbstractAvailability::class)]
 class ProductBaseDtoTest extends TestCase
 {
     public function testSettersAndGetters()
@@ -168,6 +172,30 @@ class ProductBaseDtoTest extends TestCase
             $json['_i18n']['de']['_PRODUCT']
         );
         $this->assertSame('https://shop.example/product-1', $json['_PRODUCT']['shopUrl']);
+    }
+
+    public function testJsonSerializeOmitsAvailabilityWhenNoneAdded()
+    {
+        $dto = new ProductBaseDto('1', 'PRODUCT');
+        $dto->setId('1');
+
+        $this->assertArrayNotHasKey('_availability', $dto->jsonSerialize());
+    }
+
+    public function testJsonSerializeIncludesPerMarketAvailability()
+    {
+        $dto = new ProductBaseDto('1', 'PRODUCT');
+        $dto->setId('1');
+        $dto->addAvailability(new ProductAvailability(market: 'de', active: true, instock: 14, price: 699.0));
+        $dto->addAvailability(new ProductAvailability(market: 'ch', active: false));
+
+        $json = $dto->jsonSerialize();
+
+        $this->assertSame(
+            ['active' => true, 'instock' => 14, 'price' => 699.0],
+            $json['_availability']['de']
+        );
+        $this->assertSame(['active' => false], $json['_availability']['ch']);
     }
 
     public function testJsonSerializeFiltersNullValuesByDefault()
