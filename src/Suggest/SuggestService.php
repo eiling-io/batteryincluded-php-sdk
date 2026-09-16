@@ -33,10 +33,13 @@ class SuggestService
 
     public function suggestWithFilter(SuggestSearchStruct $searchStruct): SuggestResponse
     {
+        $locale = $searchStruct->getLocale() ?? $this->apiClient->getDefaultLocale();
+
         $query = http_build_query(
             [
                 'q' => $searchStruct->getQuery(),
                 'f' => $searchStruct->getFilters(),
+                'v' => ['locale' => $locale],
             ]
         );
 

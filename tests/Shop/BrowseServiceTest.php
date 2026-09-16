@@ -9,6 +9,7 @@ use BatteryIncludedSdk\Client\CurlHttpClient;
 use BatteryIncludedSdk\Dto\CategoryDto;
 use BatteryIncludedSdk\Dto\ProductBaseDto;
 use BatteryIncludedSdk\Dto\ProductPropertyDto;
+use BatteryIncludedSdk\Dto\ProductTranslation;
 use BatteryIncludedSdk\Service\AbstractService;
 use BatteryIncludedSdk\Service\Response;
 use BatteryIncludedSdk\Service\SyncService;
@@ -49,6 +50,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(FacetCategoryDto::class)]
 #[UsesClass(ProductBaseDto::class)]
 #[UsesClass(ProductPropertyDto::class)]
+#[UsesClass(ProductTranslation::class)]
 #[UsesClass(AbstractService::class)]
 #[UsesClass(SyncService::class)]
 class BrowseServiceTest extends TestCase

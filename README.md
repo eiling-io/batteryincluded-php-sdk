@@ -20,9 +20,85 @@ composer require batteryincluded/batteryincluded-php-sdk
 ### Usage
 You can find for every implemented api action an example file in the examples directory.
 
+### Localization (i18n)
+
+Every request the API sees is resolved against a `locale` code. Rather than passing it everywhere, the SDK centralizes it as a default, configured once on `ApiClient` (it defaults to `'de'` when omitted):
+
+```php
+$apiClient = new ApiClient(
+    new CurlHttpClient(),
+    'https://api.batteryincluded.io/api/v1/collections/',
+    $collection,
+    $apiKey,
+    'de' // default locale for search and for products/blogs synced without an explicit translation
+);
+```
+
+**Search (Browse, Suggest, Similar Search)**
+
+Search structs fall back to the ApiClient's default locale automatically. Call `setLocale()` to search a different language for a single request:
+
+```php
+$searchStruct = new BrowseSearchStruct();
+$searchStruct->setQuery('iPhone');
+$searchStruct->setLocale('en'); // optional, overrides the configured default for this request only
+
+$result = (new BrowseService($apiClient))->browse($searchStruct);
+```
+
+The same `setLocale()` exists on `SuggestSearchStruct`; `SimilarSearchService::search($query, $locale = null)` takes it as an optional second argument.
+
+The `v[locale]` sent along with every search request (this is what `setLocale()`/the `ApiClient` default controls) tells the API which `_i18n.<locale>._PRODUCT` (or `_BLOG`) translation to merge into `_PRODUCT`/`_BLOG` for that response. So on the read side — filters, sorting, and reading hits — you always use the plain, un-prefixed field path; the locale is only ever passed once, via `v[locale]`, not repeated in every field path:
+
+```php
+$searchStruct->addFilter('_PRODUCT.properties.Farbe', 'Schwarz');
+$searchStruct->addFilter('_PRODUCT.categories', 'Apple > iPhone');
+```
+
+**Sync**
+
+Translatable fields — `name`, `description`, `categories`, `properties` for products; `title`, `shortDescription`, `description` for blogs; plus an optional per-locale `url` — are stored under `_i18n.<locale>._PRODUCT` (or `_BLOG`), mirroring the type-scoped key used at the top level. Everything else (price, stock, EAN, author, publish date, ...) stays structural, under the top-level `_PRODUCT`/`_BLOG` only. A search request naming that same locale via `v[locale]` (see above) is what the API uses to merge the matching translation back into `_PRODUCT`/`_BLOG` on the way out.
+
+The existing setters (`setName()`, `setDescription()`, `addCategory()`, `setProperties()`, `setTitle()`, ...) are unchanged and write into the `ApiClient`'s configured default locale — single-language integrations don't need to change anything. To sync additional languages on the same document, pin the locale the setters write to with `locale()`, then add further languages with `addTranslation()`:
+
+```php
+use BatteryIncludedSdk\Dto\ProductBaseDto;
+use BatteryIncludedSdk\Dto\ProductTranslation;
+
+$product = new ProductBaseDto('1');
+$product->setId('1');
+$product->setShopUrl('https://shop.example/product-1'); // reused for every locale unless a translation overrides it
+$product->locale('de');
+$product->setName('Ultra HD HDR LED-TV 75"');
+$product->setDescription('Ultra HD HDR LED-TV 75" (189 cm)');
+
+$product->addTranslation('en', new ProductTranslation(
+    name: 'Ultra HD HDR LED TV 75"',
+    description: 'Ultra HD HDR LED TV 75" (75 inch)',
+));
+
+(new SyncService($apiClient))->syncOneOrManyElements($product);
+```
+
+This syncs:
+
+```json
+{
+  "id": "PRODUCT-1",
+  "type": "PRODUCT",
+  "_PRODUCT": {"id": "1", "shopUrl": "https://shop.example/product-1"},
+  "_i18n": {
+    "de": {"_PRODUCT": {"name": "Ultra HD HDR LED-TV 75\"", "description": "...", "url": "https://shop.example/product-1"}},
+    "en": {"_PRODUCT": {"name": "Ultra HD HDR LED TV 75\"", "description": "...", "url": "https://shop.example/product-1"}}
+  }
+}
+```
+
+`BlogBaseDto` works the same way via `BlogTranslation`/`addTranslation()`. A full working example is available in [`examples/sync/sync_multilingual_products.php`](examples/sync/sync_multilingual_products.php).
+
 ### Extending ProductBaseDto with Custom Fields
 
-`ProductBaseDto` covers the standard product fields (`name`, `description`, `ordernumber`, `price`, `instock`, `rating`, etc.). To sync additional, shop-specific fields (e.g. `keywords`, `material`, `color`), extend the class and override `jsonSerialize()`.
+`ProductBaseDto` covers the standard product fields (`name`, `description`, `ordernumber`, `price`, `instock`, `rating`, etc.). Translatable ones (`name`, `description`, `categories`, `properties`) are synced under `_i18n.<locale>` (see [Localization](#localization-i18n)); the rest stay under `_PRODUCT`. To sync additional, shop-specific structural fields (e.g. `keywords`, `material`, `color`), extend the class and override `jsonSerialize()`.
 
 **1. Create a subclass**
 
@@ -152,7 +228,7 @@ $searchStruct->addFilter('type', 'BLOG');
 
 **4. Access type-specific fields in the result**
 
-Each hit contains the type-scoped key, so check `type` first to access the right payload:
+Each hit contains the type-scoped key, already merged with the locale requested via `v[locale]` (see [Localization](#localization-i18n)). Check `type` first to access the right payload:
 
 ```php
 foreach ($result->getHits() as $hit) {

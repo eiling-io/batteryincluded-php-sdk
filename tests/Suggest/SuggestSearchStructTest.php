@@ -42,4 +42,17 @@ class SuggestSearchStructTest extends TestCase
         $struct = new SuggestSearchStruct();
         $this->assertSame([], $struct->getFilters());
     }
+
+    public function testLocaleDefaultsToNull(): void
+    {
+        $struct = new SuggestSearchStruct();
+        $this->assertNull($struct->getLocale());
+    }
+
+    public function testSetAndGetLocale(): void
+    {
+        $struct = new SuggestSearchStruct();
+        $struct->setLocale('en');
+        $this->assertSame('en', $struct->getLocale());
+    }
 }

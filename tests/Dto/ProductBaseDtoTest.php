@@ -7,10 +7,13 @@ namespace BatteryIncludedSdkTests\Dto;
 use BatteryIncludedSdk\Dto\CategoryDto;
 use BatteryIncludedSdk\Dto\ProductBaseDto;
 use BatteryIncludedSdk\Dto\ProductPropertyDto;
+use BatteryIncludedSdk\Dto\ProductTranslation;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(ProductBaseDto::class)]
+#[UsesClass(ProductTranslation::class)]
 class ProductBaseDtoTest extends TestCase
 {
     public function testSettersAndGetters()
@@ -84,9 +87,15 @@ class ProductBaseDtoTest extends TestCase
             'type' => $type,
             '_' . $type => [
                 'id' => '1',
-                'name' => 'Name',
                 'price' => 1.5,
-                'categories' => ['A'],
+            ],
+            '_i18n' => [
+                'de' => [
+                    '_PRODUCT' => [
+                        'name' => 'Name',
+                        'categories' => ['A'],
+                    ],
+                ],
             ],
         ];
 
@@ -109,8 +118,6 @@ class ProductBaseDtoTest extends TestCase
             'type' => $type,
             '_' . $type => [
                 'id' => '1',
-                'name' => 'Name',
-                'description' => null,
                 'ordernumber' => null,
                 'manufacture' => null,
                 'manufactureNumber' => null,
@@ -120,12 +127,45 @@ class ProductBaseDtoTest extends TestCase
                 'price' => 1.5,
                 'instock' => null,
                 'rating' => null,
-                'categories' => null,
-                'properties' => null,
+            ],
+            '_i18n' => [
+                'de' => [
+                    '_PRODUCT' => [
+                        'name' => 'Name',
+                        'description' => null,
+                        'categories' => null,
+                        'properties' => null,
+                        'url' => null,
+                    ],
+                ],
             ],
         ];
 
         $this->assertSame($expected, $dto->jsonSerialize());
+    }
+
+    public function testJsonSerializeRoutesTranslatableFieldsToConfiguredLocale()
+    {
+        $dto = new ProductBaseDto('1', 'PRODUCT');
+        $dto->locale('en');
+        $dto->setId('1');
+        $dto->setName('English name');
+        $dto->setShopUrl('https://shop.example/product-1');
+        $dto->addTranslation('de', new ProductTranslation(name: 'Deutscher Name'));
+
+        $json = $dto->jsonSerialize();
+
+        // properties/categories stay their own translation-scoped fields, distinct from any structural data
+        $this->assertSame(
+            ['name' => 'English name', 'url' => 'https://shop.example/product-1'],
+            $json['_i18n']['en']['_PRODUCT']
+        );
+        // the shop URL is identical for every locale here, so both translations inherit it without repeating it
+        $this->assertSame(
+            ['name' => 'Deutscher Name', 'url' => 'https://shop.example/product-1'],
+            $json['_i18n']['de']['_PRODUCT']
+        );
+        $this->assertSame('https://shop.example/product-1', $json['_PRODUCT']['shopUrl']);
     }
 
     public function testJsonSerializeFiltersNullValuesByDefault()

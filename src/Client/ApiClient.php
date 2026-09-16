@@ -13,7 +13,13 @@ class ApiClient
         private string $baseUrl,
         private string $collection,
         private string $apiKey,
+        private string $defaultLocale = 'de',
     ) {
+    }
+
+    public function getDefaultLocale(): string
+    {
+        return $this->defaultLocale;
     }
 
     public function getJson(string $urlPart, array $parameters): Response

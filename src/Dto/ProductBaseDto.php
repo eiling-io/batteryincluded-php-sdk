@@ -34,6 +34,9 @@ class ProductBaseDto extends AbstractDto
 
     private ?ProductPropertyDto $properties = null;
 
+    /** @var array<string, ProductTranslation> additional locales beyond the one written by the flat setters */
+    private array $translations = [];
+
     public function __construct(string $identifier, string $type = 'PRODUCT')
     {
         parent::__construct($identifier, $type);
@@ -183,12 +186,37 @@ class ProductBaseDto extends AbstractDto
         $this->properties = $properties;
     }
 
+    /**
+     * Adds (or replaces) a translation for an additional locale. The locale reached by the flat
+     * setters (setName(), setDescription(), addCategory(), setProperties()) is controlled via locale().
+     */
+    public function addTranslation(string $locale, ProductTranslation $translation): void
+    {
+        $this->translations[$locale] = $translation;
+    }
+
     public function jsonSerialize(): array
     {
+        $translations = [$this->activeLocale() => new ProductTranslation(
+            $this->getName(),
+            $this->getDescription(),
+            $this->getCategories() ?? [],
+            $this->getProperties(),
+        )];
+
+        foreach ($this->translations as $locale => $translation) {
+            $translations[$locale] = $translation;
+        }
+
+        $i18n = array_map(
+            fn (ProductTranslation $translation) => [
+                '_' . $this->getType() => $this->filterJsonValues($this->withUrlFallback($translation)),
+            ],
+            $translations
+        );
+
         $jsonDto = [
             'id' => $this->getId(),
-            'name' => $this->getName(),
-            'description' => $this->getDescription(),
             'ordernumber' => $this->getOrdernumber(),
             'manufacture' => $this->getManufacture(),
             'manufactureNumber' => $this->getManufactureNumber(),
@@ -198,15 +226,26 @@ class ProductBaseDto extends AbstractDto
             'price' => $this->getPrice(),
             'instock' => $this->getInstock(),
             'rating' => $this->getRating(),
-            'categories' => $this->getCategories(),
-            'properties' => $this->getProperties(),
         ];
 
-        $jsonRaw = array_merge(
+        return array_merge(
             parent::jsonSerialize(),
-            ['_' . $this->getType() => $this->filterJsonValues($jsonDto)]
+            [
+                '_i18n' => $i18n,
+                '_' . $this->getType() => $this->filterJsonValues($jsonDto),
+            ]
         );
+    }
 
-        return $jsonRaw;
+    /**
+     * The product URL is often identical across locales, so a translation that doesn't set its own
+     * falls back to shopUrl() rather than forcing every addTranslation() call to repeat it.
+     */
+    private function withUrlFallback(ProductTranslation $translation): array
+    {
+        $payload = $translation->toArray();
+        $payload['url'] ??= $this->shopUrl;
+
+        return $payload;
     }
 }

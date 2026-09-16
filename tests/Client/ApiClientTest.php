@@ -21,4 +21,16 @@ class ApiClientTest extends TestCase
         $this->expectException(\Exception::class);
         $apiClient->postJson('/clear', 'INVALID_ARGUMENT');
     }
+
+    public function testDefaultLocaleDefaultsToGerman()
+    {
+        $apiClient = new ApiClient(new CurlHttpClient(), 'https://aaa', 'collection', 'apikey');
+        $this->assertSame('de', $apiClient->getDefaultLocale());
+    }
+
+    public function testDefaultLocaleIsConfigurable()
+    {
+        $apiClient = new ApiClient(new CurlHttpClient(), 'https://aaa', 'collection', 'apikey', 'en');
+        $this->assertSame('en', $apiClient->getDefaultLocale());
+    }
 }

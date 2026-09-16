@@ -21,7 +21,8 @@ $apiClient = new ApiClient(
     new CurlHttpClient(),
     'https://api.batteryincluded.io/api/v1/collections/',
     $collection,
-    $apiKey
+    $apiKey,
+    $locale
 );
 
 $_GET['per_page'] = (int) ($_GET['per_page'] ?? 10);
@@ -142,6 +143,9 @@ foreach ($result->getFacets() as $facet) {
             <div class="row row-cols-4 row-cols-md-4 g-4">
                 <?php
 foreach ($result->getHits() as $hit) {
+    // browse() always sends v[locale] (see setLocale()/ApiClient's default locale), and the API merges
+    // the matching _i18n.<locale>._PRODUCT content into _PRODUCT for the response - so name/description
+    // are read straight from _PRODUCT here, same as the structural fields (price, image, stock ...).
     $data = $hit['document']['_PRODUCT'];
     echo '
         <div class="mb-3 col">
