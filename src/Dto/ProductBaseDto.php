@@ -239,7 +239,9 @@ class ProductBaseDto extends AbstractDto
 
         if ($this->availabilities !== []) {
             $result['_availability'] = array_map(
-                fn (ProductAvailability $availability) => $this->filterJsonValues($availability->toArray()),
+                fn (ProductAvailability $availability) => [
+                    '_' . $this->getType() => $this->filterJsonValues($availability->toArray()),
+                ],
                 $this->availabilities
             );
         }

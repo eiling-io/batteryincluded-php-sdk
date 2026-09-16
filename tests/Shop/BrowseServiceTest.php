@@ -71,11 +71,12 @@ class BrowseServiceTest extends TestCase
         $this->assertCount(720, $result->getBody());
         $browseService = new BrowseService(Helper::getApiClient());
         $searchStruct = new BrowseSearchStruct();
-        $searchStruct->addFilter('_PRODUCT.properties.Speicherkapazität', '512GB');
+        $searchStruct->setLocale('de');
+        $searchStruct->addFilter('_i18n._PRODUCT.properties.Storage', '512GB');
         $searchStruct->setSort('_PRODUCT.price:asc');
-        $searchStruct->addFilter('_PRODUCT.categories', 'Apple > iPhone > iPhone 18 Pro');
-        $searchStruct->addFilter('_PRODUCT.properties.Farbe', 'Schwarz');
-        $searchStruct->addFilter('_PRODUCT.properties.Farbe', 'Blau');
+        $searchStruct->addFilter('_i18n._PRODUCT.categories', 'Apple > iPhone > iPhone 18 Pro');
+        $searchStruct->addFilter('_i18n._PRODUCT.properties.Color', 'Schwarz');
+        $searchStruct->addFilter('_i18n._PRODUCT.properties.Color', 'Blau');
         $searchStruct->setQuery('iPhone');
         $result = $browseService->browse($searchStruct);
 
@@ -90,6 +91,39 @@ class BrowseServiceTest extends TestCase
         $this->assertEquals($result->getPages(), 1);
     }
 
+    /**
+     * Documents the expected en-locale behaviour: filtering on the English property value should
+     * return English content. Currently fails against the live API - see the "Backend availability"
+     * note in the README's Localization section: requesting v[locale]=en still resolves _i18n to the
+     * de content and _i18n.en._PRODUCT is not searchable at all, regardless of the requested locale.
+     * This looks like a BatteryIncluded-side locale/field-mapping config issue for this collection,
+     * not an SDK bug - the "en" translation is present in the synced document (verified via id lookup),
+     * it just isn't resolved/indexed for search yet.
+     */
+    public function testBrowseMethodWithEnglishLocaleAgainstLiveApi()
+    {
+        $products = Helper::generateProducts(20);
+        $apiClient = Helper::getApiClient();
+        $syncService = new SyncService($apiClient);
+
+        $result = $syncService->syncOneOrManyElements(...$products);
+        $this->assertCount(720, $result->getBody());
+
+        $browseService = new BrowseService(Helper::getApiClient());
+        $searchStruct = new BrowseSearchStruct();
+        $searchStruct->setLocale('en');
+        $searchStruct->addFilter('_i18n._PRODUCT.properties.Color', 'Blue');
+        $result = $browseService->browse($searchStruct);
+
+        $this->assertGreaterThan(0, $result->getFound());
+
+        foreach ($result->getHits() as $hit) {
+            $translation = $hit['document']['_i18n']['_PRODUCT'];
+            $this->assertStringContainsString('Blue', $translation['name']);
+            $this->assertStringContainsString('Color: Blue', $translation['description']);
+        }
+    }
+
     public function testBrowseMethodWithPresetAgainstLiveApi()
     {
         $products = Helper::generateProducts(20);
@@ -100,12 +134,13 @@ class BrowseServiceTest extends TestCase
         $this->assertCount(720, $result->getBody());
         $browseService = new BrowseService(Helper::getApiClient());
         $searchStruct = new BrowseSearchStruct();
-        $searchStruct->addFilter('_PRODUCT.properties.Speicherkapazität', '512GB');
+        $searchStruct->setLocale('de');
+        $searchStruct->addFilter('_i18n._PRODUCT.properties.Storage', '512GB');
         $searchStruct->setPresetId('857e117c-3766-494d-a692-d7a23c384c33');
         $searchStruct->setSort('_PRODUCT.price:asc');
-        $searchStruct->addFilter('_PRODUCT.categories', 'Apple > iPhone > iPhone 18 Pro');
-        $searchStruct->addFilter('_PRODUCT.properties.Farbe', 'Schwarz');
-        $searchStruct->addFilter('_PRODUCT.properties.Farbe', 'Blau');
+        $searchStruct->addFilter('_i18n._PRODUCT.categories', 'Apple > iPhone > iPhone 18 Pro');
+        $searchStruct->addFilter('_i18n._PRODUCT.properties.Color', 'Schwarz');
+        $searchStruct->addFilter('_i18n._PRODUCT.properties.Color', 'Blau');
         $searchStruct->setQuery('iPhone');
         $result = $browseService->browse($searchStruct);
 

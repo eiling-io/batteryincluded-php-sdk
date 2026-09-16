@@ -45,7 +45,7 @@ class Helper
                         $product = new ProductBaseDto((string) $id);
                         $product->setName($device . ' ' . $i . ' Pro ' . $color . ' - ' . $storage);
                         $product->setDescription(
-                            'The latest ' . $device . ' with advanced features. Color: ' . $color . ', Storage: ' . $storage . '.'
+                            'Das neueste ' . $device . ' mit fortschrittlichen Funktionen. Farbe: ' . $color . ', Speicherkapazität: ' . $storage . '.'
                         );
                         $product->setId((string) $id);
                         $product->setOrdernumber('AP-00' . $i . '-' . $color . '-' . $storage);
@@ -59,13 +59,18 @@ class Helper
                             'https://dummyimage.com/600x400/bbb/fff.png&text=' . $i . '-' . $color . '-' . $storage
                         );
                         $product->setShopUrl('https://www.apple.com/' . $device . '-' . $i . '-pro/');
-                        $product->setProperties(
-                            (new ProductPropertyDto())
-                                ->addProperty('Gerät', $device)
-                                ->addProperty('Farbe', $color)
-                                ->addProperty('Speicherkapazität', $storage)
-                                ->addProperty('Displaygröße', '6,1')
-                        );
+
+                        // property keys are not locale-specific - BatteryIncluded maps a key like
+                        // "Color" to its displayed label ("Farbe" in German UI, "Color" in English UI)
+                        // on its end, so the same keys are used across every locale below; only values
+                        // that are actual language content (e.g. the colour name) get translated.
+                        $properties = [
+                            'Device' => $device,
+                            'Color' => $color,
+                            'Storage' => $storage,
+                            'Display size' => '6,1',
+                        ];
+                        $product->setProperties(self::buildProperties($properties));
                         $product->addCategory(
                             (new CategoryDto())->addCategoryNode('Apple')->addCategoryNode($device)->addCategoryNode($device . ' ' . $i . ' Pro')
                         );
@@ -83,11 +88,10 @@ class Helper
                                 (new CategoryDto())->addCategoryNode('Apple')->addCategoryNode($device)->addCategoryNode($device . ' ' . $i . ' Pro')->jsonSerialize(),
                                 (new CategoryDto())->addCategoryNode('Apple')->addCategoryNode($device . ' Pro ' . $colorEn)->jsonSerialize(),
                             ))),
-                            properties: (new ProductPropertyDto())
-                                ->addProperty('Device', $device)
-                                ->addProperty('Colour', $colorEn)
-                                ->addProperty('Storage', $storage)
-                                ->addProperty('Display size', '6.1'),
+                            properties: self::buildProperties(array_merge($properties, [
+                                'Color' => $colorEn,
+                                'Display size' => '6.1', // en uses a decimal point, de a decimal comma
+                            ])),
                         ));
 
                         // per-market availability alongside the translations above, synced in the same
@@ -124,6 +128,19 @@ class Helper
         return $products;
     }
 
+    /**
+     * @param array<string, string> $values
+     */
+    private static function buildProperties(array $values): ProductPropertyDto
+    {
+        $properties = new ProductPropertyDto();
+        foreach ($values as $label => $value) {
+            $properties->addProperty($label, $value);
+        }
+
+        return $properties;
+    }
+
     public static function getApiClient(): ApiClient
     {
         return new ApiClient(
@@ -142,17 +159,17 @@ class Helper
         $blogs = [];
         for ($i = 1; $i <= $int; $i++) {
             $blog = new BlogBaseDto((string) $i, 'BLOG');
-            $blog->setTitle('Blog Post ' . $i);
-            $blog->setDescription('This is the content of blog post number ' . $i . '.');
-            $blog->setAuthor('Author ' . $i);
+            $blog->setTitle('Blogbeitrag ' . $i);
+            $blog->setDescription('Dies ist der Inhalt von Blogbeitrag Nummer ' . $i . '.');
+            $blog->setAuthor('Autor ' . $i);
             $blog->setPreviewImage('https://dummyimage.com/600x400/bbb/fff.png&text=Blog ' . $i);
             $blog->setPublishedAt((new \DateTime())->modify('-' . (30 - $i) . ' days')->format('Y-m-d'));
 
             // en translation alongside the de content above, synced in the same document
             $blog->addTranslation(new BlogTranslation(
                 locale: 'en',
-                title: 'Blog Post ' . $i . ' (EN)',
-                description: 'This is the English content of blog post number ' . $i . '.',
+                title: 'Blog Post ' . $i,
+                description: 'This is the content of blog post number ' . $i . '.',
             ));
 
             $blogs[] = $blog;

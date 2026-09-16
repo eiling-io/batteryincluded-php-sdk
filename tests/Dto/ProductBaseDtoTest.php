@@ -193,9 +193,9 @@ class ProductBaseDtoTest extends TestCase
 
         $this->assertSame(
             ['active' => true, 'instock' => 14, 'price' => 699.0],
-            $json['_availability']['de']
+            $json['_availability']['de']['_PRODUCT']
         );
-        $this->assertSame(['active' => false], $json['_availability']['ch']);
+        $this->assertSame(['active' => false], $json['_availability']['ch']['_PRODUCT']);
     }
 
     public function testJsonSerializeFiltersNullValuesByDefault()

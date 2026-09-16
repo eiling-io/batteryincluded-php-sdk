@@ -51,7 +51,7 @@ The same `setLocale()` exists on `SuggestSearchStruct`; `SimilarSearchService::s
 The `v[locale]` sent along with every search request (this is what `setLocale()`/the `ApiClient` default controls) tells the API which `_i18n.<locale>._PRODUCT` (or `_BLOG`) translation to merge into `_PRODUCT`/`_BLOG` for that response. So on the read side — filters, sorting, and reading hits — you always use the plain, un-prefixed field path; the locale is only ever passed once, via `v[locale]`, not repeated in every field path:
 
 ```php
-$searchStruct->addFilter('_PRODUCT.properties.Farbe', 'Schwarz');
+$searchStruct->addFilter('_PRODUCT.properties.Color', 'Schwarz');
 $searchStruct->addFilter('_PRODUCT.categories', 'Apple > iPhone');
 ```
 
@@ -116,15 +116,15 @@ $product->addAvailability(new ProductAvailability(market: 'ch', active: false));
 (new SyncService($apiClient))->syncOneOrManyElements($product);
 ```
 
-This syncs a `_availability.<market>` block alongside `_PRODUCT`/`_i18n` (omitted entirely when no `addAvailability()` call was made):
+This syncs a `_availability.<market>` block alongside `_PRODUCT`/`_i18n`, each market wrapped in the same type-scoped key (`_PRODUCT`/`_BLOG`) as `_i18n` (omitted entirely when no `addAvailability()` call was made):
 
 ```json
 {
   "_PRODUCT": {"id": "1", "price": 699},
   "_availability": {
-    "de": {"active": true, "instock": 14, "price": 699},
-    "at": {"active": true, "instock": 3, "price": 729},
-    "ch": {"active": false}
+    "de": {"_PRODUCT": {"active": true, "instock": 14, "price": 699}},
+    "at": {"_PRODUCT": {"active": true, "instock": 3, "price": 729}},
+    "ch": {"_PRODUCT": {"active": false}}
   }
 }
 ```

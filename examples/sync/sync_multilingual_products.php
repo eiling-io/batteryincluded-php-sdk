@@ -37,6 +37,9 @@ $singleLanguageProduct->setShopUrl('https://shop.example/tv-75-hdr');
 // categories and properties are what the API's category/select facets are built from (see
 // BrowseResponse::getFacets()), so translating them here is what makes facet labels come back
 // in the requested language too - there's no separate "facet sync", it's driven by this same data.
+// Property KEYS ("Color" below) are not translated per locale - BatteryIncluded maps a key to its
+// displayed label on its end, so the same key is reused across every locale; only the VALUE, which
+// is actual language content (e.g. the colour name), changes per translation.
 $multiLanguageProduct = new ProductBaseDto('1002');
 $multiLanguageProduct->setId('1002');
 $multiLanguageProduct->setShopUrl('https://shop.example/tv-65-hdr');
@@ -44,7 +47,7 @@ $multiLanguageProduct->locale('de');
 $multiLanguageProduct->setName('Ultra HD HDR LED-TV 65"');
 $multiLanguageProduct->setDescription('Ultra HD HDR LED-TV 65" (165 cm)');
 $multiLanguageProduct->setProperties(
-    (new ProductPropertyDto())->addProperty('Farbe', 'Schwarz')
+    (new ProductPropertyDto())->addProperty('Color', 'Schwarz')
 );
 $multiLanguageProduct->addCategory(
     (new CategoryDto())->addCategoryNode('Elektronik')->addCategoryNode('Fernseher')
@@ -55,14 +58,14 @@ $multiLanguageProduct->addTranslation(new ProductTranslation(
     name: 'Ultra HD HDR LED TV 65"',
     description: 'Ultra HD HDR LED TV 65" (65 inch)',
     categories: (new CategoryDto())->addCategoryNode('Electronics')->addCategoryNode('TVs')->jsonSerialize(),
-    properties: (new ProductPropertyDto())->addProperty('Colour', 'Black'),
+    properties: (new ProductPropertyDto())->addProperty('Color', 'Black'),
 ));
 $multiLanguageProduct->addTranslation(new ProductTranslation(
     locale: 'fr',
     name: 'TV LED HDR Ultra HD 65"',
     description: 'TV LED HDR Ultra HD 65" (165 cm)',
     categories: (new CategoryDto())->addCategoryNode('Électronique')->addCategoryNode('Téléviseurs')->jsonSerialize(),
-    properties: (new ProductPropertyDto())->addProperty('Couleur', 'Noir'),
+    properties: (new ProductPropertyDto())->addProperty('Color', 'Noir'),
     url: 'https://shop.example/fr/tv-65-hdr', // this locale gets its own URL instead of shopUrl()
 ));
 

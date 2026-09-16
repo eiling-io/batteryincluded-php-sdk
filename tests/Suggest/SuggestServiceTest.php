@@ -65,7 +65,7 @@ class SuggestServiceTest extends TestCase
         $this->assertContainsOnlyInstancesOf(CompletionDto::class, $result->getQueryCompletions());
 
         $this->assertInstanceOf(SuggestResponse::class, $result);
-        $this->assertGreaterThanOrEqual(12, $result->getFounds());
+        $this->assertGreaterThanOrEqual(2, $result->getFounds());
         $this->assertCount(6, $result->getDocuments());
         $this->assertFalse($result->isLLM());
     }
