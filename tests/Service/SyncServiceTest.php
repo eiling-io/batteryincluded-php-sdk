@@ -55,7 +55,7 @@ class SyncServiceTest extends TestCase
 
         $syncService->syncOneOrManyElements($product);
 
-        $decoded = json_decode(mb_trim($sentBody), true);
+        $decoded = json_decode(trim($sentBody), true);
 
         $this->assertSame(
             ['en' => ['_PRODUCT' => ['name' => 'Widget']], 'de' => ['_PRODUCT' => ['name' => 'Gerät']]],
