@@ -13,18 +13,24 @@ $apiClient = new ApiClient(
     new CurlHttpClient(),
     'https://api.batteryincluded.io/api/v1/collections/',
     $collection,
-    $apiKey
+    $apiKey,
+    $locale
 );
 
-$syncService = new BrowseService($apiClient);
+$browseService = new BrowseService($apiClient);
 $searchStruct = new BrowseSearchStruct();
-$searchStruct->addFilter('_PRODUCT.properties.Speicherkapazität', '512GB');
-$searchStruct->setSort('_PRODUCT.price:asc');
+// the API resolves v[locale] (sent automatically, see setLocale()/ApiClient's default locale) by merging
+// the matching _i18n.<locale>._PRODUCT content into _PRODUCT for this request, so filters, sorting and
+// reading hits all just use the plain _PRODUCT.* paths below - no _i18n prefix needed on the read side.
+$searchStruct->addFilter('_PRODUCT.properties.Storage', '512GB');
+ $searchStruct->setSort('_PRODUCT.price:asc');
 $searchStruct->addFilter('_PRODUCT.categories', 'Apple > iPhone > iPhone 20 Pro');
-$searchStruct->addFilter('_PRODUCT.properties.Farbe', 'Schwarz');
-$searchStruct->addFilter('_PRODUCT.properties.Farbe', 'Blau');
+$searchStruct->addFilter('_PRODUCT.properties.Color', 'Schwarz');
+$searchStruct->addFilter('_i18n._PRODUCT.properties.Color', 'Blau');
 $searchStruct->setQuery('iPhone');
-$result = $syncService->browse($searchStruct);
+// optional: overrides the ApiClient's configured default locale for this request only
+$searchStruct->setLocale('de');
+$result = $browseService->browse($searchStruct);
 
 echo '<pre>';
 print_r($result->getRawResponse());

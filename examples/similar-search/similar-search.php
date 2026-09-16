@@ -13,11 +13,14 @@ $apiClient = new ApiClient(
     new CurlHttpClient(),
     'https://api.batteryincluded.io/api/v1/collections/',
     $collection,
-    $apiKey
+    $apiKey,
+    $locale
 );
 
 $similarService = new SimilarSearchService($apiClient);
 
 echo '<pre>';
-print_r($similarService->search('Apple', 'DE')->getSimilarSearches());
+// no locale argument needed: falls back to the ApiClient's configured default ($locale above).
+// pass one explicitly, e.g. search('Apple', 'en'), to override it for a single request.
+print_r($similarService->search('Apple')->getSimilarSearches());
 echo '</pre>';

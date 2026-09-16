@@ -5,12 +5,17 @@ declare(strict_types=1);
 namespace Dto;
 
 use BatteryIncludedSdk\Dto\AbstractDto;
+use BatteryIncludedSdk\Dto\AbstractTranslation;
 use BatteryIncludedSdk\Dto\BlogBaseDto;
+use BatteryIncludedSdk\Dto\BlogTranslation;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(BlogBaseDto::class)]
 #[CoversClass(AbstractDto::class)]
+#[UsesClass(BlogTranslation::class)]
+#[UsesClass(AbstractTranslation::class)]
 final class BlogDtoTest extends TestCase
 {
     public function testSettersAndGetters(): void
@@ -53,9 +58,11 @@ final class BlogDtoTest extends TestCase
         $this->assertArrayHasKey('_BLOG', $json);
         $this->assertSame([
             'id' => '1',
-            'title' => 'Title',
             'active' => true,
         ], $json['_BLOG']);
+        $this->assertSame([
+            'de' => ['_BLOG' => ['title' => 'Title']],
+        ], $json['_i18n']);
     }
 
     public function testJsonSerializeExportsNullValuesWhenEnabled(): void
@@ -71,15 +78,37 @@ final class BlogDtoTest extends TestCase
 
         $this->assertSame([
             'id' => '1',
-            'title' => 'Title',
             'author' => null,
             'publishedAt' => null,
             'active' => true,
-            'shortDescription' => null,
-            'description' => null,
             'previewImage' => null,
             'relatedArticles' => null,
             'blogUrl' => null,
         ], $json['_BLOG']);
+        $this->assertSame([
+            'de' => [
+                '_BLOG' => [
+                    'title' => 'Title',
+                    'shortDescription' => null,
+                    'description' => null,
+                    'url' => null,
+                ],
+            ],
+        ], $json['_i18n']);
+    }
+
+    public function testJsonSerializeRoutesTranslatableFieldsToConfiguredLocale(): void
+    {
+        $dto = new BlogBaseDto('1');
+        $dto->locale('en');
+        $dto->setId('1');
+        $dto->setTitle('English title');
+        $dto->setBlogUrl('https://blog.example/en/post');
+        $dto->addTranslation(new BlogTranslation(locale: 'de', title: 'Deutscher Titel'));
+
+        $json = $dto->jsonSerialize();
+
+        $this->assertSame(['title' => 'English title', 'url' => 'https://blog.example/en/post'], $json['_i18n']['en']['_BLOG']);
+        $this->assertSame(['title' => 'Deutscher Titel', 'url' => 'https://blog.example/en/post'], $json['_i18n']['de']['_BLOG']);
     }
 }

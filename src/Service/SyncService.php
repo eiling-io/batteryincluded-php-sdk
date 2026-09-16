@@ -15,7 +15,7 @@ class SyncService extends AbstractService
 
     public function syncOneOrManyElements(AbstractDto ...$dto): Response
     {
-        $json = $this->generateNDJSON($dto);
+        $json = $this->generateNDJSON($this->resolveLocales($dto));
 
         return $this->apiClient->postNDJson('/documents/import', $json);
     }
@@ -26,7 +26,7 @@ class SyncService extends AbstractService
      */
     public function syncFullElements(AbstractDto ...$dto): Response
     {
-        $json = $this->generateNDJSON($dto);
+        $json = $this->generateNDJSON($this->resolveLocales($dto));
 
         return $this->apiClient->postNDJson('/documents/import?full=1', $json);
     }
@@ -41,7 +41,7 @@ class SyncService extends AbstractService
      */
     public function syncFullBatchElements(string $transactionId, bool $finished = false, AbstractDto ...$dto): Response
     {
-        $json = $this->generateNDJSON($dto);
+        $json = $this->generateNDJSON($this->resolveLocales($dto));
         $apiUrl = '/documents/import?transactionId=' . $transactionId;
 
         if ($finished) {
@@ -53,7 +53,7 @@ class SyncService extends AbstractService
 
     public function partialUpdateOneOrManyElements(AbstractDto ...$dto): Response
     {
-        $json = $this->generateNDJSON($dto);
+        $json = $this->generateNDJSON($this->resolveLocales($dto));
 
         return $this->apiClient->patchNDJson('/documents/update', $json);
     }
@@ -61,5 +61,18 @@ class SyncService extends AbstractService
     public function deleteElementsByIds(string ...$elementIds): Response
     {
         return $this->apiClient->deleteJson('/documents/delete', json_encode($elementIds));
+    }
+
+    /**
+     * @param AbstractDto[] $dto
+     * @return AbstractDto[]
+     */
+    private function resolveLocales(array $dto): array
+    {
+        foreach ($dto as $element) {
+            $element->resolveLocale($this->apiClient->getDefaultLocale());
+        }
+
+        return $dto;
     }
 }

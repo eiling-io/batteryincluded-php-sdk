@@ -26,9 +26,6 @@ jobs:
             - name: Install dependencies
               run: composer install --prefer-dist --no-progress
 
-            - name: run code php-cs-fixer
-              run: ./tools/php-cs-fixer fix --config=.php-cs-fixer.php --dry-run
-
             - name: run phpstan
               run: ./tools/phpstan analyse -l 5 ./src
 
@@ -37,9 +34,24 @@ jobs:
               env:
                   COLLECTION: ${{ secrets.COLLECTION }}
                   APIKEY: ${{ secrets.APIKEY }}
+    csfixer:
+            strategy:
+                max-parallel: 1
+                matrix:
+                    php: ['8.2']
+            runs-on: ubuntu-latest
 
-        # Add a test script to composer.json, for instance: "test": "vendor/bin/phpunit"
-        # Docs: https://getcomposer.org/doc/articles/scripts.md
+            steps:
+                - uses: actions/checkout@v2
 
-        # - name: Run test suite
-        #   run: composer run-script test
+                - uses: shivammathur/setup-php@v2
+                  with:
+                    php-version: ${{ matrix.php }}
+                    tools: composer
+                    coverage: none
+
+                - name: Install dependencies
+                  run: composer install --prefer-dist --no-progress
+
+                - name: run code php-cs-fixer
+                  run: ./tools/php-cs-fixer fix --config=.php-cs-fixer.php --dry-run

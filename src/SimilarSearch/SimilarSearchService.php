@@ -12,12 +12,12 @@ class SimilarSearchService
     {
     }
 
-    public function search(string $query, string $locale = 'DE'): SimilarSearchResponse
+    public function search(string $query, ?string $locale = null): SimilarSearchResponse
     {
         $query = http_build_query(
             [
                 'q' => $query,
-                'v[locale]' => $locale,
+                'v[locale]' => $locale ?? $this->apiClient->getDefaultLocale(),
             ]
         );
 

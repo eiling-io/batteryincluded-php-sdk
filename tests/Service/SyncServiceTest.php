@@ -6,9 +6,14 @@ namespace BatteryIncludedSdkTests\Service;
 
 use BatteryIncludedSdk\Client\ApiClient;
 use BatteryIncludedSdk\Client\CurlHttpClient;
+use BatteryIncludedSdk\Client\HttpClientInterface;
+use BatteryIncludedSdk\Dto\AbstractAvailability;
+use BatteryIncludedSdk\Dto\AbstractTranslation;
 use BatteryIncludedSdk\Dto\CategoryDto;
+use BatteryIncludedSdk\Dto\ProductAvailability;
 use BatteryIncludedSdk\Dto\ProductBaseDto;
 use BatteryIncludedSdk\Dto\ProductPropertyDto;
+use BatteryIncludedSdk\Dto\ProductTranslation;
 use BatteryIncludedSdk\Service\Response;
 use BatteryIncludedSdk\Service\SyncService;
 use BatteryIncludedSdkTests\Helper;
@@ -23,8 +28,41 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(CategoryDto::class)]
 #[UsesClass(ProductBaseDto::class)]
 #[UsesClass(ProductPropertyDto::class)]
+#[UsesClass(ProductTranslation::class)]
+#[UsesClass(AbstractTranslation::class)]
+#[UsesClass(ProductAvailability::class)]
+#[UsesClass(AbstractAvailability::class)]
 class SyncServiceTest extends TestCase
 {
+    public function testSyncOneOrManyUsesApiClientsConfiguredDefaultLocale()
+    {
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $sentBody = null;
+        $httpClient->method('send')->willReturnCallback(
+            function (string $url, string $method, array $header, string $data) use (&$sentBody) {
+                $sentBody = $data;
+
+                return new Response('[]', 200);
+            }
+        );
+
+        $apiClient = new ApiClient($httpClient, 'https://api.example/', 'collection', 'key', 'en');
+        $syncService = new SyncService($apiClient);
+
+        $product = new ProductBaseDto('1');
+        $product->setName('Widget');
+        $product->addTranslation(new ProductTranslation(locale: 'de', name: 'Gerät'));
+
+        $syncService->syncOneOrManyElements($product);
+
+        $decoded = json_decode(trim($sentBody), true);
+
+        $this->assertSame(
+            ['en' => ['_PRODUCT' => ['name' => 'Widget']], 'de' => ['_PRODUCT' => ['name' => 'Gerät']]],
+            $decoded['_i18n']
+        );
+    }
+
     public function testSyncOneOrMany()
     {
         $products = Helper::generateProducts(20);

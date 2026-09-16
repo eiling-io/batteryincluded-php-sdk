@@ -93,4 +93,17 @@ class BrowseSearchStructTest extends TestCase
         ];
         $this->assertSame($expected, $struct->getVariables());
     }
+
+    public function testLocaleDefaultsToNull()
+    {
+        $struct = new BrowseSearchStruct();
+        $this->assertNull($struct->getLocale());
+    }
+
+    public function testSetAndGetLocale()
+    {
+        $struct = new BrowseSearchStruct();
+        $struct->setLocale('en');
+        $this->assertSame('en', $struct->getLocale());
+    }
 }

@@ -34,6 +34,9 @@ class ProductBaseDto extends AbstractDto
 
     private ?ProductPropertyDto $properties = null;
 
+    /** @var array<string, ProductAvailability> */
+    private array $availabilities = [];
+
     public function __construct(string $identifier, string $type = 'PRODUCT')
     {
         parent::__construct($identifier, $type);
@@ -183,12 +186,38 @@ class ProductBaseDto extends AbstractDto
         $this->properties = $properties;
     }
 
+    /**
+     * Adds (or replaces) a translation for the locale it carries (ProductTranslation::getLocale()).
+     * The locale reached by the flat setters (setName(), setDescription(), addCategory(), setProperties())
+     * is controlled via locale().
+     */
+    public function addTranslation(ProductTranslation $translation): void
+    {
+        $this->storeTranslation($translation);
+    }
+
+    /**
+     * Adds (or replaces) per-market data for the market it carries (ProductAvailability::getMarket()).
+     * Independent of locale/_i18n: a market like "de" or "at" can each get their own active flag,
+     * stock, price and categories, overriding the structural/default ones below for that market.
+     */
+    public function addAvailability(ProductAvailability $availability): void
+    {
+        $this->availabilities[$availability->getMarket()] = $availability;
+    }
+
     public function jsonSerialize(): array
     {
+        $primary = new ProductTranslation(
+            $this->activeLocale(),
+            $this->getName(),
+            $this->getDescription(),
+            $this->getCategories() ?? [],
+            $this->getProperties(),
+        );
+
         $jsonDto = [
             'id' => $this->getId(),
-            'name' => $this->getName(),
-            'description' => $this->getDescription(),
             'ordernumber' => $this->getOrdernumber(),
             'manufacture' => $this->getManufacture(),
             'manufactureNumber' => $this->getManufactureNumber(),
@@ -198,15 +227,25 @@ class ProductBaseDto extends AbstractDto
             'price' => $this->getPrice(),
             'instock' => $this->getInstock(),
             'rating' => $this->getRating(),
-            'categories' => $this->getCategories(),
-            'properties' => $this->getProperties(),
         ];
 
-        $jsonRaw = array_merge(
+        $result = array_merge(
             parent::jsonSerialize(),
-            ['_' . $this->getType() => $this->filterJsonValues($jsonDto)]
+            [
+                '_i18n' => $this->buildI18n($primary, $this->shopUrl),
+                '_' . $this->getType() => $this->filterJsonValues($jsonDto),
+            ]
         );
 
-        return $jsonRaw;
+        if ($this->availabilities !== []) {
+            $result['_availability'] = array_map(
+                fn (ProductAvailability $availability) => [
+                    '_' . $this->getType() => $this->filterJsonValues($availability->toArray()),
+                ],
+                $this->availabilities
+            );
+        }
+
+        return $result;
     }
 }
