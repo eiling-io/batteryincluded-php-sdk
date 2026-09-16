@@ -6,8 +6,10 @@ namespace Suggest;
 
 use BatteryIncludedSdk\Client\ApiClient;
 use BatteryIncludedSdk\Client\CurlHttpClient;
+use BatteryIncludedSdk\Dto\AbstractAvailability;
 use BatteryIncludedSdk\Dto\AbstractTranslation;
 use BatteryIncludedSdk\Dto\CategoryDto;
+use BatteryIncludedSdk\Dto\ProductAvailability;
 use BatteryIncludedSdk\Dto\ProductBaseDto;
 use BatteryIncludedSdk\Dto\ProductPropertyDto;
 use BatteryIncludedSdk\Dto\ProductTranslation;
@@ -42,6 +44,8 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(ProductPropertyDto::class)]
 #[UsesClass(ProductTranslation::class)]
 #[UsesClass(AbstractTranslation::class)]
+#[UsesClass(ProductAvailability::class)]
+#[UsesClass(AbstractAvailability::class)]
 #[UsesClass(AbstractService::class)]
 #[UsesClass(SyncService::class)]
 #[UsesClass(SuggestSearchStruct::class)]

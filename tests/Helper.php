@@ -9,6 +9,7 @@ use BatteryIncludedSdk\Client\CurlHttpClient;
 use BatteryIncludedSdk\Dto\BlogBaseDto;
 use BatteryIncludedSdk\Dto\BlogTranslation;
 use BatteryIncludedSdk\Dto\CategoryDto;
+use BatteryIncludedSdk\Dto\ProductAvailability;
 use BatteryIncludedSdk\Dto\ProductBaseDto;
 use BatteryIncludedSdk\Dto\ProductPropertyDto;
 use BatteryIncludedSdk\Dto\ProductTranslation;
@@ -87,6 +88,31 @@ class Helper
                                 ->addProperty('Colour', $colorEn)
                                 ->addProperty('Storage', $storage)
                                 ->addProperty('Display size', '6.1'),
+                        ));
+
+                        // per-market availability alongside the translations above, synced in the same
+                        // document (see addAvailability() in ProductBaseDto / the "Market availability"
+                        // section of the README) - de/at/ch each get their own stock and price here, and
+                        // "ch" occasionally isn't sold at all to demonstrate the inactive case.
+                        $atInstock = max(0, $product->getInstock() - rand(0, 10));
+                        $chActive = $product->getInstock() > 0;
+                        $product->addAvailability(new ProductAvailability(
+                            market: 'de',
+                            active: true,
+                            instock: $product->getInstock(),
+                            price: $product->getPrice(),
+                        ));
+                        $product->addAvailability(new ProductAvailability(
+                            market: 'at',
+                            active: $atInstock > 0,
+                            instock: $atInstock,
+                            price: $product->getPrice() + 20,
+                        ));
+                        $product->addAvailability(new ProductAvailability(
+                            market: 'ch',
+                            active: $chActive,
+                            instock: $chActive ? max(0, $product->getInstock() - rand(0, 15)) : 0,
+                            price: $product->getPrice() + 50,
                         ));
 
                         $products[] = $product;
