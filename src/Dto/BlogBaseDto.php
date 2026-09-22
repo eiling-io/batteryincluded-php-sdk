@@ -131,26 +131,41 @@ class BlogBaseDto extends AbstractDto
         $this->blogUrl = $blogUrl;
     }
 
+    /**
+     * Adds (or replaces) a translation for the locale it carries (BlogTranslation::getLocale()).
+     * The locale reached by the flat setters (setTitle(), setShortDescription(), setDescription())
+     * is controlled via locale().
+     */
+    public function addTranslation(BlogTranslation $translation): void
+    {
+        $this->storeTranslation($translation);
+    }
+
     public function jsonSerialize(): array
     {
+        $primary = new BlogTranslation(
+            $this->activeLocale(),
+            $this->getTitle(),
+            $this->getShortDescription(),
+            $this->getDescription(),
+        );
+
         $jsonDto = [
             'id' => $this->getId(),
-            'title' => $this->getTitle(),
             'author' => $this->getAuthor(),
             'publishedAt' => $this->getPublishedAt(),
             'active' => $this->getActive(),
-            'shortDescription' => $this->getShortDescription(),
-            'description' => $this->getDescription(),
             'previewImage' => $this->getPreviewImage(),
             'relatedArticles' => $this->getRelatedArticles(),
             'blogUrl' => $this->getBlogUrl(),
         ];
 
-        $jsonRaw = array_merge(
+        return array_merge(
             parent::jsonSerialize(),
-            ['_' . $this->getType() => $this->filterJsonValues($jsonDto)]
+            [
+                '_i18n' => $this->buildI18n($primary, $this->blogUrl),
+                '_' . $this->getType() => $this->filterJsonValues($jsonDto),
+            ]
         );
-
-        return $jsonRaw;
     }
 }

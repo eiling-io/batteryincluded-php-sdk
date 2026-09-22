@@ -13,13 +13,16 @@ $apiClient = new ApiClient(
     new CurlHttpClient(),
     'https://api.batteryincluded.io/api/v1/collections/',
     $collection,
-    $apiKey
+    $apiKey,
+    $locale
 );
 
 $service = new SuggestService($apiClient);
 $searchStruct = new BatteryIncludedSdk\Suggest\SuggestSearchStruct();
 $searchStruct->setQuery('Mac');
 $searchStruct->addFilter('type', 'PRODUCT');
+// optional: overrides the ApiClient's configured default locale for this request only
+// $searchStruct->setLocale('en');
 $result = $service->suggestWithFilter($searchStruct);
 
 echo '<pre>';

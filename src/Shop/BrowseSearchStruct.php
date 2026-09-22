@@ -20,6 +20,21 @@ class BrowseSearchStruct
 
     protected array $variables = [];
 
+    protected ?string $locale = null;
+
+    public function getLocale(): ?string
+    {
+        return $this->locale;
+    }
+
+    /**
+     * Overrides the SDK's configured default locale (ApiClient::getDefaultLocale()) for this request only.
+     */
+    public function setLocale(?string $locale): void
+    {
+        $this->locale = $locale;
+    }
+
     public function getPresetId(): string
     {
         return $this->presetId;

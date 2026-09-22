@@ -15,11 +15,12 @@ class SuggestService
     /**
      * @deprecated will be removed in 1.0.0, use suggestWithFilter instead
      */
-    public function suggest(string $query): SuggestResponse
+    public function suggest(string $query, ?string $locale = null): SuggestResponse
     {
         $query = http_build_query(
             [
                 'q' => $query,
+                'v' => ['locale' => $locale ?? $this->apiClient->getDefaultLocale()],
             ]
         );
 
@@ -33,10 +34,13 @@ class SuggestService
 
     public function suggestWithFilter(SuggestSearchStruct $searchStruct): SuggestResponse
     {
+        $locale = $searchStruct->getLocale() ?? $this->apiClient->getDefaultLocale();
+
         $query = http_build_query(
             [
                 'q' => $searchStruct->getQuery(),
                 'f' => $searchStruct->getFilters(),
+                'v' => ['locale' => $locale],
             ]
         );
 

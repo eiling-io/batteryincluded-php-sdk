@@ -13,7 +13,8 @@ $apiClient = new ApiClient(
     new CurlHttpClient(),
     'https://api.batteryincluded.io/api/v1/collections/',
     $collection,
-    $apiKey
+    $apiKey,
+    $locale
 );
 
 $service = new SuggestService($apiClient);
