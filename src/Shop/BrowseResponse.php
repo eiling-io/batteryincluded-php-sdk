@@ -39,7 +39,7 @@ class BrowseResponse extends Response
 
     public function getHits(): array
     {
-        return $this->getBody()['hits'];
+        return $this->getBody()['hits'] ?? [];
     }
 
     /**
