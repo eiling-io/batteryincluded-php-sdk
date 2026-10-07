@@ -53,6 +53,43 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(SyncService::class)]
 class BrowseServiceTest extends TestCase
 {
+    public function testBrowseSendsDefaultLocale()
+    {
+        $this->assertBrowseUrlContains(new BrowseSearchStruct(), 'v%5Blocale%5D=DE');
+    }
+
+    public function testBrowseSendsCustomLocale()
+    {
+        $searchStruct = new BrowseSearchStruct();
+        $searchStruct->setLocale('EN');
+        $this->assertBrowseUrlContains($searchStruct, 'v%5Blocale%5D=EN');
+    }
+
+    public function testBrowseLocaleVariableOverridesLocale()
+    {
+        $searchStruct = new BrowseSearchStruct();
+        $searchStruct->addVariable('locale', 'FR');
+        $this->assertBrowseUrlContains($searchStruct, 'v%5Blocale%5D=FR');
+    }
+
+    private function assertBrowseUrlContains(BrowseSearchStruct $searchStruct, string $expected): void
+    {
+        $mockResponse = $this->createMock(Response::class);
+        $mockResponse->method('getRawResponse')->willReturn('{"extensions":[]}');
+
+        $mockApiClient = $this->createMock(ApiClient::class);
+        $mockApiClient->expects($this->once())
+            ->method('getJson')
+            ->with(
+                $this->callback(fn ($url) => str_contains($url, $expected)),
+                []
+            )
+            ->willReturn($mockResponse);
+
+        $service = new BrowseService($mockApiClient);
+        $this->assertInstanceOf(BrowseResponse::class, $service->browse($searchStruct));
+    }
+
     public function testBrowseMethodAgainstLiveApi()
     {
         $products = Helper::generateProducts(20);

@@ -17,7 +17,7 @@ class BrowseService
         $queryArray = [
             'q' => $searchStruct->getQuery(),
             'f' => $searchStruct->getFilters(),
-            'v' => $searchStruct->getVariables(),
+            'v' => array_merge(['locale' => $searchStruct->getLocale()], $searchStruct->getVariables()),
             'page' => $searchStruct->getPage(),
             'per_page' => $searchStruct->getPerPage(),
             'sort' => $searchStruct->getSort(),

@@ -4,3 +4,7 @@
 /composer.lock
 /.php-cs-fixer.cache
 /.phpunit.result.cache
+.idea
+.claude
+.phpunit.cache
+/build

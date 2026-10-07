@@ -20,6 +20,8 @@ class BrowseSearchStruct
 
     protected array $variables = [];
 
+    protected string $locale = 'DE';
+
     public function getPresetId(): string
     {
         return $this->presetId;
@@ -103,5 +105,15 @@ class BrowseSearchStruct
     public function getVariables(): array
     {
         return $this->variables;
+    }
+
+    public function getLocale(): string
+    {
+        return $this->locale;
+    }
+
+    public function setLocale(string $locale): void
+    {
+        $this->locale = $locale;
     }
 }
