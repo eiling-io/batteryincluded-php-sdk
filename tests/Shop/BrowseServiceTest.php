@@ -9,6 +9,7 @@ use BatteryIncludedSdk\Client\CurlHttpClient;
 use BatteryIncludedSdk\Dto\CategoryDto;
 use BatteryIncludedSdk\Dto\ProductBaseDto;
 use BatteryIncludedSdk\Dto\ProductPropertyDto;
+use BatteryIncludedSdk\I18n\I18nResolver;
 use BatteryIncludedSdk\Service\AbstractService;
 use BatteryIncludedSdk\Service\Response;
 use BatteryIncludedSdk\Service\SyncService;
@@ -51,25 +52,59 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(ProductPropertyDto::class)]
 #[UsesClass(AbstractService::class)]
 #[UsesClass(SyncService::class)]
+#[UsesClass(I18nResolver::class)]
 class BrowseServiceTest extends TestCase
 {
     public function testBrowseSendsDefaultLocale()
     {
-        $this->assertBrowseUrlContains(new BrowseSearchStruct(), 'v%5Blocale%5D=DE');
+        $this->assertBrowseUrlContains(new BrowseSearchStruct(), 'v%5Blocale%5D=de');
     }
 
     public function testBrowseSendsCustomLocale()
     {
         $searchStruct = new BrowseSearchStruct();
         $searchStruct->setLocale('EN');
-        $this->assertBrowseUrlContains($searchStruct, 'v%5Blocale%5D=EN');
+        $this->assertBrowseUrlContains($searchStruct, 'v%5Blocale%5D=en');
     }
 
     public function testBrowseLocaleVariableOverridesLocale()
     {
         $searchStruct = new BrowseSearchStruct();
         $searchStruct->addVariable('locale', 'FR');
-        $this->assertBrowseUrlContains($searchStruct, 'v%5Blocale%5D=FR');
+        $this->assertBrowseUrlContains($searchStruct, 'v%5Blocale%5D=fr');
+    }
+
+    public function testHitsAreResolvedWithRequestedLocale()
+    {
+        $raw = json_encode([
+            'extensions' => [],
+            'hits' => [[
+                'document' => [
+                    'id' => 'PRODUCT-1',
+                    'type' => 'PRODUCT',
+                    '_PRODUCT' => [
+                        'name' => 'iPhone Blau',
+                        'price' => 999.5,
+                    ],
+                    // the gateway delivers the node already resolved for the requested locale
+                    '_PRODUCT_i18n' => ['name' => 'iPhone Blue'],
+                ],
+            ]],
+        ]);
+
+        $searchStruct = new BrowseSearchStruct();
+        $searchStruct->setLocale('EN');
+        $response = new BrowseResponse($raw, $searchStruct);
+
+        $this->assertSame('EN', $response->getLocale());
+        $this->assertSame(
+            ['name' => 'iPhone Blue', 'price' => 999.5],
+            $response->getHits()[0]['document']['_PRODUCT']
+        );
+        $this->assertSame(
+            ['name' => 'iPhone Blue'],
+            $response->getRawHits()[0]['document']['_PRODUCT_i18n']
+        );
     }
 
     private function assertBrowseUrlContains(BrowseSearchStruct $searchStruct, string $expected): void
@@ -100,11 +135,11 @@ class BrowseServiceTest extends TestCase
         $this->assertCount(720, $result->getBody());
         $browseService = new BrowseService(Helper::getApiClient());
         $searchStruct = new BrowseSearchStruct();
-        $searchStruct->addFilter('_PRODUCT.properties.Speicherkapazität', '512GB');
+        $searchStruct->addFilter('_PRODUCT.properties.Storage', '512GB');
         $searchStruct->setSort('_PRODUCT.price:asc');
         $searchStruct->addFilter('_PRODUCT.categories', 'Apple > iPhone > iPhone 18 Pro');
-        $searchStruct->addFilter('_PRODUCT.properties.Farbe', 'Schwarz');
-        $searchStruct->addFilter('_PRODUCT.properties.Farbe', 'Blau');
+        $searchStruct->addFilter('_PRODUCT.properties.Color', 'Schwarz');
+        $searchStruct->addFilter('_PRODUCT.properties.Color', 'Blau');
         $searchStruct->setQuery('iPhone');
         $result = $browseService->browse($searchStruct);
 
@@ -129,12 +164,12 @@ class BrowseServiceTest extends TestCase
         $this->assertCount(720, $result->getBody());
         $browseService = new BrowseService(Helper::getApiClient());
         $searchStruct = new BrowseSearchStruct();
-        $searchStruct->addFilter('_PRODUCT.properties.Speicherkapazität', '512GB');
+        $searchStruct->addFilter('_PRODUCT.properties.Storage', '512GB');
         $searchStruct->setPresetId('857e117c-3766-494d-a692-d7a23c384c33');
         $searchStruct->setSort('_PRODUCT.price:asc');
         $searchStruct->addFilter('_PRODUCT.categories', 'Apple > iPhone > iPhone 18 Pro');
-        $searchStruct->addFilter('_PRODUCT.properties.Farbe', 'Schwarz');
-        $searchStruct->addFilter('_PRODUCT.properties.Farbe', 'Blau');
+        $searchStruct->addFilter('_PRODUCT.properties.Color', 'Schwarz');
+        $searchStruct->addFilter('_PRODUCT.properties.Color', 'Blau');
         $searchStruct->setQuery('iPhone');
         $result = $browseService->browse($searchStruct);
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace BatteryIncludedSdk\Suggest;
 
 use BatteryIncludedSdk\Client\ApiClient;
+use BatteryIncludedSdk\I18n\I18nResolver;
 
 class SuggestService
 {
@@ -15,11 +16,12 @@ class SuggestService
     /**
      * @deprecated will be removed in 1.0.0, use suggestWithFilter instead
      */
-    public function suggest(string $query): SuggestResponse
+    public function suggest(string $query, string $locale = 'DE'): SuggestResponse
     {
         $query = http_build_query(
             [
                 'q' => $query,
+                'v' => ['locale' => I18nResolver::normalizeLocale($locale)],
             ]
         );
 
@@ -37,6 +39,8 @@ class SuggestService
             [
                 'q' => $searchStruct->getQuery(),
                 'f' => $searchStruct->getFilters(),
+                // the gateway fails without locale as soon as the collection uses translated facets
+                'v' => ['locale' => I18nResolver::normalizeLocale($searchStruct->getLocale())],
             ]
         );
 

@@ -170,6 +170,49 @@ foreach ($result->getHits() as $hit) {
 
 A full working example is available in [`examples/sync/sync_full_product_and_blogs.php`](examples/sync/sync_full_product_and_blogs.php).
 
+### Translations (i18n)
+
+Language dependent fields are exported in the root node `_<TYPE>_i18n`, scoped by locale (`_PRODUCT_i18n.<locale>`, `_BLOG_i18n.<locale>`, ...), everything else stays in `_PRODUCT` / `_BLOG`.
+Export every locale there, including the language of the regular fields (e.g. `de`). Locales are normalized to lower case (`DE` => `de`, `de_CH` => `de-ch`).
+Property names are always english in every locale, only the values are translated (the labels are translated in the BatteryIncluded backend):
+
+```php
+$product = new ProductBaseDto('1002');
+$product->setName('Ultra HD HDR LED-TV 65"');
+$product->setPrice(699);
+
+$product->addTranslation('de', 'name', 'Ultra HD HDR LED-TV 65"');
+$product->addCategoryTranslation('de', (new CategoryDto())->addCategoryNode('Elektronik')->addCategoryNode('Fernseher'));
+
+$product->addTranslation('en', 'name', 'Ultra HD HDR LED TV 65"');
+$product->addCategoryTranslation('en', (new CategoryDto())->addCategoryNode('Electronics')->addCategoryNode('TVs'));
+$product->addPropertyTranslation('en', 'Color', 'Black');
+
+$blog = new BlogBaseDto('1');
+$blog->setTitle('Neuigkeiten');
+$blog->addTranslation('en', 'title', 'News');
+```
+
+```json
+{"id": "PRODUCT-1002", "type": "PRODUCT",
+  "_PRODUCT": {"name": "Ultra HD HDR LED-TV 65\"", "price": 699},
+  "_PRODUCT_i18n": {
+    "de": {"name": "Ultra HD HDR LED-TV 65\"", "categories": ["Elektronik", "Elektronik > Fernseher"]},
+    "en": {"name": "Ultra HD HDR LED TV 65\"", "categories": ["Electronics", "Electronics > TVs"], "properties": [{"Color": ["Black"]}]}}}
+```
+
+The collection needs a variable which tells the gateway where the locales are located:
+
+```json
+{"name": "locale", "default": "de", "root": ["_PRODUCT_i18n", "_BLOG_i18n"]}
+```
+
+The locale is sent as `v[locale]` (`BrowseSearchStruct::setLocale()` or the `locale` variable). The gateway resolves the node for the requested locale (`_PRODUCT_i18n.en` becomes `_PRODUCT_i18n`), without `v[locale]` the default of the variable is used. There is no fallback in the gateway: if the requested locale is missing in a document, the node is removed.
+
+`BrowseResponse::getHits()` merges `_PRODUCT_i18n` into `_PRODUCT` (and `_BLOG_i18n` into `_BLOG`) and removes the node, the regular values of `_PRODUCT` remain as fallback for missing translations. Use `getRawHits()` to access the untouched response.
+
+Translated values are filtered and sorted without the locale, the gateway adds it internally, e.g. `_PRODUCT_i18n.categories` or `_PRODUCT_i18n.properties.Color`.
+
 ## Community
 
 Join our community on [Discord](https://discord.gg/fAbqNjwG) to ask questions, give feedback, or connect with other developers.

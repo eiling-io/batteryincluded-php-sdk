@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace BatteryIncludedSdk\SimilarSearch;
 
 use BatteryIncludedSdk\Client\ApiClient;
+use BatteryIncludedSdk\I18n\I18nResolver;
 
 class SimilarSearchService
 {
@@ -17,7 +18,7 @@ class SimilarSearchService
         $query = http_build_query(
             [
                 'q' => $query,
-                'v[locale]' => $locale,
+                'v[locale]' => I18nResolver::normalizeLocale($locale),
             ]
         );
 

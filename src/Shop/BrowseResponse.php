@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BatteryIncludedSdk\Shop;
 
+use BatteryIncludedSdk\I18n\I18nResolver;
 use BatteryIncludedSdk\Service\Response;
 use BatteryIncludedSdk\Shop\Extension\AbstractExtension;
 
@@ -37,9 +38,25 @@ class BrowseResponse extends Response
         }
     }
 
+    /**
+     * Hits with the translations of the requested locale merged into the documents.
+     */
     public function getHits(): array
     {
+        return I18nResolver::resolveHits($this->getRawHits(), $this->getLocale());
+    }
+
+    /**
+     * Hits as delivered by the api, including the untouched _i18n nodes.
+     */
+    public function getRawHits(): array
+    {
         return $this->getBody()['hits'] ?? [];
+    }
+
+    public function getLocale(): string
+    {
+        return (string) ($this->searchStruct->getVariables()['locale'] ?? $this->searchStruct->getLocale());
     }
 
     /**

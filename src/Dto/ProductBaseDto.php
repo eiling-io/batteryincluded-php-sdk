@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace BatteryIncludedSdk\Dto;
 
-class ProductBaseDto extends AbstractDto
+class ProductBaseDto extends AbstractTranslatableDto
 {
     private ?string $id = null;
 
@@ -181,6 +181,45 @@ class ProductBaseDto extends AbstractDto
     public function setProperties(?ProductPropertyDto $properties): void
     {
         $this->properties = $properties;
+    }
+
+    protected function getTranslatableFields(): ?array
+    {
+        return [
+            'name',
+            'description',
+            'ordernumber',
+            'manufacture',
+            'manufactureNumber',
+            'ean',
+            'imageUrl',
+            'shopUrl',
+            'price',
+            'instock',
+            'rating',
+            'categories',
+            'properties',
+        ];
+    }
+
+    public function setPropertiesTranslation(string $locale, ProductPropertyDto $properties): static
+    {
+        return $this->addTranslation($locale, 'properties', $properties);
+    }
+
+    public function addPropertyTranslation(string $locale, string $option, string $value): static
+    {
+        $properties = $this->getTranslation($locale)['properties'] ?? new ProductPropertyDto();
+
+        return $this->setPropertiesTranslation($locale, $properties->addProperty($option, $value));
+    }
+
+    public function addCategoryTranslation(string $locale, CategoryDto $category): static
+    {
+        return $this->addTranslation($locale, 'categories', array_values(array_unique(array_merge(
+            $this->getTranslation($locale)['categories'] ?? [],
+            $category->jsonSerialize()
+        ))));
     }
 
     public function jsonSerialize(): array

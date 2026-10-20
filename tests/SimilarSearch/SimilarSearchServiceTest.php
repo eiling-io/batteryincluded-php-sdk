@@ -6,6 +6,7 @@ namespace BatteryIncludedSdkTests\SimilarSearch;
 
 use BatteryIncludedSdk\Client\ApiClient;
 use BatteryIncludedSdk\Client\CurlHttpClient;
+use BatteryIncludedSdk\I18n\I18nResolver;
 use BatteryIncludedSdk\Service\AbstractService;
 use BatteryIncludedSdk\Service\Response;
 use BatteryIncludedSdk\SimilarSearch\SimilarSearchDto;
@@ -18,6 +19,7 @@ use PHPUnit\Framework\TestCase;
 
 #[CoversClass(SimilarSearchResponse::class)]
 #[CoversClass(SimilarSearchService::class)]
+#[UsesClass(I18nResolver::class)]
 #[UsesClass(ApiClient::class)]
 #[UsesClass(CurlHttpClient::class)]
 #[UsesClass(Response::class)]

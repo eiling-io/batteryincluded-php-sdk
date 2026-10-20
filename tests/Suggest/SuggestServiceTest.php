@@ -9,6 +9,7 @@ use BatteryIncludedSdk\Client\CurlHttpClient;
 use BatteryIncludedSdk\Dto\CategoryDto;
 use BatteryIncludedSdk\Dto\ProductBaseDto;
 use BatteryIncludedSdk\Dto\ProductPropertyDto;
+use BatteryIncludedSdk\I18n\I18nResolver;
 use BatteryIncludedSdk\Service\AbstractService;
 use BatteryIncludedSdk\Service\Response;
 use BatteryIncludedSdk\Service\SyncService;
@@ -41,8 +42,36 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(AbstractService::class)]
 #[UsesClass(SyncService::class)]
 #[UsesClass(SuggestSearchStruct::class)]
+#[UsesClass(I18nResolver::class)]
 class SuggestServiceTest extends TestCase
 {
+    public function testSuggestSendsLocale()
+    {
+        $searchStruct = new SuggestSearchStruct();
+        $searchStruct->setLocale('EN');
+
+        $this->assertSuggestUrlContains(
+            static fn (SuggestService $service) => $service->suggestWithFilter($searchStruct),
+            'v%5Blocale%5D=en'
+        );
+        $this->assertSuggestUrlContains(static fn (SuggestService $service) => $service->suggest('iPhone'), 'v%5Blocale%5D=de');
+    }
+
+    private function assertSuggestUrlContains(callable $suggest, string $expected): void
+    {
+        $mockResponse = $this->createMock(Response::class);
+        $mockResponse->method('getRawResponse')->willReturn('[]');
+        $mockResponse->method('getStatusCode')->willReturn(200);
+
+        $mockApiClient = $this->createMock(ApiClient::class);
+        $mockApiClient->expects($this->once())
+            ->method('getJson')
+            ->with($this->callback(fn ($url) => str_contains($url, $expected)), [])
+            ->willReturn($mockResponse);
+
+        $this->assertInstanceOf(SuggestResponse::class, $suggest(new SuggestService($mockApiClient)));
+    }
+
     public function testSuggestMethodAgainstLiveApi()
     {
         $products = Helper::generateProducts(20);
