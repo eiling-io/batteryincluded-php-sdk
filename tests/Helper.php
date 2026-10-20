@@ -13,6 +13,8 @@ use BatteryIncludedSdk\Dto\ProductPropertyDto;
 
 class Helper
 {
+    private const MANUFACTURER = 'BatteryIncluded';
+
     private const COLORS = [
         'de' => ['Blau' => 'Blau', 'Rosa' => 'Rosa', 'Gold' => 'Gold', 'Schwarz' => 'Schwarz'],
         'en' => ['Blau' => 'Blue', 'Rosa' => 'Pink', 'Gold' => 'Gold', 'Schwarz' => 'Black'],
@@ -21,21 +23,21 @@ class Helper
     private const TEXTS = [
         'de' => [
             'description' => 'Das neueste %s mit vielen Funktionen. Farbe: %s, Speicherkapazität: %s.',
-            'shopUrl' => 'https://www.apple.com/de/%s-%d-pro/',
+            'shopUrl' => 'https://www.batteryincluded.io/de/%s-%d-pro/',
             'decimalSeparator' => ',',
         ],
         'en' => [
             'description' => 'The latest %s with advanced features. Color: %s, Storage: %s.',
-            'shopUrl' => 'https://www.apple.com/en/%s-%d-pro/',
+            'shopUrl' => 'https://www.batteryincluded.io/en/%s-%d-pro/',
             'decimalSeparator' => '.',
         ],
     ];
 
     // display sizes in inch of the small and the large model of each device, the generations alternate between both
     private const DISPLAY_SIZES = [
-        'iPhone' => [6.3, 6.9],
-        'iPad' => [11.0, 13.0],
-        'MacBook' => [14.2, 16.2],
+        'Smartphone' => [6.3, 6.9],
+        'Tablet' => [11.0, 13.0],
+        'Laptop' => [14.2, 16.2],
     ];
 
     /**
@@ -43,7 +45,7 @@ class Helper
      */
     public static function generateProducts(
         int $iterations,
-        array $devices = ['iPhone', 'iPad', 'MacBook'],
+        array $devices = ['Smartphone', 'Tablet', 'Laptop'],
         array $colours = ['Blau', 'Rosa', 'Gold', 'Schwarz'],
         array $storages = ['128GB', '256GB', '512GB'],
         bool $withTranslations = true,
@@ -61,17 +63,16 @@ class Helper
                             'Das neueste ' . $device . ' mit vielen Funktionen. Farbe: ' . $color . ', Speicherkapazität: ' . $storage . '.'
                         );
                         $product->setId((string) $id);
-                        $product->setOrdernumber('AP-00' . $i . '-' . $color . '-' . $storage);
+                        $product->setOrdernumber('BI-00' . $i . '-' . $color . '-' . $storage);
                         $product->setPrice(1000 + $id);
                         $product->setInstock(rand(0, 50));
                         $product->setRating((float) (mt_rand(1, 10) / 2));
-                        $product->setManufacture('Apple');
+                        $product->setManufacture(self::MANUFACTURER);
                         $product->setManufactureNumber('A' . $i . '-' . $color . '-' . $storage);
                         $product->setEan('195950639292');
-                        $product->setImageUrl(
-                            'https://dummyimage.com/600x400/bbb/fff.png&text=' . $i . '-' . $color . '-' . $storage
-                        );
-                        $product->setShopUrl('https://www.apple.com/' . $device . '-' . $i . '-pro/');
+                        // svg of the device in its colour, delivered as data uri
+                        $product->setImageUrl(DeviceImage::dataUri($device, $color, $device . ' ' . $i . ' Pro · ' . $storage));
+                        $product->setShopUrl('https://www.batteryincluded.io/' . mb_strtolower($device) . '-' . $i . '-pro/');
                         // property names are always english, the labels are translated in the backend
                         $product->setProperties(
                             (new ProductPropertyDto())
@@ -81,10 +82,10 @@ class Helper
                                 ->addProperty('Display size', self::displaySize($device, $i, 'de'))
                         );
                         $product->addCategory(
-                            (new CategoryDto())->addCategoryNode('Apple')->addCategoryNode($device)->addCategoryNode($device . ' ' . $i . ' Pro')
+                            (new CategoryDto())->addCategoryNode(self::MANUFACTURER)->addCategoryNode($device)->addCategoryNode($device . ' ' . $i . ' Pro')
                         );
                         $product->addCategory(
-                            (new CategoryDto())->addCategoryNode('Apple')->addCategoryNode($device . ' Pro ' . $color)
+                            (new CategoryDto())->addCategoryNode(self::MANUFACTURER)->addCategoryNode($device . ' Pro ' . $color)
                         );
                         if ($withTranslations) {
                             // every locale is exported to the _PRODUCT_i18n root node, the regular fields above are the fallback
@@ -115,7 +116,7 @@ class Helper
         $product
             ->addTranslation($locale, 'name', $device . ' ' . $i . ' Pro ' . $translatedColor . ' - ' . $storage)
             ->addTranslation($locale, 'description', sprintf($texts['description'], $device, $translatedColor, $storage))
-            ->addTranslation($locale, 'shopUrl', sprintf($texts['shopUrl'], $device, $i))
+            ->addTranslation($locale, 'shopUrl', sprintf($texts['shopUrl'], mb_strtolower($device), $i))
             ->setPropertiesTranslation(
                 $locale,
                 (new ProductPropertyDto())
@@ -126,17 +127,17 @@ class Helper
             )
             ->addCategoryTranslation(
                 $locale,
-                (new CategoryDto())->addCategoryNode('Apple')->addCategoryNode($device)->addCategoryNode($device . ' ' . $i . ' Pro')
+                (new CategoryDto())->addCategoryNode(self::MANUFACTURER)->addCategoryNode($device)->addCategoryNode($device . ' ' . $i . ' Pro')
             )
             ->addCategoryTranslation(
                 $locale,
-                (new CategoryDto())->addCategoryNode('Apple')->addCategoryNode($device . ' Pro ' . $translatedColor)
+                (new CategoryDto())->addCategoryNode(self::MANUFACTURER)->addCategoryNode($device . ' Pro ' . $translatedColor)
             );
     }
 
     private static function displaySize(string $device, int $i, string $locale): string
     {
-        $size = self::DISPLAY_SIZES[$device][$i % 2] ?? self::DISPLAY_SIZES['iPhone'][$i % 2];
+        $size = self::DISPLAY_SIZES[$device][$i % 2] ?? self::DISPLAY_SIZES['Smartphone'][$i % 2];
         $decimals = floor($size) === $size ? 0 : 1;
 
         return number_format($size, $decimals, self::TEXTS[$locale]['decimalSeparator'], '');

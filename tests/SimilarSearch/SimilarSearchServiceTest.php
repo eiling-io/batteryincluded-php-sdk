@@ -29,7 +29,7 @@ class SimilarSearchServiceTest extends TestCase
     public function testSimilarSearchMethodAgainstLiveApi()
     {
         $similarSearchService = new SimilarSearchService(Helper::getApiClient());
-        $result = $similarSearchService->search('iPhone');
+        $result = $similarSearchService->search('Smartphone');
 
         $this->assertContainsOnlyInstancesOf(SimilarSearchDto::class, $result->getSimilarSearches());
 

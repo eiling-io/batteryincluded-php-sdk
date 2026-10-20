@@ -50,11 +50,11 @@ foreach ($storages as $storage) {
         'Storage: ' . $storage . '.'
     );
     $product->setId((string) $id);
-    $product->setOrdernumber('AP-00' . $id . '-' . $storage);
+    $product->setOrdernumber('BI-00' . $id . '-' . $storage);
     $product->setPrice(1000 + $id);
     $product->setInstock(random_int(0, 50));
     $product->setRating((float) (random_int(1, 10) / 2));
-    $product->setManufacture('Apple');
+    $product->setManufacture('BatteryIncluded');
     $product->setManufactureNumber('A' . $id . '-' . $storage);
 
     $products[] = $product;

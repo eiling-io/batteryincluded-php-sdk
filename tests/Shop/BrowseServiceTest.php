@@ -137,10 +137,10 @@ class BrowseServiceTest extends TestCase
         $searchStruct = new BrowseSearchStruct();
         $searchStruct->addFilter('_PRODUCT.properties.Storage', '512GB');
         $searchStruct->setSort('_PRODUCT.price:asc');
-        $searchStruct->addFilter('_PRODUCT.categories', 'Apple > iPhone > iPhone 18 Pro');
+        $searchStruct->addFilter('_PRODUCT.categories', 'BatteryIncluded > Smartphone > Smartphone 18 Pro');
         $searchStruct->addFilter('_PRODUCT.properties.Color', 'Schwarz');
         $searchStruct->addFilter('_PRODUCT.properties.Color', 'Blau');
-        $searchStruct->setQuery('iPhone');
+        $searchStruct->setQuery('Smartphone');
         $result = $browseService->browse($searchStruct);
 
         $this->assertContainsOnlyInstancesOf(FacetDto::class, $result->getFacets());
@@ -167,10 +167,10 @@ class BrowseServiceTest extends TestCase
         $searchStruct->addFilter('_PRODUCT.properties.Storage', '512GB');
         $searchStruct->setPresetId('857e117c-3766-494d-a692-d7a23c384c33');
         $searchStruct->setSort('_PRODUCT.price:asc');
-        $searchStruct->addFilter('_PRODUCT.categories', 'Apple > iPhone > iPhone 18 Pro');
+        $searchStruct->addFilter('_PRODUCT.categories', 'BatteryIncluded > Smartphone > Smartphone 18 Pro');
         $searchStruct->addFilter('_PRODUCT.properties.Color', 'Schwarz');
         $searchStruct->addFilter('_PRODUCT.properties.Color', 'Blau');
-        $searchStruct->setQuery('iPhone');
+        $searchStruct->setQuery('Smartphone');
         $result = $browseService->browse($searchStruct);
 
         $this->assertContainsOnlyInstancesOf(FacetDto::class, $result->getFacets());

@@ -20,10 +20,10 @@ $syncService = new BrowseService($apiClient);
 $searchStruct = new BrowseSearchStruct();
 $searchStruct->addFilter('_PRODUCT.properties.Storage', '512GB');
 $searchStruct->setSort('_PRODUCT.price:asc');
-$searchStruct->addFilter('_PRODUCT.categories', 'Apple > iPhone > iPhone 20 Pro');
+$searchStruct->addFilter('_PRODUCT.categories', 'BatteryIncluded > Smartphone > Smartphone 20 Pro');
 $searchStruct->addFilter('_PRODUCT.properties.Color', 'Schwarz');
 $searchStruct->addFilter('_PRODUCT.properties.Color', 'Blau');
-$searchStruct->setQuery('iPhone');
+$searchStruct->setQuery('Smartphone');
 $searchStruct->setPresetId('857e117c-3766-494d-a692-d7a23c384c33');
 $result = $syncService->browse($searchStruct);
 
