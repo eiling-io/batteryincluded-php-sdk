@@ -25,11 +25,14 @@ class Helper
             'description' => 'Das neueste %s mit vielen Funktionen. Farbe: %s, Speicherkapazität: %s.',
             'shopUrl' => 'https://www.batteryincluded.io/de/%s-%d-pro/',
             'decimalSeparator' => ',',
+            // nouns are capitalized in german
+            'lowercaseDevice' => false,
         ],
         'en' => [
             'description' => 'The latest %s with advanced features. Color: %s, Storage: %s.',
             'shopUrl' => 'https://www.batteryincluded.io/en/%s-%d-pro/',
             'decimalSeparator' => '.',
+            'lowercaseDevice' => true,
         ],
     ];
 
@@ -84,9 +87,6 @@ class Helper
                         $product->addCategory(
                             (new CategoryDto())->addCategoryNode(self::MANUFACTURER)->addCategoryNode($device)->addCategoryNode($device . ' ' . $i . ' Pro')
                         );
-                        $product->addCategory(
-                            (new CategoryDto())->addCategoryNode(self::MANUFACTURER)->addCategoryNode($device . ' Pro ' . $color)
-                        );
                         if ($withTranslations) {
                             // every locale is exported to the _PRODUCT_i18n root node, the regular fields above are the fallback
                             foreach (array_keys(self::TEXTS) as $locale) {
@@ -115,7 +115,7 @@ class Helper
 
         $product
             ->addTranslation($locale, 'name', $device . ' ' . $i . ' Pro ' . $translatedColor . ' - ' . $storage)
-            ->addTranslation($locale, 'description', sprintf($texts['description'], $device, $translatedColor, $storage))
+            ->addTranslation($locale, 'description', sprintf($texts['description'], $texts['lowercaseDevice'] ? mb_strtolower($device) : $device, $translatedColor, $storage))
             ->addTranslation($locale, 'shopUrl', sprintf($texts['shopUrl'], mb_strtolower($device), $i))
             ->setPropertiesTranslation(
                 $locale,
@@ -128,10 +128,6 @@ class Helper
             ->addCategoryTranslation(
                 $locale,
                 (new CategoryDto())->addCategoryNode(self::MANUFACTURER)->addCategoryNode($device)->addCategoryNode($device . ' ' . $i . ' Pro')
-            )
-            ->addCategoryTranslation(
-                $locale,
-                (new CategoryDto())->addCategoryNode(self::MANUFACTURER)->addCategoryNode($device . ' Pro ' . $translatedColor)
             );
     }
 

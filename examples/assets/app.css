@@ -122,7 +122,46 @@ mark {
     margin-left: .5rem;
 }
 
+.category-row {
+    display: flex;
+    align-items: center;
+}
+
+.category-toggle,
+.category-toggle-spacer {
+    flex: 0 0 1.5rem;
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+.category-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 0;
+    border-radius: .375rem;
+    background: none;
+    color: var(--bs-secondary-color);
+}
+
+.category-toggle:hover {
+    background: var(--bs-secondary-bg);
+    color: var(--bs-body-color);
+}
+
+.category-toggle .bi {
+    font-size: .75rem;
+    transition: transform .15s ease;
+}
+
+.category-toggle:not(.collapsed) .bi {
+    transform: rotate(90deg);
+}
+
 .category-link {
+    flex: 1 1 auto;
+    min-width: 0;
     display: flex;
     gap: .5rem;
     padding: .2rem .5rem;

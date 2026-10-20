@@ -295,25 +295,40 @@ function demoVisibleFacets(array $facets, string $language, string $categoryFiel
 }
 
 /**
- * Category tree as navigation, the children of the selected path are expanded.
+ * Category tree as navigation, every node with subcategories can be expanded, the selected path is expanded initially.
  */
-function categoryTree(array $nodes, string $field, string $parentPath = ''): string
+function categoryTree(array $nodes, string $field, string $parentPath = '', bool $expanded = true): string
 {
-    $html = '<ul class="category-tree list-unstyled mb-0">';
+    // natural order, the api delivers e.g. "Laptop 9 Pro" before "Laptop 10 Pro" only by chance
+    uksort($nodes, static fn ($a, $b) => strnatcasecmp((string) $a, (string) $b));
+
+    $id = 'category-' . md5($field . "\0" . $parentPath);
+    $html = '<ul class="category-tree list-unstyled mb-0' . ($parentPath === '' ? '' : ' collapse' . ($expanded ? ' show' : '')) . '" id="' . e($id) . '">';
     foreach ($nodes as $name => $node) {
         $path = $parentPath === '' ? (string) $name : $parentPath . ' > ' . $name;
         $checked = $node['checked'] ?? false;
+        $hasChildren = !empty($node['childs']);
+        // a single root (e.g. the shop name) is always expanded, otherwise the tree would show only one entry
+        $isExpanded = $checked || ($parentPath === '' && count($nodes) === 1);
+        $childId = 'category-' . md5($field . "\0" . $path);
         $href = url(['f' => array_merge($GLOBALS['state']['f'], [$field => [$path]]), 'page' => null]);
 
-        $html .= '<li>';
+        $html .= '<li><div class="category-row">';
+        if ($hasChildren) {
+            $html .= '<button class="category-toggle' . ($isExpanded ? '' : ' collapsed') . '" type="button" data-bs-toggle="collapse" data-bs-target="#' . e($childId) . '"'
+                . ' aria-expanded="' . ($isExpanded ? 'true' : 'false') . '" aria-controls="' . e($childId) . '" aria-label="' . e(t('toggle_category', (string) $name)) . '">'
+                . '<i class="bi bi-chevron-right" aria-hidden="true"></i></button>';
+        } else {
+            $html .= '<span class="category-toggle-spacer" aria-hidden="true"></span>';
+        }
         $html .= '<a class="category-link' . ($checked ? ' active' : '') . '" href="' . e($href) . '"' . ($checked ? ' aria-current="true"' : '') . '>';
         $html .= '<span>' . e($name) . '</span>';
         if (isset($node['count'])) {
             $html .= '<span class="facet-count">' . e($node['count']) . '</span>';
         }
-        $html .= '</a>';
-        if ($checked && !empty($node['childs'])) {
-            $html .= categoryTree($node['childs'], $field, $path);
+        $html .= '</a></div>';
+        if ($hasChildren) {
+            $html .= categoryTree($node['childs'], $field, $path, $isExpanded);
         }
         $html .= '</li>';
     }
