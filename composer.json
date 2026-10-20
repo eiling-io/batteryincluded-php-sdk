@@ -5,7 +5,10 @@
   "autoload": {
     "psr-4": {
       "BatteryIncludedSdk\\": "src/"
-    }
+    },
+    "files": [
+      "src/Polyfill/mbstring.php"
+    ]
   },
   "autoload-dev": {
     "psr-4": {

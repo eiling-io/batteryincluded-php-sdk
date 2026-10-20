@@ -61,7 +61,7 @@ function demoResolveLanguage(): string
     }
 
     foreach (explode(',', (string) ($_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? '')) as $accepted) {
-        $language = mb_strtolower(mb_substr(trim($accepted), 0, 2));
+        $language = mb_strtolower(mb_substr(mb_trim($accepted), 0, 2));
         if (isset(DEMO_LANGUAGES[$language])) {
             return $language;
         }
@@ -120,8 +120,8 @@ function demoRequestFilters(): array
         }
 
         if (array_key_exists('from', $values) || array_key_exists('till', $values)) {
-            $from = trim((string) ($values['from'] ?? ''));
-            $till = trim((string) ($values['till'] ?? ''));
+            $from = mb_trim((string) ($values['from'] ?? ''));
+            $till = mb_trim((string) ($values['till'] ?? ''));
             if (is_numeric($from) || is_numeric($till)) {
                 $filters[$field] = [
                     'from' => is_numeric($from) ? $from : '0',

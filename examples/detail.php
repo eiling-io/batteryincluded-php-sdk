@@ -9,7 +9,7 @@ use BatteryIncludedSdk\Shop\BrowseService;
 require_once __DIR__ . '/app/bootstrap.php';
 
 $lang = demoResolveLanguage();
-$id = trim(is_string($_GET['id'] ?? null) ? $_GET['id'] : '');
+$id = mb_trim(is_string($_GET['id'] ?? null) ? $_GET['id'] : '');
 
 // the browse endpoint delivers a single document with a filter on its id
 $searchStruct = new BrowseSearchStruct();

@@ -11,7 +11,7 @@ header('Content-Type: application/json; charset=utf-8');
 
 $lang = demoResolveLanguage();
 
-$query = trim(is_string($_GET['q'] ?? null) ? $_GET['q'] : '');
+$query = mb_trim(is_string($_GET['q'] ?? null) ? $_GET['q'] : '');
 if (mb_strlen($query) < 2) {
     echo json_encode(['completions' => [], 'products' => [], 'found' => 0]);
 
@@ -47,7 +47,8 @@ foreach (array_slice($response->getDocuments(), 0, 4) as $document) {
     $products[] = [
         'html' => highlight($name),
         'image' => (string) ($product['imageUrl'] ?? ''),
-        'url' => detailUrl((string) ($document['id'] ?? '')),
+        // the id is only part of the suggestions if it is configured as suggest field, otherwise the search is opened
+        'url' => isset($document['id']) ? detailUrl((string) $document['id']) : '',
         'ordernumber' => strip_tags((string) ($product['ordernumber'] ?? '')),
     ];
 }

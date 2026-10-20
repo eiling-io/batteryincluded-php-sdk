@@ -13,7 +13,7 @@ use BatteryIncludedSdk\Shop\FacetSelectDto;
 require_once __DIR__ . '/app/bootstrap.php';
 
 $lang = demoResolveLanguage();
-$query = trim(is_string($_GET['q'] ?? null) ? $_GET['q'] : '');
+$query = mb_trim(is_string($_GET['q'] ?? null) ? $_GET['q'] : '');
 $sort = is_string($_GET['sort'] ?? null) && isset(DEMO_SORTINGS[$_GET['sort']]) ? $_GET['sort'] : '';
 $perPage = in_array((int) ($_GET['per_page'] ?? 0), DEMO_PER_PAGE, true) ? (int) $_GET['per_page'] : DEMO_PER_PAGE[0];
 $page = max(1, (int) ($_GET['page'] ?? 1));
@@ -144,7 +144,7 @@ require __DIR__ . '/app/partials/header.php';
                                                     <?php if ($facet instanceof FacetRatingDto) { ?>
                                                         <?php echo stars((float) $value->getName()); ?>
                                                     <?php } else { ?>
-                                                        <?php echo e(trim(facetValueLabel($field, $value->getName()) . ' ' . $facet->getFieldUnit())); ?>
+                                                        <?php echo e(mb_trim(facetValueLabel($field, $value->getName()) . ' ' . $facet->getFieldUnit())); ?>
                                                     <?php } ?>
                                                 </label>
                                                 <span class="facet-count"><?php echo e($value->getCount()); ?></span>

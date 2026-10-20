@@ -24,7 +24,7 @@ final class I18nResolver
 
     public static function normalizeLocale(string $locale): string
     {
-        return mb_strtolower(str_replace('_', '-', trim($locale)));
+        return mb_strtolower(str_replace('_', '-', mb_trim($locale)));
     }
 
     /**
