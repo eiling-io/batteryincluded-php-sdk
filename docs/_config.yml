@@ -1,0 +1,29 @@
+title: BatteryIncluded PHP SDK
+description: Sync your catalog to BatteryIncluded and build search, suggestions and recommendations in PHP.
+remote_theme: just-the-docs/just-the-docs@v0.10.1
+plugins:
+  - jekyll-remote-theme
+
+color_scheme: light
+search_enabled: true
+heading_anchors: true
+
+aux_links:
+  GitHub: https://github.com/eiling-io/batteryincluded-php-sdk
+  Packagist: https://packagist.org/packages/batteryincluded/batteryincluded-php-sdk
+  API reference: https://www.postman.com/batteryincluded/core/overview
+
+gh_edit_link: true
+gh_edit_link_text: Edit this page on GitHub
+gh_edit_repository: https://github.com/eiling-io/batteryincluded-php-sdk
+gh_edit_branch: main
+gh_edit_source: docs
+gh_edit_view_mode: edit
+
+footer_content: Licensed under the <a href="https://github.com/eiling-io/batteryincluded-php-sdk/blob/main/LICENSE">MIT License</a>.
+
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: default
