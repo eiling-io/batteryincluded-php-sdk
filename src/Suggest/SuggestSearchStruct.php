@@ -10,6 +10,8 @@ class SuggestSearchStruct
 
     protected string $query = '';
 
+    protected string $locale = 'DE';
+
     public function setQuery(string $query): void
     {
         $this->query = $query;
@@ -37,5 +39,15 @@ class SuggestSearchStruct
     public function getFilters(): array
     {
         return $this->filters;
+    }
+
+    public function getLocale(): string
+    {
+        return $this->locale;
+    }
+
+    public function setLocale(string $locale): void
+    {
+        $this->locale = $locale;
     }
 }

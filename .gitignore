@@ -8,3 +8,8 @@
 .claude
 .phpunit.cache
 /build
+/docs/_site
+/docs/.jekyll-cache
+/docs/Gemfile
+/docs/Gemfile.lock
+/docs/.sass-cache

@@ -5,12 +5,17 @@ declare(strict_types=1);
 namespace Dto;
 
 use BatteryIncludedSdk\Dto\AbstractDto;
+use BatteryIncludedSdk\Dto\AbstractTranslatableDto;
 use BatteryIncludedSdk\Dto\BlogBaseDto;
+use BatteryIncludedSdk\I18n\I18nResolver;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(BlogBaseDto::class)]
 #[CoversClass(AbstractDto::class)]
+#[CoversClass(AbstractTranslatableDto::class)]
+#[UsesClass(I18nResolver::class)]
 final class BlogDtoTest extends TestCase
 {
     public function testSettersAndGetters(): void
@@ -81,5 +86,31 @@ final class BlogDtoTest extends TestCase
             'relatedArticles' => null,
             'blogUrl' => null,
         ], $json['_BLOG']);
+    }
+
+    public function testJsonSerializeIncludesTranslations(): void
+    {
+        $dto = new BlogBaseDto('1');
+        $dto->setId('1');
+        $dto->setTitle('Neuigkeiten');
+        $dto->addTranslation('de', 'title', 'Neuigkeiten')
+            ->addTranslation('en', 'title', 'News')
+            ->addTranslation('en', 'blogUrl', 'https://blog.url/en');
+
+        $this->assertSame([
+            'id' => 'BLOG-1',
+            'type' => 'BLOG',
+            '_BLOG_i18n' => [
+                'de' => ['title' => 'Neuigkeiten'],
+                'en' => ['title' => 'News', 'blogUrl' => 'https://blog.url/en'],
+            ],
+            '_BLOG' => ['id' => '1', 'title' => 'Neuigkeiten'],
+        ], $dto->jsonSerialize());
+    }
+
+    public function testTranslationOfUnknownFieldThrows(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        (new BlogBaseDto('1'))->addTranslation('en', 'id', '2');
     }
 }

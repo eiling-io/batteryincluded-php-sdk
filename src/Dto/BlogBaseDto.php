@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace BatteryIncludedSdk\Dto;
 
-class BlogBaseDto extends AbstractDto
+class BlogBaseDto extends AbstractTranslatableDto
 {
     private ?string $id = null;
 
@@ -29,6 +29,21 @@ class BlogBaseDto extends AbstractDto
     public function __construct(string $identifier, string $type = 'BLOG')
     {
         parent::__construct($identifier, $type);
+    }
+
+    protected function getTranslatableFields(): ?array
+    {
+        return [
+            'title',
+            'author',
+            'publishedAt',
+            'active',
+            'shortDescription',
+            'description',
+            'previewImage',
+            'relatedArticles',
+            'blogUrl',
+        ];
     }
 
     public function getId(): ?string

@@ -19,5 +19,5 @@ $apiClient = new ApiClient(
 $similarService = new SimilarSearchService($apiClient);
 
 echo '<pre>';
-print_r($similarService->search('Apple', 'DE')->getSimilarSearches());
+print_r($similarService->search('BatteryIncluded', 'DE')->getSimilarSearches());
 echo '</pre>';
