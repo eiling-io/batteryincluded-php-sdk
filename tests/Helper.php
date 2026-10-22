@@ -160,7 +160,8 @@ class Helper
             $blog->setTitle('Blog Post ' . $i);
             $blog->setDescription('This is the content of blog post number ' . $i . '.');
             $blog->setAuthor('Author ' . $i);
-            $blog->setPreviewImage('https://dummyimage.com/600x400/bbb/fff.png&text=Blog ' . $i);
+            // svg cover with a topic icon, delivered as data uri
+            $blog->setPreviewImage(BlogImage::dataUri($i));
             $blog->setPublishedAt((new \DateTime())->modify('-' . (30 - $i) . ' days')->format('Y-m-d'));
             $blog
                 ->addTranslation('de', 'title', 'Blogbeitrag ' . $i)
