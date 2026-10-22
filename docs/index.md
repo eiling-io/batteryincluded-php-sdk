@@ -35,6 +35,7 @@ foreach ($result->getHits() as $hit) {
 | [Getting started](getting-started) | `ApiClient`, `CurlHttpClient`, `HttpClientInterface` |
 | [Syncing documents](syncing) | `ProductBaseDto`, `BlogBaseDto`, `SyncService` |
 | [Translations (i18n)](translations) | `addTranslation()`, `I18nResolver` |
+| [Backend configuration](backend-configuration) | Filterable fields, filters, suggest fields, relevance |
 | [Search & filters](search) | `BrowseService`, `BrowseSearchStruct`, `BrowseResponse`, facets, extensions |
 | [Suggestions](suggestions) | `SuggestService`, `SimilarSearchService`, `HighlightsService` |
 | [Recommendations](recommendations) | `RecommendationsService`, `CartRecommendationsService`, `PresetsService` |

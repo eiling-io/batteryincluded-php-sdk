@@ -1,6 +1,6 @@
 ---
 title: Suggestions
-nav_order: 6
+nav_order: 7
 ---
 
 # Suggestions
@@ -40,8 +40,8 @@ $response->getFacets();   // facets configured for suggestions
 $response->isLLM();       // true if the api flagged the response with `llm`
 ```
 
-- Documents contain the highlighted fields configured for suggestions in the backend. Add `id` there if you want to
-  link to detail pages.
+- Documents contain the highlighted fields selected under [Suggest in the backend](backend-configuration#suggest). Add
+  `id` there if you want to link to detail pages.
 - Translated fields stay in `_PRODUCT_i18n`, there is no merging like in `BrowseResponse`.
 - Always set a locale, see [translations](translations#requesting-a-locale).
 

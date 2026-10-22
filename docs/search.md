@@ -1,6 +1,6 @@
 ---
 title: Search & filters
-nav_order: 5
+nav_order: 6
 ---
 
 # Search & filters
@@ -117,6 +117,7 @@ $searchStruct->addVariable('currency', 'EUR');
 
 ## Facets
 
+Facets exist only for fields that are [configured as filters in the backend](backend-configuration#filters).
 `getFacets()` turns the facet counts into typed objects. Pass the field that holds your category tree, e.g.
 `_PRODUCT_i18n.categories` for [translated categories](translations#filtering-and-sorting):
 
