@@ -1,0 +1,250 @@
+# BatteryIncluded PHP SDK – integration guide for AI agents
+
+> Everything needed to add BatteryIncluded search to a PHP shop with the SDK `batteryincluded/batteryincluded-php-sdk`.
+> Follow the steps in order. Human-readable docs: https://eiling-io.github.io/batteryincluded-php-sdk/
+
+## 0. Ask the user for
+
+1. The collection name, always prefixed with `customer.` (e.g. `customer.my-shop`).
+2. The API key of that collection. Store it in the environment or secret store, never in the repository or the browser.
+3. The languages of the shop (e.g. `de`, `en`) and which language the regular product fields are in.
+4. Whether the collection may be fully replaced (full import deletes all documents that are not sent).
+
+## 1. Install
+
+```bash
+composer require batteryincluded/batteryincluded-php-sdk
+```
+
+Requirements: PHP 8.2+, extensions `curl` and `mbstring`. No further dependencies.
+
+## 2. Create the client
+
+```php
+use BatteryIncludedSdk\Client\ApiClient;
+use BatteryIncludedSdk\Client\CurlHttpClient;
+
+$apiClient = new ApiClient(
+    new CurlHttpClient(),
+    'https://api.batteryincluded.io/api/v1/collections/',
+    getenv('BATTERYINCLUDED_COLLECTION'), // e.g. "customer.my-shop"
+    getenv('BATTERYINCLUDED_API_KEY')
+);
+```
+
+Every service takes this client. Every response has `getStatusCode()`, `getBody()` (decoded array) and `getRawResponse()`.
+
+## 3. Map the catalog to DTOs
+
+```php
+use BatteryIncludedSdk\Dto\CategoryDto;
+use BatteryIncludedSdk\Dto\ProductBaseDto;
+use BatteryIncludedSdk\Dto\ProductPropertyDto;
+
+$dto = new ProductBaseDto((string) $product->id);   // stored as "PRODUCT-<id>"
+$dto->setId((string) $product->id);
+$dto->setName($product->name);
+$dto->setDescription($product->description);
+$dto->setOrdernumber($product->sku);
+$dto->setManufacture($product->brand);
+$dto->setEan($product->ean);
+$dto->setImageUrl($product->imageUrl);
+$dto->setShopUrl($product->url);
+$dto->setPrice((float) $product->price);
+$dto->setInstock((int) $product->stock);
+$dto->setRating((float) $product->rating);
+
+// one CategoryDto per category path; the SDK exports all parent paths ("A", "A > B")
+$dto->addCategory((new CategoryDto())->addCategoryNode('Electronics')->addCategoryNode('TVs'));
+
+// property names must be language independent (e.g. always "Color"), a property can have several values
+$dto->setProperties((new ProductPropertyDto())->addProperty('Color', 'Black')->addProperty('Size', '65'));
+```
+
+Blog posts: `BlogBaseDto` with `setTitle()`, `setAuthor()`, `setPublishedAt('Y-m-d')`, `setActive()`,
+`setShortDescription()`, `setDescription()`, `setPreviewImage()`, `setBlogUrl()`. Stored as `BLOG-<id>` with fields in
+`_BLOG`. Other content types: second constructor argument, e.g. `new BlogBaseDto('42', 'FAQ')`.
+
+Shop-specific fields: extend `ProductBaseDto` and merge them into the type node:
+
+```php
+class ProductDto extends ProductBaseDto
+{
+    private ?string $material = null;
+
+    public function setMaterial(?string $material): void
+    {
+        $this->material = $material;
+    }
+
+    public function jsonSerialize(): array
+    {
+        return array_merge_recursive(
+            parent::jsonSerialize(),
+            ['_' . $this->getType() => $this->filterJsonValues(['material' => $this->material])]
+        );
+    }
+}
+```
+
+Exported document:
+
+```json
+{"id": "PRODUCT-1002", "type": "PRODUCT", "_PRODUCT": {"id": "1002", "name": "…", "price": 699, "categories": ["Electronics", "Electronics > TVs"], "properties": [{"Color": ["Black"]}]}}
+```
+
+Filter and sort on fields with their node prefix, e.g. `_PRODUCT.price`, `_PRODUCT.properties.Color`.
+
+## 4. Translations (multi-language shops only)
+
+Add every language, including the language of the regular fields. Keep the regular fields filled, they are the default.
+
+```php
+$dto->addTranslation('de', 'name', 'Fernseher 65"')
+    ->addTranslation('de', 'description', '…')
+    ->addCategoryTranslation('de', (new CategoryDto())->addCategoryNode('Elektronik')->addCategoryNode('Fernseher'))
+    ->addPropertyTranslation('de', 'Color', 'Schwarz');
+
+$dto->addTranslation('en', 'name', 'TV 65"')
+    ->addTranslation('en', 'shopUrl', 'https://shop.example/en/tv-65')
+    ->addCategoryTranslation('en', (new CategoryDto())->addCategoryNode('Electronics')->addCategoryNode('TVs'))
+    ->setPropertiesTranslation('en', (new ProductPropertyDto())->addProperty('Color', 'Black'));
+```
+
+- Exported as `_PRODUCT_i18n: {"de": {...}, "en": {...}}` next to `_PRODUCT`. Blog posts use `_BLOG_i18n`.
+- Translatable product fields: name, description, ordernumber, manufacture, manufactureNumber, ean, imageUrl, shopUrl,
+  price, instock, rating, categories, properties. Other fields throw `InvalidArgumentException`.
+- Locales are normalized to lower case: `DE` → `de`, `de_CH` → `de-ch`.
+- The collection needs the variable `{"name": "locale", "default": "de", "root": ["_PRODUCT_i18n", "_BLOG_i18n"]}`
+  (portal → Schema → Variables). Ask the user to configure it.
+
+## 5. Sync
+
+```php
+use BatteryIncludedSdk\Service\SyncService;
+
+$sync = new SyncService($apiClient);
+
+$sync->syncOneOrManyElements(...$dtos);                 // create or replace the given documents
+$sync->syncFullElements(...$dtos);                      // full import: deletes all documents not sent
+$sync->partialUpdateOneOrManyElements(...$dtos);        // only the set fields, e.g. price and stock
+$sync->deleteElementsByIds('240', '2');
+
+// large catalogs: full import in chunks with one transaction, the last chunk finishes it
+$transactionId = 'full-' . date('YmdHis');
+$chunks = array_chunk($dtos, 500);
+foreach ($chunks as $index => $chunk) {
+    $sync->syncFullBatchElements($transactionId, $index === array_key_last($chunks), ...$chunk);
+}
+```
+
+Each call returns one result per document: `[['id' => 'PRODUCT-1002', 'success' => true], …]`. Check `success`.
+`null` fields are not sent; call `$dto->exportNullValues()` to clear fields with a partial update.
+
+## 6. Configure the BatteryIncluded portal (manual, after the first sync)
+
+The SDK cannot do this. Tell the user to configure in https://portal.batteryincluded.io:
+
+1. Integration → Schema: mark filter fields as **Filterable**, choose their **language**, enter **label** and **unit**.
+   With translations, configure each locale (e.g. `_PRODUCT_i18n › en › properties › Color`). Save schema.
+2. Configuration → Filters: add the filters (translated fields use `_PRODUCT_i18n › locale › …`). Types:
+   Select (Default) for properties, Select (Tree) for categories, Range for price, Rating for ratings. Order them. Save.
+3. Configuration → Suggest: fields for word completion (e.g. name, ordernumber, ean) and the fields returned with
+   suggested documents. Add `id`, image and url if the suggestion layer needs them. Save.
+4. Configuration → Relevance → Search: searched fields with priority and typo tolerance (0 for ean/ordernumber). Save.
+
+Without step 1 and 2 `getFacets()` is empty; without step 4 queries find nothing.
+
+## 7. Search result page
+
+```php
+use BatteryIncludedSdk\Shop\BrowseSearchStruct;
+use BatteryIncludedSdk\Shop\BrowseService;
+use BatteryIncludedSdk\Shop\FacetCategoryDto;
+use BatteryIncludedSdk\Shop\FacetRangeDto;
+use BatteryIncludedSdk\Shop\FacetRatingDto;
+use BatteryIncludedSdk\Shop\FacetSelectDto;
+
+$search = new BrowseSearchStruct();
+$search->setQuery($query);                 // empty = all documents (category pages)
+$search->setLocale($language);             // sent as v[locale], always set it in multi-language shops
+$search->addFilters($_GET['f'] ?? []);     // ?f[_PRODUCT.properties.Color][]=Black&f[_PRODUCT.price][from]=100&f[_PRODUCT.price][till]=500
+$search->addFilter('type', 'PRODUCT');     // optional: only products
+$search->setSort('_PRODUCT.price:asc');    // optional, default relevance
+$search->setPerPage(24);
+$search->setPage($page);
+
+$result = (new BrowseService($apiClient))->browse($search);
+
+$result->getFound();
+$result->getPages();
+
+foreach ($result->getHits() as $hit) {
+    $document = $hit['document'];          // translations are already merged into _PRODUCT / _BLOG
+    $data = $document['_' . $document['type']];
+}
+
+// pass the category field: "_PRODUCT_i18n.categories" with translations, otherwise "_PRODUCT.categories"
+foreach ($result->getFacets('_PRODUCT_i18n.categories') as $facet) {
+    $facet->getFieldName();                // filter key for addFilter()
+    $facet->getFieldLabel();               // label from the portal
+    match (true) {
+        $facet instanceof FacetSelectDto => $facet->getValues(),         // FacetValueDto: getName(), getCount(), isChecked()
+        $facet instanceof FacetRangeDto => [$facet->getMin(), $facet->getMax()],
+        $facet instanceof FacetRatingDto => $facet->getRatings(),
+        $facet instanceof FacetCategoryDto => $facet->getCategories(),  // tree: name => ['count', 'checked', 'childs']
+    };
+}
+```
+
+- Values of one field are combined with OR, different fields with AND. Ranges: `addRangeFilter($field, $from, $till)`.
+- With translations filter on `_PRODUCT_i18n.<field>` without the locale; the gateway adds it.
+- The response also contains facets of other locales (`_PRODUCT_i18n.de.properties.Color`); hide fields with a locale
+  segment.
+- Single document (detail page): `addFilter('id', 'PRODUCT-1002')` and `setPerPage(1)`.
+- Merchandising: `getRedirectsExtensions()` (redirect to `getData()['url']`), `getTeaserExtensions()`,
+  `getPromotionsExtensions()`, `getCodesExtensions()`.
+- Presets: `setPresetId($id)`; list them with `(new PresetsService($apiClient))->getPresets()->getPresets()`.
+
+## 8. Suggestions (search as you type)
+
+```php
+use BatteryIncludedSdk\Suggest\SuggestSearchStruct;
+use BatteryIncludedSdk\Suggest\SuggestService;
+
+$suggest = new SuggestSearchStruct();
+$suggest->setQuery($input);
+$suggest->setLocale($language);            // required: without locale the endpoint fails with HTTP 500
+$suggest->addFilter('type', 'PRODUCT');
+
+$response = (new SuggestService($apiClient))->suggestWithFilter($suggest);
+
+$response->getQueryCompletions();          // CompletionDto: getValue(), getHighlighted()
+$response->getDocuments();                 // only the fields selected in the portal; translated fields stay in _PRODUCT_i18n
+$response->getFounds();
+```
+
+Escape all output except `<mark>` tags of highlighted values. Call the endpoint server side (API key!), e.g. from a
+small JSON endpoint that the browser queries with a debounce of ~150 ms and a minimum of 2 characters.
+
+Further services: `SimilarSearchService::search($query, $locale)`, `HighlightsService::getHighlights()`,
+`RecommendationsService::recommendByIdentifier('1002')` and
+`CartRecommendationsService::recommendByIdentifiers(['1002', '1003'])` (both grouped in `related`, `also`, `together`).
+
+## 9. Verify
+
+1. Sync a few products and check `success` in the response.
+2. Browse without query: `getFound()` equals the number of synced documents.
+3. Browse with a query from a product name: the product is found (otherwise check Relevance → Search).
+4. `getFacets()` returns the configured filters with labels (otherwise check Schema → Filterable and Filters).
+5. Multi-language: browse with each locale and compare `_PRODUCT.name` in `getHits()`.
+6. Suggest with two characters of a product name returns documents.
+
+## Pitfalls
+
+- Full imports (`syncFullElements`, finished batch) delete every document not sent.
+- Always send the locale in multi-language shops; the gateway has no fallback for missing translations, the regular
+  fields in `_PRODUCT` are the default.
+- Facets exist only after the portal configuration; the SDK cannot create them.
+- Never expose the API key to the browser; proxy suggest requests through your backend.
+- Reference implementation: the demo shop in `examples/` of the repository (`index.php`, `detail.php`, `api/suggest.php`).

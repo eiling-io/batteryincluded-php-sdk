@@ -1,0 +1,27 @@
+# BatteryIncluded PHP SDK
+
+> Official PHP SDK for BatteryIncluded: sync products and content to a BatteryIncluded collection and build search
+> result pages, filters, search-as-you-type suggestions and recommendations in PHP 8.2+.
+
+Install with `composer require batteryincluded/batteryincluded-php-sdk`. For a complete integration guide in one file
+read [llms-full.txt](https://eiling-io.github.io/batteryincluded-php-sdk/llms-full.txt).
+
+## Docs
+
+- [Getting started](https://raw.githubusercontent.com/eiling-io/batteryincluded-php-sdk/main/docs/getting-started.md): installation, API client, services, responses, custom HTTP client
+- [Syncing documents](https://raw.githubusercontent.com/eiling-io/batteryincluded-php-sdk/main/docs/syncing.md): products, blog posts, full and batched imports, partial updates, custom fields
+- [Translations (i18n)](https://raw.githubusercontent.com/eiling-io/batteryincluded-php-sdk/main/docs/translations.md): `_PRODUCT_i18n` schema, locale variable, translated hits and filters
+- [Backend configuration](https://raw.githubusercontent.com/eiling-io/batteryincluded-php-sdk/main/docs/backend-configuration.md): filterable fields, filters, suggest fields and relevance in the BatteryIncluded portal
+- [Search & filters](https://raw.githubusercontent.com/eiling-io/batteryincluded-php-sdk/main/docs/search.md): browse, filters, sorting, pagination, facets, extensions
+- [Suggestions](https://raw.githubusercontent.com/eiling-io/batteryincluded-php-sdk/main/docs/suggestions.md): suggest, similar searches, highlights
+- [Recommendations](https://raw.githubusercontent.com/eiling-io/batteryincluded-php-sdk/main/docs/recommendations.md): product and cart recommendations, presets
+
+## Examples
+
+- [Demo shop](https://raw.githubusercontent.com/eiling-io/batteryincluded-php-sdk/main/docs/demo-shop.md): complete storefront built with the SDK
+- [Example scripts](https://github.com/eiling-io/batteryincluded-php-sdk/tree/main/examples): one script per service
+
+## Optional
+
+- [API reference](https://www.postman.com/batteryincluded/core/overview): all endpoints of the BatteryIncluded API
+- [Development](https://raw.githubusercontent.com/eiling-io/batteryincluded-php-sdk/main/docs/development.md): tests, code style, static analysis

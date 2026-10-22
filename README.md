@@ -9,6 +9,8 @@ The SDK is licensed under the [MIT License](LICENSE). Feel free to contribute!
 
 📖 **[Read the documentation](https://eiling-io.github.io/batteryincluded-php-sdk/)** for guides on syncing, search, translations, suggestions and recommendations.
 
+🤖 **Using an AI coding agent?** Point it to [`llms-full.txt`](https://eiling-io.github.io/batteryincluded-php-sdk/llms-full.txt), the complete integration guide in one file ([`llms.txt`](https://eiling-io.github.io/batteryincluded-php-sdk/llms.txt) lists all pages). Agents working on this repository find their instructions in [`AGENTS.md`](AGENTS.md).
+
 The [API documentation](https://www.postman.com/batteryincluded/core/overview) provides all information about the available endpoints.
 
 ### Install & Integrate the SDK into your Project

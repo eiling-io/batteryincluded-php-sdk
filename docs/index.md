@@ -42,6 +42,11 @@ foreach ($result->getHits() as $hit) {
 | [Demo shop](demo-shop) | A complete storefront built with the SDK |
 | [Development](development) | Tests, code style, static analysis |
 
+## For AI coding agents
+
+Let your agent read [`llms-full.txt`](llms-full.txt): installation, sync, translations, portal configuration, search,
+suggestions and a verification checklist in one file. [`llms.txt`](llms.txt) lists all pages of this documentation.
+
 ## Requirements
 
 - PHP 8.2 or higher with the `curl` and `mbstring` extensions
