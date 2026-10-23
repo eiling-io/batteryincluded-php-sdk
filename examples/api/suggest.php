@@ -42,13 +42,14 @@ foreach (array_slice($response->getQueryCompletions(), 0, 5) as $completion) {
 $products = [];
 foreach (array_slice($response->getDocuments(), 0, 4) as $document) {
     $product = $document['_PRODUCT'] ?? [];
+    // the shop id (`_PRODUCT.id`, selected under Suggest in the portal) plus the type is the document id, e.g. PRODUCT-720
+    $productId = strip_tags((string) ($product['id'] ?? ''));
     // the highlighted name is part of the _PRODUCT_i18n node, resolved by the gateway for the requested locale
     $name = (string) ($document['_PRODUCT_i18n']['name'] ?? $product['name'] ?? '');
     $products[] = [
         'html' => highlight($name),
         'image' => (string) ($product['imageUrl'] ?? ''),
-        // the id is only part of the suggestions if it is configured as suggest field, otherwise the search is opened
-        'url' => isset($document['id']) ? detailUrl((string) $document['id']) : '',
+        'url' => $productId !== '' ? detailUrl('PRODUCT-' . $productId) : '',
         'ordernumber' => strip_tags((string) ($product['ordernumber'] ?? '')),
     ];
 }

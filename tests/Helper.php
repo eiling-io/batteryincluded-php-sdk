@@ -15,6 +15,8 @@ class Helper
 {
     private const MANUFACTURER = 'BatteryIncluded';
 
+    private const DEVICE_CODES = ['Smartphone' => 'SP', 'Tablet' => 'TB', 'Laptop' => 'LT'];
+
     private const COLORS = [
         'de' => ['Blau' => 'Blau', 'Rosa' => 'Rosa', 'Gold' => 'Gold', 'Schwarz' => 'Schwarz'],
         'en' => ['Blau' => 'Blue', 'Rosa' => 'Pink', 'Gold' => 'Gold', 'Schwarz' => 'Black'],
@@ -66,12 +68,13 @@ class Helper
                             'Das neueste ' . $device . ' mit vielen Funktionen. Farbe: ' . $color . ', Speicherkapazität: ' . $storage . '.'
                         );
                         $product->setId((string) $id);
-                        $product->setOrdernumber('BI-00' . $i . '-' . $color . '-' . $storage);
+                        // unique per product, the device is part of the number
+                        $product->setOrdernumber(sprintf('BI-%s-%02d-%s-%s', self::DEVICE_CODES[$device], $i, $color, $storage));
                         $product->setPrice(1000 + $id);
                         $product->setInstock(rand(0, 50));
                         $product->setRating((float) (mt_rand(1, 10) / 2));
                         $product->setManufacture(self::MANUFACTURER);
-                        $product->setManufactureNumber('A' . $i . '-' . $color . '-' . $storage);
+                        $product->setManufactureNumber(sprintf('%s%d-%s-%s', self::DEVICE_CODES[$device], $i, $color, $storage));
                         $product->setEan('195950639292');
                         // svg of the device in its colour, delivered as data uri
                         $product->setImageUrl(DeviceImage::dataUri($device, $color, $device . ' ' . $i . ' Pro · ' . $storage));
