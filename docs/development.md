@@ -35,6 +35,13 @@ local `phpunit.xml` (copy of `phpunit.xml.dist`, ignored by git) or as secrets i
 {: .warning }
 Use a dedicated test collection, the live tests overwrite its documents.
 
+The live tests sync products only. To restore the complete demo data (720 products and 10 blog posts) run a full
+sync, the CI does this at the end of every run:
+
+```bash
+COLLECTION=customer.my-test-collection APIKEY=... php tests/sync-demo-data.php
+```
+
 ## Code style
 
 ```bash
@@ -60,7 +67,9 @@ make ddev-phpstan
 make ddev-quality
 ```
 
-The CI runs code style, PHPStan and the tests on PHP 8.2, 8.3, 8.4 and 8.5.
+The CI runs code style, PHPStan and the tests on PHP 8.2, 8.3, 8.4 and 8.5. Afterwards the job
+`restore demo data` runs `tests/sync-demo-data.php` once, also when the tests failed (not for pull requests from forks,
+they have no access to the secrets).
 
 ## Documentation
 

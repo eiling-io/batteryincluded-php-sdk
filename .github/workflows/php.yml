@@ -38,8 +38,29 @@ jobs:
                   COLLECTION: ${{ secrets.COLLECTION }}
                   APIKEY: ${{ secrets.APIKEY }}
 
-        # Add a test script to composer.json, for instance: "test": "vendor/bin/phpunit"
-        # Docs: https://getcomposer.org/doc/articles/scripts.md
+    # the live tests overwrite the collection with products only, restore the full demo data (products and blog posts)
+    # at the end of every run, also when the tests failed
+    sync-demo-data:
+        name: restore demo data
+        needs: test
+        # forks have no access to the secrets
+        if: ${{ !cancelled() && (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository) }}
+        runs-on: ubuntu-latest
 
-        # - name: Run test suite
-        #   run: composer run-script test
+        steps:
+            - uses: actions/checkout@v4
+
+            - uses: shivammathur/setup-php@v2
+              with:
+                php-version: '8.4'
+                tools: composer
+                coverage: none
+
+            - name: Install dependencies
+              run: composer install --prefer-dist --no-progress
+
+            - name: full sync of the demo data
+              run: php tests/sync-demo-data.php
+              env:
+                  COLLECTION: ${{ secrets.COLLECTION }}
+                  APIKEY: ${{ secrets.APIKEY }}

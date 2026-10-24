@@ -67,5 +67,6 @@ CI runs code style (dry run), PHPStan and PHPUnit on PHP 8.2, 8.3, 8.4 and 8.5.
 
 - The live tests sync `Helper::generateProducts(20)` (720 products) into the collection from the `COLLECTION` and
   `APIKEY` environment variables and **overwrite its documents**. Use a dedicated test collection.
-- `examples/sync/sync_full_product_and_blogs.php` runs a full import: all other documents of the collection are deleted.
+- `tests/sync-demo-data.php` (run by the CI job `restore demo data` after the tests) and
+  `examples/sync/sync_full_product_and_blogs.php` run a full import: all other documents of the collection are deleted.
 - Never commit credentials: `examples/credentials.php` and `phpunit.xml` stay without real keys.
