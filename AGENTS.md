@@ -40,7 +40,9 @@ docker run --rm -v "$PWD":/app -w /app php:8.4-cli \
 make ddev-quality                                                      # all of the above in ddev
 ```
 
-CI runs code style (dry run), PHPStan and PHPUnit on PHP 8.2, 8.3, 8.4 and 8.5.
+CI runs code style (dry run) and PHPStan on PHP 8.2, 8.3, 8.4 and 8.5. PHPUnit always talks to the live API, so it runs
+in the job `tests (live api)` with the secrets of the GitHub environment `testing`, which a maintainer has to approve.
+Do not move the secrets back to repository secrets.
 
 ## Rules
 
@@ -71,6 +73,6 @@ CI runs code style (dry run), PHPStan and PHPUnit on PHP 8.2, 8.3, 8.4 and 8.5.
 
 - The live tests sync `Helper::generateProducts(20)` (720 products) into the collection from the `COLLECTION` and
   `APIKEY` environment variables and **overwrite its documents**. Use a dedicated test collection.
-- `tests/sync-demo-data.php` (run by the CI job `restore demo data` after the tests) and
+- `tests/sync-demo-data.php` (run as last step of the CI job `tests (live api)`) and
   `examples/sync/sync_full_product_and_blogs.php` run a full import: all other documents of the collection are deleted.
 - Never commit credentials: `examples/credentials.php` and `phpunit.xml` stay without real keys.
