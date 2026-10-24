@@ -147,7 +147,7 @@ foreach ($result->getFacets('_PRODUCT.categories') as $facet) {
 ```
 
 The `checked` state reflects the filters of the search struct, so you can render the sidebar directly from the
-response.
+response. Facets without counts for the current result are skipped, the api delivers them without a type.
 
 ## Extensions
 

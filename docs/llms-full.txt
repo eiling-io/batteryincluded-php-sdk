@@ -214,6 +214,7 @@ foreach ($result->getFacets('_PRODUCT_i18n.categories') as $facet) {
 
 - Values of one field are combined with OR, different fields with AND. Ranges: `addRangeFilter($field, $from, $till)`.
 - With translations filter on `_PRODUCT_i18n.<field>` without the locale; the gateway adds it.
+- Facets without counts are skipped (the api delivers them without `type`).
 - The response also contains facets of other locales (`_PRODUCT_i18n.de.properties.Color`); hide fields with a locale
   segment.
 - Single document (detail page): `addFilter('id', 'PRODUCT-1002')` and `setPerPage(1)`.

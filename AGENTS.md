@@ -33,7 +33,7 @@ Package: `batteryincluded/batteryincluded-php-sdk`. Docs: https://eiling-io.gith
 ```bash
 composer install
 ./vendor/bin/phpunit                                                   # all tests, includes live tests
-./vendor/bin/phpunit --filter 'Dto|I18n|Polyfill|SearchStruct'          # unit tests only
+./vendor/bin/phpunit --filter 'Dto|I18n|Polyfill|SearchStruct|BrowseResponse' # unit tests only
 docker run --rm -v "$PWD":/app -w /app php:8.4-cli \
   php ./tools/php-cs-fixer fix --config=.php-cs-fixer.php              # code style, run on PHP 8.4
 ./tools/phpstan analyse -l 5 ./src/ ./tests/                           # static analysis

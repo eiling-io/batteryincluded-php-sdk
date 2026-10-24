@@ -21,7 +21,7 @@ class BrowseResponse extends Response
     {
         parent::__construct($responseRaw, $statusCode);
 
-        foreach ($this->getBody()['extensions'] as $extensionData) {
+        foreach ($this->getBody()['extensions'] ?? [] as $extensionData) {
             switch ($extensionData['type']) {
                 case 'teaser':
                     $this->teaserExtensions[] = $this->extensions[] = new Extension\TeaserExtension($extensionData['data']);
@@ -79,12 +79,13 @@ class BrowseResponse extends Response
     public function getFacets(string $categoryField = '_PRODUCT.categories'): array
     {
         $result = [];
-        $facets = $this->getBody()['facet_counts'];
+        $facets = $this->getBody()['facet_counts'] ?? [];
         foreach ($facets as $facet) {
-            if ($facet['field_name'] === $categoryField) {
+            if (($facet['field_name'] ?? null) === $categoryField) {
                 $facet['type'] = 'category';
             }
-            switch ($facet['type']) {
+            // The api omits the type for facets without counts, there is nothing to render then.
+            switch ($facet['type'] ?? null) {
                 case 'category':
                     $result[] = new FacetCategoryDto($facet, $this->searchStruct->getFilters());
                     break;
