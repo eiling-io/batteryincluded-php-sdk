@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BatteryIncludedSdk\Shop;
 
+use BatteryIncludedSdk\Availability\AvailabilityResolver;
 use BatteryIncludedSdk\Client\ApiClient;
 use BatteryIncludedSdk\I18n\I18nResolver;
 
@@ -18,6 +19,10 @@ class BrowseService
         $variables = array_merge(['locale' => $searchStruct->getLocale()], $searchStruct->getVariables());
         // the gateway selects `_PRODUCT_i18n.<locale>` by key, the locales are exported normalized
         $variables['locale'] = I18nResolver::normalizeLocale((string) $variables['locale']);
+        $availability = $variables[AvailabilityResolver::VARIABLE] ?? $searchStruct->getAvailability();
+        if ($availability !== null) {
+            $variables[AvailabilityResolver::VARIABLE] = AvailabilityResolver::normalizeScope((string) $availability);
+        }
 
         $queryArray = [
             'q' => $searchStruct->getQuery(),

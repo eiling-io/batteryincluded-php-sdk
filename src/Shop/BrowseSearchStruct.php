@@ -22,6 +22,8 @@ class BrowseSearchStruct
 
     protected string $locale = 'DE';
 
+    protected ?string $availability = null;
+
     public function getPresetId(): string
     {
         return $this->presetId;
@@ -115,5 +117,19 @@ class BrowseSearchStruct
     public function setLocale(string $locale): void
     {
         $this->locale = $locale;
+    }
+
+    public function getAvailability(): ?string
+    {
+        return $this->availability;
+    }
+
+    /**
+     * Scope of `_PRODUCT_availability` (e.g. country or sales channel), sent as `v[availability]`.
+     * Without it the gateway uses the default of the collection variable.
+     */
+    public function setAvailability(?string $availability): void
+    {
+        $this->availability = $availability;
     }
 }

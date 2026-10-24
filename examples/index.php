@@ -13,6 +13,7 @@ use BatteryIncludedSdk\Shop\FacetSelectDto;
 require_once __DIR__ . '/app/bootstrap.php';
 
 $lang = demoResolveLanguage();
+$country = demoResolveCountry();
 $query = mb_trim(is_string($_GET['q'] ?? null) ? $_GET['q'] : '');
 $sort = is_string($_GET['sort'] ?? null) && isset(DEMO_SORTINGS[$_GET['sort']]) ? $_GET['sort'] : '';
 $perPage = in_array((int) ($_GET['per_page'] ?? 0), DEMO_PER_PAGE, true) ? (int) $_GET['per_page'] : DEMO_PER_PAGE[0];
@@ -20,7 +21,7 @@ $page = max(1, (int) ($_GET['page'] ?? 1));
 $filters = demoRequestFilters();
 
 // state of the page, used by url() to build links
-$state = ['q' => $query, 'f' => $filters, 'sort' => $sort, 'per_page' => $perPage === DEMO_PER_PAGE[0] ? null : $perPage, 'page' => $page, 'lang' => $lang];
+$state = ['q' => $query, 'f' => $filters, 'sort' => $sort, 'per_page' => $perPage === DEMO_PER_PAGE[0] ? null : $perPage, 'page' => $page, 'lang' => $lang, 'country' => $country];
 
 $searchStruct = new BrowseSearchStruct();
 $searchStruct->setQuery($query);
@@ -29,6 +30,8 @@ $searchStruct->setSort($sort);
 $searchStruct->setPerPage($perPage);
 $searchStruct->setPage($page);
 $searchStruct->setLocale(DEMO_LANGUAGES[$lang]['locale']);
+// status, price and stock of the country, the sdk merges them into the hits after the translations
+$searchStruct->setAvailability(DEMO_COUNTRIES[$country]['availability']);
 
 $result = null;
 $error = null;
@@ -62,6 +65,7 @@ $pageTitle = $query;
 $homeUrl = url(['q' => null, 'f' => null, 'sort' => null, 'page' => null]);
 // filters are language specific, they are kept only for the current language
 $languageUrl = static fn (string $code) => url(['lang' => $code, 'f' => $code === $lang ? $filters : null, 'page' => null]);
+$countryUrl = static fn (string $code) => url(['country' => $code, 'page' => null]);
 require __DIR__ . '/app/partials/header.php';
 ?>
 
@@ -84,6 +88,7 @@ require __DIR__ . '/app/partials/header.php';
                     <form id="filter-form" action="index.php" method="get" data-auto-submit>
                         <input type="hidden" name="q" value="<?php echo e($query); ?>">
                         <input type="hidden" name="lang" value="<?php echo e($lang); ?>">
+                        <input type="hidden" name="country" value="<?php echo e($country); ?>">
                         <?php foreach ($filters as $field => $values) {
                             // filters without visible facet (e.g. categories) are kept as hidden fields
                             if (isset($facets[$field]) && !$facets[$field]['facet'] instanceof FacetCategoryDto) {
@@ -282,8 +287,9 @@ require __DIR__ . '/app/partials/header.php';
                                 </div>
                             </article>
                         <?php } else {
-                            $instock = (int) ($data['instock'] ?? 0); ?>
-                            <article class="card h-100 product">
+                            $stock = stockStatus($data);
+                            $isSold = ($data['active'] ?? true) !== false; ?>
+                            <article class="card h-100 product<?php echo $isSold ? '' : ' product-inactive'; ?>">
                                 <div class="product-image">
                                     <img src="<?php echo e($data['imageUrl'] ?? ''); ?>" alt="<?php echo e($data['name'] ?? ''); ?>" loading="lazy">
                                 </div>
@@ -301,9 +307,9 @@ require __DIR__ . '/app/partials/header.php';
                                     <div class="mt-auto d-flex align-items-end justify-content-between gap-2">
                                         <div>
                                             <div class="fs-5 fw-semibold"><?php echo isset($data['price']) ? e(formatPrice((float) $data['price'])) : ''; ?></div>
-                                            <div class="small <?php echo $instock > 0 ? 'text-success' : 'text-danger'; ?>">
-                                                <i class="bi <?php echo $instock > 0 ? 'bi-check-circle' : 'bi-x-circle'; ?>" aria-hidden="true"></i>
-                                                <?php echo e($instock > 0 ? t('in_stock', $instock) : t('out_of_stock')); ?>
+                                            <div class="small <?php echo e($stock['class']); ?>">
+                                                <i class="bi <?php echo e($stock['icon']); ?>" aria-hidden="true"></i>
+                                                <?php echo e($stock['label']); ?>
                                             </div>
                                         </div>
                                         <?php if (!empty($data['ordernumber'])) { ?>
@@ -353,6 +359,7 @@ require __DIR__ . '/app/partials/header.php';
                                 'page' => $searchStruct->getPage(),
                                 'perPage' => $searchStruct->getPerPage(),
                                 'locale' => $searchStruct->getLocale(),
+                                'availability' => $searchStruct->getAvailability(),
                             ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)); ?></code></pre>
                         </div>
                         <?php if ($hits !== []) { ?>
@@ -361,7 +368,7 @@ require __DIR__ . '/app/partials/header.php';
                                 <pre><code><?php echo e(json_encode($result->getRawHits()[0]['document'] ?? null, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)); ?></code></pre>
                             </div>
                             <div class="col-md-6">
-                                <h3 class="h6"><?php echo e(t('resolved_hit', $result->getLocale())); ?></h3>
+                                <h3 class="h6"><?php echo e(t('resolved_hit', $result->getLocale(), (string) $result->getAvailability())); ?></h3>
                                 <pre><code><?php echo e(json_encode($hits[0]['document'] ?? null, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)); ?></code></pre>
                             </div>
                         <?php } ?>

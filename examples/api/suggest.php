@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use BatteryIncludedSdk\Availability\AvailabilityResolver;
 use BatteryIncludedSdk\Suggest\SuggestSearchStruct;
 use BatteryIncludedSdk\Suggest\SuggestService;
 
@@ -10,6 +11,8 @@ require_once __DIR__ . '/../app/bootstrap.php';
 header('Content-Type: application/json; charset=utf-8');
 
 $lang = demoResolveLanguage();
+// selects the prices of the country and keeps it in the links to the detail page
+$country = demoResolveCountry();
 
 $query = mb_trim(is_string($_GET['q'] ?? null) ? $_GET['q'] : '');
 if (mb_strlen($query) < 2) {
@@ -21,6 +24,7 @@ if (mb_strlen($query) < 2) {
 $searchStruct = new SuggestSearchStruct();
 $searchStruct->setQuery($query);
 $searchStruct->setLocale(DEMO_LANGUAGES[$lang]['locale']);
+$searchStruct->setAvailability(DEMO_COUNTRIES[$country]['availability']);
 
 try {
     $response = (new SuggestService(demoApiClient()))->suggestWithFilter($searchStruct);
@@ -41,7 +45,8 @@ foreach (array_slice($response->getQueryCompletions(), 0, 5) as $completion) {
 
 $products = [];
 foreach (array_slice($response->getDocuments(), 0, 4) as $document) {
-    $product = $document['_PRODUCT'] ?? [];
+    // price (and status) of the country, delivered in `_PRODUCT_availability` if selected under Suggest in the portal
+    $product = AvailabilityResolver::resolveDocument($document, $country)['_PRODUCT'] ?? [];
     // the shop id (`_PRODUCT.id`, selected under Suggest in the portal) plus the type is the document id, e.g. PRODUCT-720
     $productId = strip_tags((string) ($product['id'] ?? ''));
     // the highlighted name is part of the _PRODUCT_i18n node, resolved by the gateway for the requested locale
@@ -51,6 +56,8 @@ foreach (array_slice($response->getDocuments(), 0, 4) as $document) {
         'image' => (string) ($product['imageUrl'] ?? ''),
         'url' => $productId !== '' ? detailUrl('PRODUCT-' . $productId) : '',
         'ordernumber' => strip_tags((string) ($product['ordernumber'] ?? '')),
+        'price' => isset($product['price']) ? formatPrice((float) strip_tags((string) $product['price'])) : '',
+        'stock' => isset($product['active']) || isset($product['instock']) ? stockStatus($product) : null,
     ];
 }
 

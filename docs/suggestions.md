@@ -44,6 +44,8 @@ $response->isLLM();       // true if the api flagged the response with `llm`
   `id` there if you want to link to detail pages.
 - Translated fields stay in `_PRODUCT_i18n`, there is no merging like in `BrowseResponse`.
 - Always set a locale, see [translations](translations#requesting-a-locale).
+- `setAvailability('ch')` sends `v[availability]` like on the search page. Prices only arrive if `price` is selected
+  under Suggest in the portal, see [availability](availability#suggestions).
 
 `suggest(string $query, string $locale = 'DE')` is a shortcut without filters. It is deprecated in favour of
 `suggestWithFilter()`.

@@ -72,6 +72,7 @@ class Helper
                         $product->setOrdernumber(sprintf('BI-%s-%02d-%s-%s', self::DEVICE_CODES[$device], $i, $color, $storage));
                         $product->setPrice(1000 + $id);
                         $product->setInstock(rand(0, 50));
+                        $product->setActive(true);
                         $product->setRating((float) (mt_rand(1, 10) / 2));
                         $product->setManufacture(self::MANUFACTURER);
                         $product->setManufactureNumber(sprintf('%s%d-%s-%s', self::DEVICE_CODES[$device], $i, $color, $storage));
@@ -96,6 +97,7 @@ class Helper
                                 self::addTranslations($product, $locale, $i, $device, $color, $storage);
                             }
                         }
+                        self::addAvailabilities($product, $id);
                         $products[] = $product;
                     }
                 }
@@ -132,6 +134,20 @@ class Helper
                 $locale,
                 (new CategoryDto())->addCategoryNode(self::MANUFACTURER)->addCategoryNode($device)->addCategoryNode($device . ' ' . $i . ' Pro')
             );
+    }
+
+    /**
+     * Prices and status per country in `_PRODUCT_availability`, the regular fields above are the fallback.
+     */
+    private static function addAvailabilities(ProductBaseDto $product, int $id): void
+    {
+        $price = (float) $product->getPrice();
+
+        // every third product is on sale in germany
+        $product->setAvailability('de', active: true, price: $id % 3 === 0 ? round($price * 0.9, 2) : $price);
+        $product->setAvailability('at', price: round($price * 1.02, 2));
+        // switzerland has a few products less and no stock of its own
+        $product->setAvailability('ch', active: $id % 8 !== 0, price: round($price * 1.1, 2), instock: $id % 5 === 0 ? 0 : null);
     }
 
     private static function displaySize(string $device, int $i, string $locale): string

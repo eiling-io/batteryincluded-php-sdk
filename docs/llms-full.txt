@@ -118,6 +118,21 @@ $dto->addTranslation('en', 'name', 'TV 65"')
 - The collection needs the variable `{"name": "locale", "default": "de", "root": ["_PRODUCT_i18n", "_BLOG_i18n"]}`
   (portal → Schema → Variables). Ask the user to configure it.
 
+## 4b. Availability (prices or status per country / sales channel only)
+
+```php
+$dto->setPrice(999.0);   // defaults stay in _PRODUCT
+$dto->setActive(true);
+$dto->setAvailability('de', active: true, price: 1337.0)
+    ->setAvailability('ch', active: false, instock: 0);
+```
+
+- Exported as `_PRODUCT_availability: {"de": {...}, "ch": {...}}` next to `_PRODUCT`, independent of the translations.
+- Allowed fields: active, price, instock. `false`/`0` overwrite the default, `null` keeps it. No fallback between scopes.
+- The collection needs the variable `{"name": "availability", "default": "de", "root": ["_PRODUCT_availability"]}`.
+- Request with `BrowseSearchStruct::setAvailability('ch')` (`v[availability]`); `getHits()` merges translations first,
+  then the availability. Filters and sortings on `_PRODUCT.price` use the default values.
+
 ## 5. Sync
 
 ```php
@@ -215,6 +230,7 @@ use BatteryIncludedSdk\Suggest\SuggestService;
 $suggest = new SuggestSearchStruct();
 $suggest->setQuery($input);
 $suggest->setLocale($language);            // required: without locale the endpoint fails with HTTP 500
+$suggest->setAvailability($country);       // optional, prices per country in `_PRODUCT_availability`
 $suggest->addFilter('type', 'PRODUCT');
 
 $response = (new SuggestService($apiClient))->suggestWithFilter($suggest);
@@ -245,6 +261,7 @@ Further services: `SimilarSearchService::search($query, $locale)`, `HighlightsSe
 - Full imports (`syncFullElements`, finished batch) delete every document not sent.
 - Always send the locale in multi-language shops; the gateway has no fallback for missing translations, the regular
   fields in `_PRODUCT` are the default.
+- Availability overrides only change the delivered hits; `_PRODUCT.price` filters and sortings use the defaults.
 - Facets exist only after the portal configuration; the SDK cannot create them.
 - Never expose the API key to the browser; proxy suggest requests through your backend.
 - Reference implementation: the demo shop in `examples/` of the repository (`index.php`, `detail.php`, `api/suggest.php`).

@@ -30,6 +30,16 @@ body {
     border-radius: .25rem;
 }
 
+.suggest .suggest-price {
+    flex-shrink: 0;
+    white-space: nowrap;
+    line-height: 1.2;
+}
+
+.suggest .dropdown-item.active .suggest-price small {
+    color: inherit !important;
+}
+
 .suggest .dropdown-item.active mark,
 .suggest .dropdown-item:active mark {
     color: inherit;
@@ -306,4 +316,10 @@ mark {
 
 .api-details summary {
     cursor: pointer;
+}
+
+/* products which are not sold in the selected country */
+.product-inactive .product-image img {
+    filter: grayscale(1);
+    opacity: .5;
 }

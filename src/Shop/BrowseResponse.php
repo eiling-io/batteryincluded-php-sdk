@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BatteryIncludedSdk\Shop;
 
+use BatteryIncludedSdk\Availability\AvailabilityResolver;
 use BatteryIncludedSdk\I18n\I18nResolver;
 use BatteryIncludedSdk\Service\Response;
 use BatteryIncludedSdk\Shop\Extension\AbstractExtension;
@@ -39,15 +40,18 @@ class BrowseResponse extends Response
     }
 
     /**
-     * Hits with the translations of the requested locale merged into the documents.
+     * Hits with the translations of the requested locale and then the availability merged into the documents.
      */
     public function getHits(): array
     {
-        return I18nResolver::resolveHits($this->getRawHits(), $this->getLocale());
+        return AvailabilityResolver::resolveHits(
+            I18nResolver::resolveHits($this->getRawHits(), $this->getLocale()),
+            (string) $this->getAvailability()
+        );
     }
 
     /**
-     * Hits as delivered by the api, including the untouched _i18n nodes.
+     * Hits as delivered by the api, including the untouched _i18n and _availability nodes.
      */
     public function getRawHits(): array
     {
@@ -57,6 +61,16 @@ class BrowseResponse extends Response
     public function getLocale(): string
     {
         return (string) ($this->searchStruct->getVariables()['locale'] ?? $this->searchStruct->getLocale());
+    }
+
+    /**
+     * Requested availability scope, null if the gateway used the default of the collection variable.
+     */
+    public function getAvailability(): ?string
+    {
+        $availability = $this->searchStruct->getVariables()[AvailabilityResolver::VARIABLE] ?? $this->searchStruct->getAvailability();
+
+        return $availability !== null ? (string) $availability : null;
     }
 
     /**

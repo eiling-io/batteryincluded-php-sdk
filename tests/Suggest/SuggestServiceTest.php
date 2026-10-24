@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Suggest;
 
+use BatteryIncludedSdk\Availability\AvailabilityResolver;
 use BatteryIncludedSdk\Client\ApiClient;
 use BatteryIncludedSdk\Client\CurlHttpClient;
 use BatteryIncludedSdk\Dto\CategoryDto;
@@ -43,6 +44,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(SyncService::class)]
 #[UsesClass(SuggestSearchStruct::class)]
 #[UsesClass(I18nResolver::class)]
+#[UsesClass(AvailabilityResolver::class)]
 class SuggestServiceTest extends TestCase
 {
     public function testSuggestSendsLocale()
@@ -57,7 +59,23 @@ class SuggestServiceTest extends TestCase
         $this->assertSuggestUrlContains(static fn (SuggestService $service) => $service->suggest('iPhone'), 'v%5Blocale%5D=de');
     }
 
-    private function assertSuggestUrlContains(callable $suggest, string $expected): void
+    public function testSuggestSendsAvailabilityOnlyWhenSet()
+    {
+        $searchStruct = new SuggestSearchStruct();
+        $searchStruct->setAvailability('CH');
+
+        $this->assertSuggestUrlContains(
+            static fn (SuggestService $service) => $service->suggestWithFilter($searchStruct),
+            'v%5Bavailability%5D=ch'
+        );
+        $this->assertSuggestUrlContains(
+            static fn (SuggestService $service) => $service->suggestWithFilter(new SuggestSearchStruct()),
+            'v%5Blocale%5D=de',
+            'availability'
+        );
+    }
+
+    private function assertSuggestUrlContains(callable $suggest, string $expected, ?string $unexpected = null): void
     {
         $mockResponse = $this->createMock(Response::class);
         $mockResponse->method('getRawResponse')->willReturn('[]');
@@ -66,7 +84,7 @@ class SuggestServiceTest extends TestCase
         $mockApiClient = $this->createMock(ApiClient::class);
         $mockApiClient->expects($this->once())
             ->method('getJson')
-            ->with($this->callback(fn ($url) => str_contains($url, $expected)), [])
+            ->with($this->callback(fn ($url) => str_contains($url, $expected) && ($unexpected === null || !str_contains($url, $unexpected))), [])
             ->willReturn($mockResponse);
 
         $this->assertInstanceOf(SuggestResponse::class, $suggest(new SuggestService($mockApiClient)));

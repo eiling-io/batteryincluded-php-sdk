@@ -22,6 +22,7 @@ Package: `batteryincluded/batteryincluded-php-sdk`. Docs: https://eiling-io.gith
 | `src/Suggest/`, `src/SimilarSearch/`, `src/Highlights/` | Suggestions |
 | `src/Recommendations/`, `src/CartRecommendations/`, `src/Presets/` | Recommendations, presets |
 | `src/I18n/I18nResolver.php` | Resolves `_<TYPE>_i18n` nodes into `_<TYPE>` |
+| `src/Availability/AvailabilityResolver.php`, `src/Dto/AbstractAvailabilityDto.php` | `_<TYPE>_availability` per country or sales channel |
 | `src/Polyfill/mbstring.php` | `mb_trim()` for PHP < 8.4, autoloaded via `composer.json` `files` |
 | `tests/` | Unit tests and live tests; `Helper.php` generates the test data, `DeviceImage.php` its SVG images |
 | `examples/` | One script per service plus a demo shop (`index.php`, `detail.php`, `app/`, `assets/`) |
@@ -60,6 +61,9 @@ CI runs code style (dry run), PHPStan and PHPUnit on PHP 8.2, 8.3, 8.4 and 8.5.
   `BrowseResponse::getHits()` merges it into `_PRODUCT`, `getRawHits()` returns it untouched.
 - Always send `v[locale]` in lower case. `BrowseService`, `SuggestService` and `SimilarSearchService` normalize it.
   The suggest endpoint returns HTTP 500 without locale once translated facets are configured.
+- Availability: `_PRODUCT_availability.<scope>.{active,price,instock}` overwrites `_PRODUCT` for `v[availability]`
+  (`BrowseSearchStruct::setAvailability()`, sent only when set). It is a separate module next to i18n, do not merge
+  the two. `getHits()` resolves i18n first, then availability. No fallback between scopes, `false`/`0` overwrite.
 - Filters, suggest fields and relevance are configured in the BatteryIncluded portal, not in the SDK
   (see `docs/backend-configuration.md`).
 

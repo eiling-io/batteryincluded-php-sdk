@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BatteryIncludedSdkTests\Shop;
 
+use BatteryIncludedSdk\Availability\AvailabilityResolver;
 use BatteryIncludedSdk\Client\ApiClient;
 use BatteryIncludedSdk\Client\CurlHttpClient;
 use BatteryIncludedSdk\Dto\CategoryDto;
@@ -53,6 +54,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(AbstractService::class)]
 #[UsesClass(SyncService::class)]
 #[UsesClass(I18nResolver::class)]
+#[UsesClass(AvailabilityResolver::class)]
 class BrowseServiceTest extends TestCase
 {
     public function testBrowseSendsDefaultLocale()
@@ -72,6 +74,76 @@ class BrowseServiceTest extends TestCase
         $searchStruct = new BrowseSearchStruct();
         $searchStruct->addVariable('locale', 'FR');
         $this->assertBrowseUrlContains($searchStruct, 'v%5Blocale%5D=fr');
+    }
+
+    public function testBrowseSendsNoAvailabilityByDefault()
+    {
+        $this->assertBrowseUrlDoesNotContain(new BrowseSearchStruct(), 'availability');
+    }
+
+    public function testBrowseSendsNormalizedAvailability()
+    {
+        $searchStruct = new BrowseSearchStruct();
+        $searchStruct->setAvailability('DE_CH');
+        $this->assertBrowseUrlContains($searchStruct, 'v%5Bavailability%5D=de-ch');
+    }
+
+    public function testBrowseAvailabilityVariableOverridesAvailability()
+    {
+        $searchStruct = new BrowseSearchStruct();
+        $searchStruct->setAvailability('de');
+        $searchStruct->addVariable('availability', 'AT');
+        $this->assertBrowseUrlContains($searchStruct, 'v%5Bavailability%5D=at');
+    }
+
+    public function testHitsAreResolvedWithRequestedAvailabilityAfterLocale()
+    {
+        $raw = json_encode([
+            'extensions' => [],
+            'hits' => [[
+                'document' => [
+                    'id' => 'PRODUCT-1',
+                    'type' => 'PRODUCT',
+                    '_PRODUCT_i18n' => ['name' => 'Phone', 'price' => 899.0],
+                    // resolved by the gateway for `v[availability]`
+                    '_PRODUCT_availability' => ['price' => 1337.5, 'active' => false, 'instock' => 0],
+                    '_PRODUCT' => ['name' => 'Handy', 'price' => 999.0, 'active' => true, 'instock' => 5],
+                ],
+            ]],
+        ]);
+
+        $searchStruct = new BrowseSearchStruct();
+        $searchStruct->setLocale('en');
+        $searchStruct->setAvailability('ch');
+        $response = new BrowseResponse($raw, $searchStruct);
+
+        $this->assertSame('ch', $response->getAvailability());
+        $this->assertSame(
+            ['name' => 'Phone', 'price' => 1337.5, 'active' => false, 'instock' => 0],
+            $response->getHits()[0]['document']['_PRODUCT']
+        );
+        $this->assertArrayHasKey('_PRODUCT_availability', $response->getRawHits()[0]['document']);
+    }
+
+    public function testUnresolvedAvailabilityWithoutScopeKeepsDefaults()
+    {
+        $raw = json_encode([
+            'extensions' => [],
+            'hits' => [[
+                'document' => [
+                    'id' => 'PRODUCT-1',
+                    'type' => 'PRODUCT',
+                    // the collection has no availability variable, the node arrives scoped
+                    '_PRODUCT_availability' => ['ch' => ['active' => false]],
+                    '_PRODUCT' => ['active' => true],
+                ],
+            ]],
+        ]);
+
+        $response = new BrowseResponse($raw, new BrowseSearchStruct());
+
+        $this->assertNull($response->getAvailability());
+        $this->assertSame(['_PRODUCT' => ['active' => true]], array_diff_key($response->getHits()[0]['document'], ['id' => 1, 'type' => 1]));
     }
 
     public function testHitsAreResolvedWithRequestedLocale()
@@ -105,6 +177,20 @@ class BrowseServiceTest extends TestCase
             ['name' => 'iPhone Blue'],
             $response->getRawHits()[0]['document']['_PRODUCT_i18n']
         );
+    }
+
+    private function assertBrowseUrlDoesNotContain(BrowseSearchStruct $searchStruct, string $unexpected): void
+    {
+        $mockResponse = $this->createMock(Response::class);
+        $mockResponse->method('getRawResponse')->willReturn('{"extensions":[]}');
+
+        $mockApiClient = $this->createMock(ApiClient::class);
+        $mockApiClient->expects($this->once())
+            ->method('getJson')
+            ->with($this->callback(fn ($url) => !str_contains($url, $unexpected)), [])
+            ->willReturn($mockResponse);
+
+        (new BrowseService($mockApiClient))->browse($searchStruct);
     }
 
     private function assertBrowseUrlContains(BrowseSearchStruct $searchStruct, string $expected): void

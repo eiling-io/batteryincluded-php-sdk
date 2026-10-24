@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use BatteryIncludedSdk\Availability\AvailabilityResolver;
 use BatteryIncludedSdk\I18n\I18nResolver;
 use BatteryIncludedSdk\Shop\BrowseSearchStruct;
 use BatteryIncludedSdk\Shop\BrowseService;
@@ -9,6 +10,7 @@ use BatteryIncludedSdk\Shop\BrowseService;
 require_once __DIR__ . '/app/bootstrap.php';
 
 $lang = demoResolveLanguage();
+$country = demoResolveCountry();
 $id = mb_trim(is_string($_GET['id'] ?? null) ? $_GET['id'] : '');
 
 // the browse endpoint delivers a single document with a filter on its id
@@ -16,6 +18,7 @@ $searchStruct = new BrowseSearchStruct();
 $searchStruct->addFilter('id', $id);
 $searchStruct->setPerPage(1);
 $searchStruct->setLocale(DEMO_LANGUAGES[$lang]['locale']);
+$searchStruct->setAvailability(DEMO_COUNTRIES[$country]['availability']);
 
 $result = null;
 $error = null;
@@ -37,6 +40,10 @@ $data = $document[$payloadKey] ?? [];
 $translations = $rawHit['document'][I18nResolver::getKey($type)] ?? [];
 $translatedFields = is_array($translations) ? array_keys(I18nResolver::resolveDocument([$payloadKey => [], I18nResolver::getKey($type) => $translations], $lang)[$payloadKey]) : [];
 
+// fields delivered in `_<TYPE>_availability` for the requested country, they overwrite translations and default values
+$availabilities = $rawHit['document'][AvailabilityResolver::getKey($type)] ?? [];
+$availabilityFields = is_array($availabilities) ? array_keys(AvailabilityResolver::resolveDocument([$payloadKey => [], AvailabilityResolver::getKey($type) => $availabilities], $country)[$payloadKey]) : [];
+
 // categories link to the search, filtered with the translated categories if the document has some
 $categoryField = in_array('categories', $translatedFields, true) ? I18nResolver::getKey('PRODUCT') . '.categories' : '_PRODUCT.categories';
 $properties = array_merge(...array_values(array_filter((array) ($data['properties'] ?? []), 'is_array')) ?: [[]]);
@@ -51,13 +58,14 @@ foreach ($result?->getFacets($categoryField) ?? [] as $facet) {
 $referer = (string) ($_SERVER['HTTP_REFERER'] ?? '');
 $backUrl = str_contains($referer, '/index.php') && parse_url($referer, PHP_URL_HOST) === ($_SERVER['HTTP_HOST'] ?? null)
     ? $referer
-    : 'index.php?' . http_build_query(['lang' => $lang]);
+    : 'index.php?' . http_build_query(['lang' => $lang, 'country' => $country]);
 
-$state = ['lang' => $lang];
+$state = ['lang' => $lang, 'country' => $country];
 $query = '';
 $pageTitle = (string) ($data['name'] ?? $data['title'] ?? $id);
-$homeUrl = 'index.php?' . http_build_query(['lang' => $lang]);
+$homeUrl = 'index.php?' . http_build_query(['lang' => $lang, 'country' => $country]);
 $languageUrl = static fn (string $code) => detailUrl($id, $code);
+$countryUrl = static fn (string $code) => 'detail.php?' . http_build_query(['id' => $id, 'lang' => $lang, 'country' => $code]);
 $json = static fn (mixed $value) => json_encode($value, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 require __DIR__ . '/app/partials/header.php';
 ?>
@@ -109,7 +117,7 @@ require __DIR__ . '/app/partials/header.php';
                                 </a>
                             <?php } ?>
                         <?php } else {
-                            $instock = (int) ($data['instock'] ?? 0); ?>
+                            $stock = stockStatus($data); ?>
                             <?php if (!empty($data['manufacture'])) { ?>
                                 <div class="small text-uppercase text-body-secondary fw-semibold"><?php echo e($data['manufacture']); ?></div>
                             <?php } ?>
@@ -120,10 +128,13 @@ require __DIR__ . '/app/partials/header.php';
                             <div class="d-flex flex-wrap align-items-end gap-4 mb-3">
                                 <div>
                                     <div class="fs-3 fw-semibold"><?php echo isset($data['price']) ? e(formatPrice((float) $data['price'])) : ''; ?></div>
-                                    <div class="<?php echo $instock > 0 ? 'text-success' : 'text-danger'; ?>">
-                                        <i class="bi <?php echo $instock > 0 ? 'bi-check-circle' : 'bi-x-circle'; ?>" aria-hidden="true"></i>
-                                        <?php echo e($instock > 0 ? t('in_stock', $instock) : t('out_of_stock')); ?>
+                                    <div class="<?php echo e($stock['class']); ?>">
+                                        <i class="bi <?php echo e($stock['icon']); ?>" aria-hidden="true"></i>
+                                        <?php echo e($stock['label']); ?>
                                     </div>
+                                    <?php if ($availabilityFields !== []) { ?>
+                                        <div class="small text-body-secondary"><?php echo e(t('availability_of', countryLabel($country))); ?></div>
+                                    <?php } ?>
                                 </div>
                                 <?php if (!empty($data['shopUrl'])) { ?>
                                     <a class="btn btn-primary" href="<?php echo e($data['shopUrl']); ?>" target="_blank" rel="noopener">
@@ -170,7 +181,7 @@ require __DIR__ . '/app/partials/header.php';
         <section class="card mb-4">
             <div class="card-body">
                 <h2 class="h5"><?php echo e(t('all_data')); ?></h2>
-                <p class="small text-body-secondary"><?php echo e(t('all_data_hint', mb_strtoupper($lang))); ?></p>
+                <p class="small text-body-secondary"><?php echo e(t('all_data_hint', mb_strtoupper($lang), countryLabel($country))); ?></p>
                 <div class="table-responsive">
                     <table class="table table-sm small align-middle mb-0">
                         <thead>
@@ -189,12 +200,15 @@ require __DIR__ . '/app/partials/header.php';
                             </tr>
                         <?php } ?>
                         <?php foreach (flattenData($data) as $field => $value) {
-                            $isTranslated = in_array(explode('.', $field)[0], $translatedFields, true); ?>
+                            $isTranslated = in_array(explode('.', $field)[0], $translatedFields, true);
+                            $isAvailability = in_array(explode('.', $field)[0], $availabilityFields, true); ?>
                             <tr>
                                 <td><code><?php echo e($payloadKey . '.' . $field); ?></code></td>
                                 <td class="text-break"><?php echo e(is_array($value) ? implode(', ', $value) : (is_bool($value) ? var_export($value, true) : $value)); ?></td>
                                 <td>
-                                    <?php if ($isTranslated) { ?>
+                                    <?php if ($isAvailability) { ?>
+                                        <span class="badge text-bg-success"><?php echo e(t('source_availability', mb_strtoupper($country))); ?></span>
+                                    <?php } elseif ($isTranslated) { ?>
                                         <span class="badge text-bg-primary"><?php echo e(t('source_translation', mb_strtoupper($lang))); ?></span>
                                     <?php } else { ?>
                                         <span class="badge text-bg-secondary"><?php echo e(t('source_default')); ?></span>
@@ -219,6 +233,7 @@ require __DIR__ . '/app/partials/header.php';
                         'filters' => $searchStruct->getFilters(),
                         'perPage' => $searchStruct->getPerPage(),
                         'locale' => $searchStruct->getLocale(),
+                        'availability' => $searchStruct->getAvailability(),
                     ])); ?></code></pre>
                 </div>
                 <div class="col-md-6">
@@ -231,7 +246,7 @@ require __DIR__ . '/app/partials/header.php';
                         <pre><code><?php echo e($json($rawHit)); ?></code></pre>
                     </div>
                     <div class="col-md-6">
-                        <h3 class="h6"><?php echo e(t('resolved_hit_detail', $result->getLocale())); ?></h3>
+                        <h3 class="h6"><?php echo e(t('resolved_hit_detail', $result->getLocale(), (string) $result->getAvailability())); ?></h3>
                         <pre><code><?php echo e($json($result->getHits()[0])); ?></code></pre>
                     </div>
                 <?php } ?>

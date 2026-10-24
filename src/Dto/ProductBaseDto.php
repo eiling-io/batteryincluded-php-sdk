@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace BatteryIncludedSdk\Dto;
 
-class ProductBaseDto extends AbstractTranslatableDto
+class ProductBaseDto extends AbstractAvailabilityDto
 {
     private ?string $id = null;
 
@@ -27,6 +27,8 @@ class ProductBaseDto extends AbstractTranslatableDto
     private ?float $price = null;
 
     private ?int $instock = null;
+
+    private ?bool $active = null;
 
     private ?float $rating = null;
 
@@ -149,6 +151,16 @@ class ProductBaseDto extends AbstractTranslatableDto
         $this->instock = $instock;
     }
 
+    public function getActive(): ?bool
+    {
+        return $this->active;
+    }
+
+    public function setActive(?bool $active): void
+    {
+        $this->active = $active;
+    }
+
     public function getRating(): ?float
     {
         return $this->rating;
@@ -222,6 +234,25 @@ class ProductBaseDto extends AbstractTranslatableDto
         ))));
     }
 
+    protected function getAvailabilityFields(): ?array
+    {
+        return ['active', 'price', 'instock'];
+    }
+
+    /**
+     * Null values are not exported, the value of the payload applies to them.
+     */
+    public function setAvailability(string $scope, ?bool $active = null, ?float $price = null, ?int $instock = null): static
+    {
+        foreach (['active' => $active, 'price' => $price, 'instock' => $instock] as $field => $value) {
+            if ($value !== null) {
+                $this->addAvailability($scope, $field, $value);
+            }
+        }
+
+        return $this;
+    }
+
     public function jsonSerialize(): array
     {
         $jsonDto = [
@@ -236,6 +267,7 @@ class ProductBaseDto extends AbstractTranslatableDto
             'shopUrl' => $this->getShopUrl(),
             'price' => $this->getPrice(),
             'instock' => $this->getInstock(),
+            'active' => $this->getActive(),
             'rating' => $this->getRating(),
             'categories' => $this->getCategories(),
             'properties' => $this->getProperties(),

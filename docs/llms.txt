@@ -11,6 +11,7 @@ read [llms-full.txt](https://eiling-io.github.io/batteryincluded-php-sdk/llms-fu
 - [Getting started](https://raw.githubusercontent.com/eiling-io/batteryincluded-php-sdk/main/docs/getting-started.md): installation, API client, services, responses, custom HTTP client
 - [Syncing documents](https://raw.githubusercontent.com/eiling-io/batteryincluded-php-sdk/main/docs/syncing.md): products, blog posts, full and batched imports, partial updates, custom fields
 - [Translations (i18n)](https://raw.githubusercontent.com/eiling-io/batteryincluded-php-sdk/main/docs/translations.md): `_PRODUCT_i18n` schema, locale variable, translated hits and filters
+- [Availability](https://raw.githubusercontent.com/eiling-io/batteryincluded-php-sdk/main/docs/availability.md): `_PRODUCT_availability` schema, status, price and stock per country or sales channel
 - [Backend configuration](https://raw.githubusercontent.com/eiling-io/batteryincluded-php-sdk/main/docs/backend-configuration.md): filterable fields, filters, suggest fields and relevance in the BatteryIncluded portal
 - [Search & filters](https://raw.githubusercontent.com/eiling-io/batteryincluded-php-sdk/main/docs/search.md): browse, filters, sorting, pagination, facets, extensions
 - [Suggestions](https://raw.githubusercontent.com/eiling-io/batteryincluded-php-sdk/main/docs/suggestions.md): suggest, similar searches, highlights

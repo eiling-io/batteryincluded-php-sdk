@@ -18,6 +18,7 @@ to try changes against your own collection.
 - Facets in the sidebar: category tree, select, range and rating filters, plus a type filter for products and blog posts
 - Sorting, pagination, teasers, promotions, redirects and promotion codes
 - Language switch (German / English) with [translated documents](translations)
+- Country switch (Germany / Austria / Switzerland) with [prices and status per country](availability), products which are not sold in a country are greyed out
 - Detail page with all fields of a document, their source (translation or default) and the raw api response
 - Light and dark mode
 

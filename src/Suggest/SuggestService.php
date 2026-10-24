@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BatteryIncludedSdk\Suggest;
 
+use BatteryIncludedSdk\Availability\AvailabilityResolver;
 use BatteryIncludedSdk\Client\ApiClient;
 use BatteryIncludedSdk\I18n\I18nResolver;
 
@@ -35,12 +36,17 @@ class SuggestService
 
     public function suggestWithFilter(SuggestSearchStruct $searchStruct): SuggestResponse
     {
+        // the gateway fails without locale as soon as the collection uses translated facets
+        $variables = ['locale' => I18nResolver::normalizeLocale($searchStruct->getLocale())];
+        if ($searchStruct->getAvailability() !== null) {
+            $variables[AvailabilityResolver::VARIABLE] = AvailabilityResolver::normalizeScope($searchStruct->getAvailability());
+        }
+
         $query = http_build_query(
             [
                 'q' => $searchStruct->getQuery(),
                 'f' => $searchStruct->getFilters(),
-                // the gateway fails without locale as soon as the collection uses translated facets
-                'v' => ['locale' => I18nResolver::normalizeLocale($searchStruct->getLocale())],
+                'v' => $variables,
             ]
         );
 

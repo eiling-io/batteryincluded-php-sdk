@@ -21,6 +21,20 @@ const DEMO_LANGUAGES = [
 ];
 const DEMO_DEFAULT_LANGUAGE = 'de';
 const DEMO_LANGUAGE_COOKIE = 'bi_demo_lang';
+
+/**
+ * Countries of the demo shop, independent of the language.
+ *
+ * - availability: sent to the api as `v[availability]`, the sdk merges `_PRODUCT_availability.<scope>` (active, price,
+ *   instock) into the hits
+ */
+const DEMO_COUNTRIES = [
+    'de' => ['flag' => '🇩🇪', 'availability' => 'de', 'currency' => 'EUR'],
+    'at' => ['flag' => '🇦🇹', 'availability' => 'at', 'currency' => 'EUR'],
+    'ch' => ['flag' => '🇨🇭', 'availability' => 'ch', 'currency' => 'CHF'],
+];
+const DEMO_DEFAULT_COUNTRY = 'de';
+const DEMO_COUNTRY_COOKIE = 'bi_demo_country';
 const DEMO_SORTINGS = [
     '' => 'sort_relevance',
     '_PRODUCT.price:asc' => 'sort_price_asc',
@@ -68,6 +82,48 @@ function demoResolveLanguage(): string
     }
 
     return DEMO_DEFAULT_LANGUAGE;
+}
+
+/**
+ * Country from the query or the cookie, in this order.
+ */
+function demoResolveCountry(): string
+{
+    $requested = mb_strtolower((string) ($_GET['country'] ?? ''));
+    if (isset(DEMO_COUNTRIES[$requested])) {
+        if (($_COOKIE[DEMO_COUNTRY_COOKIE] ?? '') !== $requested && !headers_sent()) {
+            setcookie(DEMO_COUNTRY_COOKIE, $requested, ['expires' => time() + 31536000, 'path' => '/', 'samesite' => 'Lax']);
+        }
+
+        return $requested;
+    }
+
+    $cookie = (string) ($_COOKIE[DEMO_COUNTRY_COOKIE] ?? '');
+
+    return isset(DEMO_COUNTRIES[$cookie]) ? $cookie : DEMO_DEFAULT_COUNTRY;
+}
+
+function countryLabel(string $country): string
+{
+    return translation('countries')[$country] ?? mb_strtoupper($country);
+}
+
+/**
+ * Stock status of a product, a product which is inactive in the country is not sold there.
+ *
+ * @return array{class: string, icon: string, label: string}
+ */
+function stockStatus(array $data): array
+{
+    if (($data['active'] ?? true) === false) {
+        return ['class' => 'text-body-secondary', 'icon' => 'bi-slash-circle', 'label' => t('not_sold_in', countryLabel($GLOBALS['country']))];
+    }
+
+    $instock = (int) ($data['instock'] ?? 0);
+
+    return $instock > 0
+        ? ['class' => 'text-success', 'icon' => 'bi-check-circle', 'label' => t('in_stock', $instock)]
+        : ['class' => 'text-danger', 'icon' => 'bi-x-circle', 'label' => t('out_of_stock')];
 }
 
 function translation(string $key): mixed
@@ -159,7 +215,7 @@ function url(array $overrides = []): string
  */
 function detailUrl(string $id, ?string $language = null): string
 {
-    return 'detail.php?' . http_build_query(['id' => $id, 'lang' => $language ?? $GLOBALS['lang']]);
+    return 'detail.php?' . http_build_query(['id' => $id, 'lang' => $language ?? $GLOBALS['lang'], 'country' => $GLOBALS['country'] ?? null]);
 }
 
 /**
@@ -198,11 +254,13 @@ function urlWithoutFilter(string $field, ?string $value = null): string
 
 function formatPrice(float $price): string
 {
+    // the prices of `_PRODUCT_availability` are in the currency of the country
+    $currency = DEMO_COUNTRIES[$GLOBALS['country'] ?? DEMO_DEFAULT_COUNTRY]['currency'];
     if (class_exists(NumberFormatter::class)) {
-        return (string) (new NumberFormatter(DEMO_LANGUAGES[$GLOBALS['lang']]['intl'], NumberFormatter::CURRENCY))->formatCurrency($price, 'EUR');
+        return (string) (new NumberFormatter(DEMO_LANGUAGES[$GLOBALS['lang']]['intl'], NumberFormatter::CURRENCY))->formatCurrency($price, $currency);
     }
 
-    return number_format($price, 2, ',', '.') . ' €';
+    return number_format($price, 2, ',', '.') . ' ' . $currency;
 }
 
 function formatNumber(float $number): string

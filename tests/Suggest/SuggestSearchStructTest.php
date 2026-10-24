@@ -26,6 +26,14 @@ class SuggestSearchStructTest extends TestCase
         $this->assertSame('en', $struct->getLocale());
     }
 
+    public function testAvailability(): void
+    {
+        $struct = new SuggestSearchStruct();
+        $this->assertNull($struct->getAvailability());
+        $struct->setAvailability('ch');
+        $this->assertSame('ch', $struct->getAvailability());
+    }
+
     public function testAddFilter(): void
     {
         $struct = new SuggestSearchStruct();

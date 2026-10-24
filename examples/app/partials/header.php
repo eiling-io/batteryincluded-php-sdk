@@ -6,10 +6,12 @@ declare(strict_types=1);
  * Page head and navigation bar, shared by all pages of the demo shop.
  *
  * @var string                    $lang
+ * @var string                    $country
  * @var string                    $query       search term shown in the search field
  * @var string                    $pageTitle   prefix of the document title
  * @var string                    $homeUrl     target of the logo
  * @var callable(string): string  $languageUrl url of the current page in another language
+ * @var callable(string): string  $countryUrl  url of the current page in another country
  */
 ?>
 <!doctype html>
@@ -43,6 +45,7 @@ declare(strict_types=1);
 
         <form class="search flex-grow-1 position-relative" action="index.php" method="get" role="search" data-suggest-url="api/suggest.php">
             <input type="hidden" name="lang" value="<?php echo e($lang); ?>">
+            <input type="hidden" name="country" value="<?php echo e($country); ?>">
             <div class="input-group">
                 <span class="input-group-text bg-body-tertiary border-end-0"><i class="bi bi-search" aria-hidden="true"></i></span>
                 <input class="form-control border-start-0 bg-body-tertiary" type="search" name="q" value="<?php echo e($query); ?>"
@@ -65,6 +68,24 @@ declare(strict_types=1);
                     <li>
                         <a class="dropdown-item<?php echo $code === $lang ? ' active' : ''; ?>" href="<?php echo e($languageUrl($code)); ?>" hreflang="<?php echo e($code); ?>" lang="<?php echo e($code); ?>">
                             <span aria-hidden="true"><?php echo $language['flag']; ?></span> <?php echo e($language['label']); ?>
+                        </a>
+                    </li>
+                <?php } ?>
+            </ul>
+        </div>
+
+        <div class="dropdown">
+            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="<?php echo e(t('country')); ?>" title="<?php echo e(t('country')); ?>">
+                <span aria-hidden="true"><?php echo DEMO_COUNTRIES[$country]['flag']; ?></span>
+                <span class="d-none d-sm-inline"><?php echo e(DEMO_COUNTRIES[$country]['currency']); ?></span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+                <li><h2 class="dropdown-header"><?php echo e(t('country_hint')); ?></h2></li>
+                <?php foreach (DEMO_COUNTRIES as $code => $countryConfig) { ?>
+                    <li>
+                        <a class="dropdown-item<?php echo $code === $country ? ' active' : ''; ?>" href="<?php echo e($countryUrl($code)); ?>">
+                            <span aria-hidden="true"><?php echo $countryConfig['flag']; ?></span> <?php echo e(countryLabel($code)); ?>
+                            <span class="text-body-secondary small">(<?php echo e($countryConfig['currency']); ?>)</span>
                         </a>
                     </li>
                 <?php } ?>

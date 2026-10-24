@@ -20,6 +20,14 @@ class BrowseSearchStructTest extends TestCase
         $this->assertSame(1, $struct->getPage());
         $this->assertSame('', $struct->getSort());
         $this->assertSame('DE', $struct->getLocale());
+        $this->assertNull($struct->getAvailability());
+    }
+
+    public function testSetAndGetAvailability()
+    {
+        $struct = new BrowseSearchStruct();
+        $struct->setAvailability('CH');
+        $this->assertSame('CH', $struct->getAvailability());
     }
 
     public function testSetAndGetLocale()

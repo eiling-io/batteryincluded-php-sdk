@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace BatteryIncludedSdkTests\Dto;
 
+use BatteryIncludedSdk\Availability\AvailabilityResolver;
+use BatteryIncludedSdk\Dto\AbstractAvailabilityDto;
 use BatteryIncludedSdk\Dto\AbstractTranslatableDto;
 use BatteryIncludedSdk\Dto\CategoryDto;
 use BatteryIncludedSdk\Dto\ProductBaseDto;
@@ -15,8 +17,10 @@ use PHPUnit\Framework\TestCase;
 
 #[CoversClass(ProductBaseDto::class)]
 #[CoversClass(AbstractTranslatableDto::class)]
+#[CoversClass(AbstractAvailabilityDto::class)]
 #[UsesClass(ProductPropertyDto::class)]
 #[UsesClass(I18nResolver::class)]
+#[CoversClass(AvailabilityResolver::class)]
 class ProductBaseDtoTest extends TestCase
 {
     public function testSettersAndGetters()
@@ -35,6 +39,8 @@ class ProductBaseDtoTest extends TestCase
         $dto->setPrice(9.99);
         $dto->setInstock(5);
         $dto->setRating(2.5);
+        $dto->setActive(false);
+        $this->assertFalse($dto->getActive());
         $this->assertSame('123', $dto->getId());
         $this->assertSame('PRODUCT-123', $dto->getIdentifier());
         $this->assertSame('Testprodukt', $dto->getName());
@@ -176,6 +182,49 @@ class ProductBaseDtoTest extends TestCase
         );
     }
 
+    public function testAvailabilities()
+    {
+        $dto = new ProductBaseDto('1', 'PRODUCT');
+        $this->assertNull($dto->getAvailabilities());
+
+        $dto->setAvailability('DE', active: true, price: 1337.0);
+        $dto->setAvailability('de_CH', active: false, instock: 0);
+        $dto->addAvailability('de', 'instock', 3);
+
+        $this->assertSame(['active' => true, 'price' => 1337.0, 'instock' => 3], $dto->getAvailability('de'));
+        $this->assertSame(['active' => false, 'instock' => 0], $dto->getAvailability('DE-CH'));
+        $this->assertNull($dto->getAvailability('at'));
+    }
+
+    public function testAvailabilityOfUnknownFieldThrows()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Field "name" is not scoped by availability');
+
+        (new ProductBaseDto('1', 'PRODUCT'))->addAvailability('de', 'name', 'Name');
+    }
+
+    public function testJsonSerializeIncludesAvailabilitiesAfterTranslations()
+    {
+        $dto = new ProductBaseDto('1', 'PRODUCT');
+        $dto->setId('1');
+        $dto->setPrice(999.0);
+        $dto->setActive(true);
+        $dto->addTranslation('en', 'name', 'Phone');
+        $dto->setAvailability('de', price: 1337.0);
+
+        $this->assertSame([
+            'id' => 'PRODUCT-1',
+            'type' => 'PRODUCT',
+            '_PRODUCT_i18n' => ['en' => ['name' => 'Phone']],
+            '_PRODUCT_availability' => ['de' => ['price' => 1337.0]],
+            '_PRODUCT' => ['id' => '1', 'price' => 999.0, 'active' => true],
+        ], $dto->jsonSerialize());
+
+        $withoutTranslations = (new ProductBaseDto('2', 'PRODUCT'))->setAvailability('ch', active: false);
+        $this->assertSame(['id', 'type', '_PRODUCT_availability', '_PRODUCT'], array_keys($withoutTranslations->jsonSerialize()));
+    }
+
     public function testJsonSerialize()
     {
         $id = '1';
@@ -229,6 +278,7 @@ class ProductBaseDtoTest extends TestCase
                 'shopUrl' => null,
                 'price' => 1.5,
                 'instock' => null,
+                'active' => null,
                 'rating' => null,
                 'categories' => null,
                 'properties' => null,
