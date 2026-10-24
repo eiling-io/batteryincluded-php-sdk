@@ -67,9 +67,11 @@ make ddev-phpstan
 make ddev-quality
 ```
 
-The CI runs code style, PHPStan and the tests on PHP 8.2, 8.3, 8.4 and 8.5. Afterwards the job
-`restore demo data` runs `tests/sync-demo-data.php` once, also when the tests failed (not for pull requests from forks,
-they have no access to the secrets).
+The CI runs code style and PHPStan on PHP 8.2, 8.3, 8.4 and 8.5 without secrets. The tests talk to the live API and
+run in the job `tests (live api)` with the secrets of the GitHub environment `testing`: a maintainer has to approve the
+run (required reviewers of the environment) after reviewing the code. The job runs the tests on all PHP versions one
+after another and finally restores the demo data with `tests/sync-demo-data.php`, also when the tests failed. Pull
+requests from forks get no secrets.
 
 ## Documentation
 
