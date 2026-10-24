@@ -82,7 +82,11 @@
                 <a class="dropdown-item suggest-product d-flex align-items-center gap-2" role="option" id="suggest-${id++}"
                    href="${escape(product.url || searchUrl(query))}">
                     <img src="${escape(product.image)}" alt="" loading="lazy">
-                    <span class="text-truncate">${product.html}<br><small class="text-body-secondary">${escape(product.ordernumber)}</small></span>
+                    <span class="text-truncate flex-grow-1">${product.html}<br><small class="text-body-secondary">${escape(product.ordernumber)}</small></span>
+                    ${product.price ? `<span class="suggest-price text-end">
+                        <span class="fw-semibold">${escape(product.price)}</span>
+                        ${product.stock ? `<br><small class="${escape(product.stock.class)}">${escape(product.stock.label)}</small>` : ''}
+                    </span>` : ''}
                 </a>`).join('');
         }
         if (data.found > 0) {

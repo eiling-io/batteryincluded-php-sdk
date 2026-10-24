@@ -121,3 +121,15 @@ a:not([class]) {
 footer {
   color: #aaa;
 }
+
+// the title of the blue note callout is too dark on the dark background, use the light brand cyan instead
+p.note,
+blockquote.note {
+  background: rgba($eiling-cyan, .1) !important;
+  border-left-color: $eiling-cyan !important;
+}
+
+p.note::before,
+blockquote.note::before {
+  color: lighten($eiling-cyan, 15%) !important;
+}
