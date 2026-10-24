@@ -41,7 +41,8 @@ make ddev-quality                                                      # all of 
 ```
 
 CI runs code style (dry run) and PHPStan on PHP 8.2, 8.3, 8.4 and 8.5. PHPUnit always talks to the live API, so it runs
-in the job `tests (live api)` with the secrets of the GitHub environment `testing`, which a maintainer has to approve.
+in the job `tests (live api)` with the secrets of the GitHub environment `testing`, which a maintainer has to approve
+(pushes to `main` use `testing-main`, limited to the branch `main`, without approval).
 Do not move the secrets back to repository secrets.
 
 ## Rules

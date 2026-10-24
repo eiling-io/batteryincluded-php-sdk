@@ -32,12 +32,14 @@ jobs:
             - name: run phpstan
               run: ./tools/phpstan analyse -l 5 ./src
 
-    # the tests talk to the live api, the secrets of the environment `testing` are only handed out after a maintainer
-    # approved the run (required reviewers of the environment). One job for all php versions, so one approval per run.
+    # the tests talk to the live api, for pull requests the secrets of the environment `testing` are only handed out after
+    # a maintainer approved the run (required reviewers of the environment). One job for all php versions, so one approval
+    # per run. Pushes to main (merges) use the environment `testing-main`, it has no reviewers but is limited to the
+    # branch main, otherwise nobody could approve the runs of the maintainer himself (prevent self-review).
     tests:
         name: tests (live api)
         needs: quality
-        environment: testing
+        environment: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && 'testing-main' || 'testing' }}
         runs-on: ubuntu-latest
         env:
             COLLECTION: ${{ secrets.COLLECTION }}
