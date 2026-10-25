@@ -41,7 +41,7 @@ $response->isLLM();       // true if the api flagged the response with `llm`
 ```
 
 - Documents contain the highlighted fields selected under [Suggest in the backend](backend-configuration#suggest). Add
-  `id` there if you want to link to detail pages.
+  `id` (the document id in the root, e.g. `PRODUCT-1002`) there if you want to link to detail pages.
 - Translated fields stay in `_PRODUCT_i18n`, there is no merging like in `BrowseResponse`.
 - Always set a locale, see [translations](translations#requesting-a-locale).
 - `setAvailability('ch')` sends `v[availability]` like on the search page. Prices only arrive if `price` is selected

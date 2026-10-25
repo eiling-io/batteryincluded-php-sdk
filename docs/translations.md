@@ -25,7 +25,6 @@ Language dependent fields are stored in `_<TYPE>_i18n.<locale>`, everything else
     "en": {"name": "Ultra HD LED TV 65\"", "categories": ["Electronics", "Electronics > TVs"]}
   },
   "_PRODUCT": {
-    "id": "1002",
     "name": "Ultra HD LED-TV 65\"",
     "price": 699,
     "instock": 14
@@ -54,7 +53,6 @@ use BatteryIncludedSdk\Dto\ProductBaseDto;
 use BatteryIncludedSdk\Dto\ProductPropertyDto;
 
 $product = new ProductBaseDto('1002');
-$product->setId('1002');
 $product->setName('Ultra HD LED-TV 65"');   // default value
 $product->setPrice(699);
 
@@ -100,7 +98,7 @@ The gateway resolves the node for the requested locale:
 ```json
 {
   "_PRODUCT_i18n": {"name": "Ultra HD LED TV 65\"", "categories": ["Electronics", "Electronics > TVs"]},
-  "_PRODUCT": {"id": "1002", "name": "Ultra HD LED-TV 65\"", "price": 699, "instock": 14}
+  "_PRODUCT": {"name": "Ultra HD LED-TV 65\"", "price": 699, "instock": 14}
 }
 ```
 

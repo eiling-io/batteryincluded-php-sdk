@@ -67,7 +67,6 @@ class Helper
                         $product->setDescription(
                             'Das neueste ' . $device . ' mit vielen Funktionen. Farbe: ' . $color . ', Speicherkapazität: ' . $storage . '.'
                         );
-                        $product->setId((string) $id);
                         // unique per product, the device is part of the number
                         $product->setOrdernumber(sprintf('BI-%s-%02d-%s-%s', self::DEVICE_CODES[$device], $i, $color, $storage));
                         $product->setPrice(1000 + $id);

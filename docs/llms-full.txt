@@ -41,8 +41,7 @@ use BatteryIncludedSdk\Dto\CategoryDto;
 use BatteryIncludedSdk\Dto\ProductBaseDto;
 use BatteryIncludedSdk\Dto\ProductPropertyDto;
 
-$dto = new ProductBaseDto((string) $product->id);   // stored as "PRODUCT-<id>"
-$dto->setId((string) $product->id);
+$dto = new ProductBaseDto((string) $product->id);   // exported as root id "PRODUCT-<id>", setId() is deprecated
 $dto->setName($product->name);
 $dto->setDescription($product->description);
 $dto->setOrdernumber($product->sku);
@@ -90,7 +89,7 @@ class ProductDto extends ProductBaseDto
 Exported document:
 
 ```json
-{"id": "PRODUCT-1002", "type": "PRODUCT", "_PRODUCT": {"id": "1002", "name": "…", "price": 699, "categories": ["Electronics", "Electronics > TVs"], "properties": [{"Color": ["Black"]}]}}
+{"id": "PRODUCT-1002", "type": "PRODUCT", "_PRODUCT": {"name": "…", "price": 699, "categories": ["Electronics", "Electronics > TVs"], "properties": [{"Color": ["Black"]}]}}
 ```
 
 Filter and sort on fields with their node prefix, e.g. `_PRODUCT.price`, `_PRODUCT.properties.Color`.
@@ -143,7 +142,7 @@ $sync = new SyncService($apiClient);
 $sync->syncOneOrManyElements(...$dtos);                 // create or replace the given documents
 $sync->syncFullElements(...$dtos);                      // full import: deletes all documents not sent
 $sync->partialUpdateOneOrManyElements(...$dtos);        // only the set fields, e.g. price and stock
-$sync->deleteElementsByIds('240', '2');
+$sync->deleteElementsByIds('PRODUCT-240', 'BLOG-2');   // root ids, prefixed with the type
 
 // large catalogs: full import in chunks with one transaction, the last chunk finishes it
 $transactionId = 'full-' . date('YmdHis');

@@ -19,7 +19,6 @@ $apiClient = new ApiClient(
 $syncService = new SyncService($apiClient);
 
 $product = new ProductBaseDto('239');
-$product->setId('239');
 $product->setPrice(13337.95);
 $result = $syncService->partialUpdateOneOrManyElements($product);
 

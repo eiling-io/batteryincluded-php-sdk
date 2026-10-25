@@ -26,7 +26,6 @@ The default values stay in `_PRODUCT`, the scoped values are stored in `_PRODUCT
     "ch": {"active": false, "instock": 0}
   },
   "_PRODUCT": {
-    "id": "1002",
     "name": "Ultra HD LED-TV 65\"",
     "price": 999.0,
     "active": true,
@@ -49,7 +48,6 @@ Configure a second variable in the BatteryIncluded backend:
 use BatteryIncludedSdk\Dto\ProductBaseDto;
 
 $product = new ProductBaseDto('1002');
-$product->setId('1002');
 $product->setPrice(999.0);      // default values
 $product->setActive(true);
 $product->setInstock(14);

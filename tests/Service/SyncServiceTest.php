@@ -66,7 +66,6 @@ class SyncServiceTest extends TestCase
     public function testPartialUpdate()
     {
         $product = new ProductBaseDto('239');
-        $product->setId('239');
         $product->setPrice(13337.95);
         $apiClient = Helper::getApiClient();
         $syncService = new SyncService($apiClient);

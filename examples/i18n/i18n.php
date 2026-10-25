@@ -23,7 +23,6 @@ $apiClient = new ApiClient(
 
 // the regular fields act as fallback for every locale without translation
 $product = new ProductBaseDto('i18n-1');
-$product->setId('i18n-1');
 $product->setName('Smartphone 17 Pro Blau - 256GB');
 $product->setDescription('Das neueste Smartphone mit vielen Funktionen.');
 $product->setManufacture('BatteryIncluded');

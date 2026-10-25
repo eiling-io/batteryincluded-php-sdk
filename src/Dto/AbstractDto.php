@@ -48,7 +48,8 @@ abstract class AbstractDto implements DtoInterface
     {
         return [
             'id' => $this->getIdentifier(),
-            'type' => $this->type,
+            // upper case like the id prefix and the type node, so `'_' . $document['type']` finds the node
+            'type' => $this->getType(),
             '_' . $this->getType() => [],
         ];
     }

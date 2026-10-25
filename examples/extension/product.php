@@ -49,7 +49,6 @@ foreach ($storages as $storage) {
     $product->setDescription(
         'Storage: ' . $storage . '.'
     );
-    $product->setId((string) $id);
     $product->setOrdernumber('BI-00' . $id . '-' . $storage);
     $product->setPrice(1000 + $id);
     $product->setInstock(random_int(0, 50));

@@ -46,11 +46,19 @@ class BlogBaseDto extends AbstractTranslatableDto
         ];
     }
 
+    /**
+     * @deprecated the document is identified by the root id `<TYPE>-<identifier>` from the constructor,
+     *             this value is no longer exported
+     */
     public function getId(): ?string
     {
         return $this->id;
     }
 
+    /**
+     * @deprecated the document is identified by the root id `<TYPE>-<identifier>` from the constructor,
+     *             this value is no longer exported
+     */
     public function setId(?string $id): void
     {
         $this->id = $id;
@@ -149,7 +157,6 @@ class BlogBaseDto extends AbstractTranslatableDto
     public function jsonSerialize(): array
     {
         $jsonDto = [
-            'id' => $this->getId(),
             'title' => $this->getTitle(),
             'author' => $this->getAuthor(),
             'publishedAt' => $this->getPublishedAt(),

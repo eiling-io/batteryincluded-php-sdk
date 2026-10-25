@@ -109,7 +109,8 @@ suggest** at the top to try your changes.
 | First Click Suggestions | Suggestions shown before the visitor types, optionally per variable such as `locale` | – |
 
 Only the fields listed under **Product suggestions** are part of the suggested documents. Add `id` there if your shop
-links suggestions to detail pages, and the image and url fields if your suggestion layer shows them.
+links suggestions to detail pages (the document id in the root, e.g. `PRODUCT-1002`), and the image and url fields if
+your suggestion layer shows them.
 
 ## Relevance
 

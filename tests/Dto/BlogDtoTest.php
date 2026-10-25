@@ -45,10 +45,32 @@ final class BlogDtoTest extends TestCase
         $this->assertSame('https://blog.url', $dto->getBlogUrl());
     }
 
+    public function testIdIsOnlyExportedInRoot(): void
+    {
+        $dto = new BlogBaseDto('1');
+        $dto->setId('legacy');
+        $dto->setTitle('Title');
+
+        $this->assertSame(
+            ['id' => 'BLOG-1', 'type' => 'BLOG', '_BLOG' => ['title' => 'Title']],
+            $dto->jsonSerialize()
+        );
+    }
+
+    public function testCustomTypeIsUpperCaseInIdTypeAndNode(): void
+    {
+        $dto = new BlogBaseDto('42', 'faq');
+        $dto->setTitle('Shipping');
+
+        $this->assertSame(
+            ['id' => 'FAQ-42', 'type' => 'FAQ', '_FAQ' => ['title' => 'Shipping']],
+            $dto->jsonSerialize()
+        );
+    }
+
     public function testJsonSerialize(): void
     {
         $dto = new BlogBaseDto('1');
-        $dto->setId('1');
         $dto->setTitle('Title');
         $dto->setActive(true);
 
@@ -57,7 +79,6 @@ final class BlogDtoTest extends TestCase
         $this->assertIsArray($json);
         $this->assertArrayHasKey('_BLOG', $json);
         $this->assertSame([
-            'id' => '1',
             'title' => 'Title',
             'active' => true,
         ], $json['_BLOG']);
@@ -66,7 +87,6 @@ final class BlogDtoTest extends TestCase
     public function testJsonSerializeExportsNullValuesWhenEnabled(): void
     {
         $dto = new BlogBaseDto('1');
-        $dto->setId('1');
         $dto->setTitle('Title');
         $dto->setActive(true);
 
@@ -75,7 +95,6 @@ final class BlogDtoTest extends TestCase
         $json = $dto->jsonSerialize();
 
         $this->assertSame([
-            'id' => '1',
             'title' => 'Title',
             'author' => null,
             'publishedAt' => null,
@@ -91,7 +110,6 @@ final class BlogDtoTest extends TestCase
     public function testJsonSerializeIncludesTranslations(): void
     {
         $dto = new BlogBaseDto('1');
-        $dto->setId('1');
         $dto->setTitle('Neuigkeiten');
         $dto->addTranslation('de', 'title', 'Neuigkeiten')
             ->addTranslation('en', 'title', 'News')
@@ -104,7 +122,7 @@ final class BlogDtoTest extends TestCase
                 'de' => ['title' => 'Neuigkeiten'],
                 'en' => ['title' => 'News', 'blogUrl' => 'https://blog.url/en'],
             ],
-            '_BLOG' => ['id' => '1', 'title' => 'Neuigkeiten'],
+            '_BLOG' => ['title' => 'Neuigkeiten'],
         ], $dto->jsonSerialize());
     }
 

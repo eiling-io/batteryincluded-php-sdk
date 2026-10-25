@@ -145,7 +145,6 @@ class ProductBaseDtoTest extends TestCase
     public function testJsonSerializeIncludesTranslations()
     {
         $dto = new ProductBaseDto('1', 'PRODUCT');
-        $dto->setId('1');
         $dto->setManufacture('Manufacturer');
         $dto->addTranslation('de', 'manufacture', 'Hersteller');
 
@@ -156,7 +155,6 @@ class ProductBaseDtoTest extends TestCase
                 'de' => ['manufacture' => 'Hersteller'],
             ],
             '_PRODUCT' => [
-                'id' => '1',
                 'manufacture' => 'Manufacturer',
             ],
         ], $dto->jsonSerialize());
@@ -165,7 +163,6 @@ class ProductBaseDtoTest extends TestCase
     public function testExportedTranslationsCanBeResolved()
     {
         $dto = new ProductBaseDto('1', 'PRODUCT');
-        $dto->setId('1');
         $dto->setName('iPhone Blau');
         $dto->setDescription('Beschreibung');
         $dto->addTranslation('en', 'name', 'iPhone Blue');
@@ -173,11 +170,11 @@ class ProductBaseDtoTest extends TestCase
         $document = json_decode(json_encode($dto), true);
 
         $this->assertSame(
-            ['id' => '1', 'name' => 'iPhone Blue', 'description' => 'Beschreibung'],
+            ['name' => 'iPhone Blue', 'description' => 'Beschreibung'],
             I18nResolver::resolveDocument($document, 'en')['_PRODUCT']
         );
         $this->assertSame(
-            ['id' => '1', 'name' => 'iPhone Blau', 'description' => 'Beschreibung'],
+            ['name' => 'iPhone Blau', 'description' => 'Beschreibung'],
             I18nResolver::resolveDocument($document, 'de')['_PRODUCT']
         );
     }
@@ -207,7 +204,6 @@ class ProductBaseDtoTest extends TestCase
     public function testJsonSerializeIncludesAvailabilitiesAfterTranslations()
     {
         $dto = new ProductBaseDto('1', 'PRODUCT');
-        $dto->setId('1');
         $dto->setPrice(999.0);
         $dto->setActive(true);
         $dto->addTranslation('en', 'name', 'Phone');
@@ -218,7 +214,7 @@ class ProductBaseDtoTest extends TestCase
             'type' => 'PRODUCT',
             '_PRODUCT_i18n' => ['en' => ['name' => 'Phone']],
             '_PRODUCT_availability' => ['de' => ['price' => 1337.0]],
-            '_PRODUCT' => ['id' => '1', 'price' => 999.0, 'active' => true],
+            '_PRODUCT' => ['price' => 999.0, 'active' => true],
         ], $dto->jsonSerialize());
 
         $withoutTranslations = (new ProductBaseDto('2', 'PRODUCT'))->setAvailability('ch', active: false);
@@ -230,7 +226,6 @@ class ProductBaseDtoTest extends TestCase
         $id = '1';
         $type = 'PRODUCT';
         $dto = new ProductBaseDto($id, $type);
-        $dto->setId($id);
         $dto->setName('Name');
         $dto->setPrice(1.5);
 
@@ -242,7 +237,6 @@ class ProductBaseDtoTest extends TestCase
             'id' => $type . '-' . $id,
             'type' => $type,
             '_' . $type => [
-                'id' => '1',
                 'name' => 'Name',
                 'price' => 1.5,
                 'categories' => ['A'],
@@ -257,7 +251,6 @@ class ProductBaseDtoTest extends TestCase
         $id = '1';
         $type = 'PRODUCT';
         $dto = new ProductBaseDto($id, $type);
-        $dto->setId($id);
         $dto->setName('Name');
         $dto->setPrice(1.5);
 
@@ -267,7 +260,6 @@ class ProductBaseDtoTest extends TestCase
             'id' => $type . '-' . $id,
             'type' => $type,
             '_' . $type => [
-                'id' => '1',
                 'name' => 'Name',
                 'description' => null,
                 'ordernumber' => null,
@@ -291,18 +283,29 @@ class ProductBaseDtoTest extends TestCase
     public function testJsonSerializeFiltersNullValuesByDefault()
     {
         $dto = new ProductBaseDto('1', 'PRODUCT');
-        $dto->setId('1');
+        $dto->setName('Name');
 
-        $this->assertSame(['id' => '1'], $dto->jsonSerialize()['_PRODUCT']);
+        $this->assertSame(['name' => 'Name'], $dto->jsonSerialize()['_PRODUCT']);
     }
 
     public function testExportNullValuesCanBeDisabledAgain()
     {
         $dto = new ProductBaseDto('1', 'PRODUCT');
-        $dto->setId('1');
         $dto->exportNullValues();
         $dto->exportNullValues(false);
 
-        $this->assertSame(['id' => '1'], $dto->jsonSerialize()['_PRODUCT']);
+        $this->assertSame([], $dto->jsonSerialize()['_PRODUCT']);
+    }
+
+    public function testIdIsOnlyExportedInRoot()
+    {
+        $dto = new ProductBaseDto('1');
+        $dto->setId('legacy');
+        $dto->setName('Name');
+
+        $this->assertSame(
+            ['id' => 'PRODUCT-1', 'type' => 'PRODUCT', '_PRODUCT' => ['name' => 'Name']],
+            $dto->jsonSerialize()
+        );
     }
 }

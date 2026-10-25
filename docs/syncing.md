@@ -19,8 +19,7 @@ use BatteryIncludedSdk\Dto\CategoryDto;
 use BatteryIncludedSdk\Dto\ProductBaseDto;
 use BatteryIncludedSdk\Dto\ProductPropertyDto;
 
-$product = new ProductBaseDto('1002');          // identifier of the product in your shop
-$product->setId('1002');
+$product = new ProductBaseDto('1002');          // identifier of the product in your shop, exported as id PRODUCT-1002
 $product->setName('Ultra HD LED TV 65"');
 $product->setDescription('4K television with HDR.');
 $product->setOrdernumber('TV-65');
@@ -51,7 +50,6 @@ The document is exported like this:
   "id": "PRODUCT-1002",
   "type": "PRODUCT",
   "_PRODUCT": {
-    "id": "1002",
     "name": "Ultra HD LED TV 65\"",
     "price": 699,
     "categories": ["Electronics", "Electronics > TVs"],
@@ -60,7 +58,10 @@ The document is exported like this:
 }
 ```
 
-- The document id is prefixed with its type (`PRODUCT-1002`), so products and blog posts never collide.
+- The document id is the identifier from the constructor prefixed with its type (`PRODUCT-1002`), next to `type`
+  in the root. Products and blog posts with the same auto increment never collide, and partial updates and deletes
+  address documents by this id. There is no `id` field in `_PRODUCT`; `setId()` is deprecated and no longer exported.
+  An `_PRODUCT.id` from an earlier export stays in the index until the document is deleted and imported again.
 - All fields live in a type-scoped node (`_PRODUCT`). Filter and sort on them with that prefix, e.g. `_PRODUCT.price`.
 - A category path is exported with all its parents (`Electronics`, `Electronics > TVs`).
 - Fields that are `null` are not exported (see [Clearing fields](#clearing-fields)).
@@ -75,7 +76,6 @@ BatteryIncluded backend and values via [translations](translations).
 use BatteryIncludedSdk\Dto\BlogBaseDto;
 
 $blog = new BlogBaseDto('1');
-$blog->setId('1');
 $blog->setTitle('Top 5 smartphones');
 $blog->setAuthor('Jane Doe');
 $blog->setPublishedAt('2026-06-01');
@@ -133,7 +133,6 @@ Send only the fields that changed, e.g. price and stock:
 
 ```php
 $product = new ProductBaseDto('1002');
-$product->setId('1002');
 $product->setPrice(649.0);
 $product->setInstock(9);
 
@@ -147,7 +146,6 @@ Fields that are `null` are skipped on export, so a partial update never clears a
 
 ```php
 $product = new ProductBaseDto('1002');
-$product->setId('1002');
 $product->setRating(null);
 $product->exportNullValues();
 
@@ -157,7 +155,7 @@ $syncService->partialUpdateOneOrManyElements($product);
 ### Deleting documents
 
 ```php
-$syncService->deleteElementsByIds('240', '2');
+$syncService->deleteElementsByIds('PRODUCT-240', 'BLOG-2'); // root ids, prefixed with the type
 ```
 
 ## Custom fields
@@ -194,5 +192,5 @@ class ProductDto extends ProductBaseDto
 The type is the second constructor argument. Use it to store further content, e.g. stores or FAQ entries:
 
 ```php
-$faq = new BlogBaseDto('42', 'FAQ'); // stored as FAQ-42 with the fields in _FAQ
+$faq = new BlogBaseDto('42', 'faq'); // stored as id FAQ-42, type FAQ, with the fields in _FAQ (always upper case)
 ```

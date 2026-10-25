@@ -47,14 +47,14 @@ $products = [];
 foreach (array_slice($response->getDocuments(), 0, 4) as $document) {
     // price (and status) of the country, delivered in `_PRODUCT_availability` if selected under Suggest in the portal
     $product = AvailabilityResolver::resolveDocument($document, $country)['_PRODUCT'] ?? [];
-    // the shop id (`_PRODUCT.id`, selected under Suggest in the portal) plus the type is the document id, e.g. PRODUCT-720
-    $productId = strip_tags((string) ($product['id'] ?? ''));
+    // the document id in the root (selected under Suggest in the portal), e.g. PRODUCT-720
+    $productId = strip_tags((string) ($document['id'] ?? ''));
     // the highlighted name is part of the _PRODUCT_i18n node, resolved by the gateway for the requested locale
     $name = (string) ($document['_PRODUCT_i18n']['name'] ?? $product['name'] ?? '');
     $products[] = [
         'html' => highlight($name),
         'image' => (string) ($product['imageUrl'] ?? ''),
-        'url' => $productId !== '' ? detailUrl('PRODUCT-' . $productId) : '',
+        'url' => $productId !== '' ? detailUrl($productId) : '',
         'ordernumber' => strip_tags((string) ($product['ordernumber'] ?? '')),
         'price' => isset($product['price']) ? formatPrice((float) strip_tags((string) $product['price'])) : '',
         'stock' => isset($product['active']) || isset($product['instock']) ? stockStatus($product) : null,

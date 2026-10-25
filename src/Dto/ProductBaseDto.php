@@ -41,11 +41,19 @@ class ProductBaseDto extends AbstractAvailabilityDto
         parent::__construct($identifier, $type);
     }
 
+    /**
+     * @deprecated the document is identified by the root id `<TYPE>-<identifier>` from the constructor,
+     *             this value is no longer exported
+     */
     public function getId(): ?string
     {
         return $this->id;
     }
 
+    /**
+     * @deprecated the document is identified by the root id `<TYPE>-<identifier>` from the constructor,
+     *             this value is no longer exported
+     */
     public function setId(?string $id): void
     {
         $this->id = $id;
@@ -256,7 +264,6 @@ class ProductBaseDto extends AbstractAvailabilityDto
     public function jsonSerialize(): array
     {
         $jsonDto = [
-            'id' => $this->getId(),
             'name' => $this->getName(),
             'description' => $this->getDescription(),
             'ordernumber' => $this->getOrdernumber(),
