@@ -129,5 +129,10 @@ class SuggestServiceTest extends TestCase
         $this->assertGreaterThanOrEqual(12, $result->getFounds());
         $this->assertCount(6, $result->getDocuments());
         $this->assertFalse($result->isLLM());
+
+        // the root id links a suggestion to its detail page, it has to be selected under Suggest in the portal
+        foreach ($result->getDocuments() as $document) {
+            $this->assertMatchesRegularExpression('/^PRODUCT-\d+$/', (string) ($document['id'] ?? ''));
+        }
     }
 }
