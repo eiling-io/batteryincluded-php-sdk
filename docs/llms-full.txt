@@ -1,7 +1,7 @@
 # BatteryIncluded PHP SDK – integration guide for AI agents
 
 > Everything needed to add BatteryIncluded search to a PHP shop with the SDK `batteryincluded/batteryincluded-php-sdk`.
-> Follow the steps in order. Human-readable docs: https://eiling-io.github.io/batteryincluded-php-sdk/
+> Follow the steps in order. Human-readable docs: https://sdk.batteryincluded.eiling.io/
 
 ## 0. Ask the user for
 

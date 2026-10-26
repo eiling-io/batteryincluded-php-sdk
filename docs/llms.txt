@@ -4,7 +4,7 @@
 > result pages, filters, search-as-you-type suggestions and recommendations in PHP 8.2+.
 
 Install with `composer require batteryincluded/batteryincluded-php-sdk`. For a complete integration guide in one file
-read [llms-full.txt](https://eiling-io.github.io/batteryincluded-php-sdk/llms-full.txt).
+read [llms-full.txt](https://sdk.batteryincluded.eiling.io/llms-full.txt).
 
 ## Docs
 

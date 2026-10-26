@@ -6,7 +6,7 @@ Guidance for AI coding agents working **on this repository**. To integrate the S
 ## Project
 
 Official PHP SDK for [BatteryIncluded](https://batteryincluded.ai) (search, suggestions, recommendations).
-Package: `batteryincluded/batteryincluded-php-sdk`. Docs: https://eiling-io.github.io/batteryincluded-php-sdk/
+Package: `batteryincluded/batteryincluded-php-sdk`. Docs: https://sdk.batteryincluded.eiling.io/
 
 - PHP `^8.2`, extensions `curl` and `mbstring`, **no runtime dependencies**. Do not add any.
 - Namespace `BatteryIncludedSdk\` → `src/`, tests `BatteryIncludedSdkTests\` → `tests/`.
