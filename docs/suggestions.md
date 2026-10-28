@@ -77,9 +77,12 @@ Popular searches and query suggestions, e.g. to fill an empty search layer:
 ```php
 use BatteryIncludedSdk\Highlights\HighlightsService;
 
-$highlights = (new HighlightsService($apiClient))->getHighlights();
+$highlights = (new HighlightsService($apiClient))->getHighlights('de');   // locale of the query suggestions
 
 $highlights->getSearches();
 $highlights->getQuerySuggestions();
 $highlights->getAll();   // ['searches' => [...], 'querySuggestions' => [...]]
 ```
+
+With [translations](translations) the query suggestions are configured per locale, pass the locale of the shop. Without
+locale the gateway delivers no query suggestions of a translated collection.

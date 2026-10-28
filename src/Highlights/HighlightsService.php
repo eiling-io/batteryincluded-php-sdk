@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace BatteryIncludedSdk\Highlights;
 
 use BatteryIncludedSdk\Client\ApiClient;
+use BatteryIncludedSdk\I18n\I18nResolver;
 
 class HighlightsService
 {
@@ -12,10 +13,15 @@ class HighlightsService
     {
     }
 
-    public function getHighlights(): HighlightsResponse
+    /**
+     * @param string|null $locale locale of the translated query suggestions, e.g. `de_DE`, sent as `v[locale]`
+     */
+    public function getHighlights(?string $locale = null): HighlightsResponse
     {
+        $query = $locale !== null ? '?' . http_build_query(['v' => ['locale' => I18nResolver::normalizeLocale($locale)]]) : '';
+
         $response = $this->apiClient->getJson(
-            '/documents/highlights',
+            '/documents/highlights' . $query,
             []
         );
 
