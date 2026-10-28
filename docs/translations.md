@@ -93,7 +93,9 @@ $searchStruct = new BrowseSearchStruct();
 $searchStruct->setLocale('en');            // or $searchStruct->addVariable('locale', 'en')
 ```
 
-`SuggestSearchStruct::setLocale()` and `SimilarSearchService::search($query, $locale)` work the same way.
+`SuggestSearchStruct::setLocale()`, `SimilarSearchService::search($query, $locale)`,
+`HighlightsService::getHighlights($locale)` and the optional `$locale` of the
+[recommendations](recommendations) work the same way.
 
 The gateway resolves the node for the requested locale:
 
@@ -106,10 +108,13 @@ The gateway resolves the node for the requested locale:
 
 - Without `v[locale]` the `default` of the variable applies.
 - There is no fallback in the gateway: if a document lacks the requested locale, the node is removed.
+- Request exactly the locales you exported: `de` does not find documents exported with `de-de`, and vice versa.
 
 {: .warning }
 Always send a locale to the suggest endpoint. Without it the gateway currently fails with a 500 as soon as the
-collection uses translated facets. The SDK sends `DE` by default.
+collection uses translated facets. The search structs and `SimilarSearchService` send `DE` (normalized `de`) by
+default, which only fits collections exported with `de`. Set the locale of your shop, e.g. `de_DE` for documents
+exported with `de-de`.
 
 ## Reading translated hits
 

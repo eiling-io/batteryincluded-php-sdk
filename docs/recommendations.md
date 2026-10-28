@@ -29,6 +29,15 @@ $recommendations['together'];  // frequently bought together
 Pass the identifier of your product (`1002`), the SDK adds the type prefix. For other types use the second argument,
 e.g. `recommendByIdentifier('1', 'BLOG')`.
 
+In multi-language shops pass the locale as third argument. The SDK sends it as `v[locale]` and merges the
+translations of the locale into the documents, like [`BrowseResponse::getHits()`](translations#reading-translated-hits):
+
+```php
+$response = (new RecommendationsService($apiClient))->recommendByIdentifier('1002', 'PRODUCT', 'de_DE');
+
+$response->getRecommendations()['related'][0]['document']['_PRODUCT']['name']; // German name
+```
+
 ## Cart recommendations
 
 Recommendations for the content of a cart:
@@ -44,6 +53,10 @@ $response = (new CartRecommendationsService($apiClient))->recommendByIdentifiers
 $response->getRecommendations();   // grouped like the product recommendations
 ```
 
+The locale is the fourth argument, `recommendByIdentifiers($ids, $filters, 'PRODUCT', 'de_DE')`. It is required to
+filter translated fields like `_PRODUCT_i18n.categories`, they are filtered without locale as in the
+[search](translations#filtering-and-sorting).
+
 If the api returns no recommendations, both responses contain empty `related`, `also` and `together` lists.
 
 ## Presets
@@ -58,4 +71,5 @@ foreach ((new PresetsService($apiClient))->getPresets()->getPresets() as $preset
 }
 ```
 
-Use a preset id with [`BrowseSearchStruct::setPresetId()`](search#presets-and-variables).
+Use a preset id with [`BrowseSearchStruct::setPresetId()`](search#presets-and-variables). The names of the presets
+are not translated, the api delivers them as maintained in the backend.

@@ -114,6 +114,8 @@ $dto->addTranslation('en', 'name', 'TV 65"')
 - Translatable product fields: name, description, ordernumber, manufacture, manufactureNumber, ean, imageUrl, shopUrl,
   price, instock, rating, categories, properties. Other fields throw `InvalidArgumentException`.
 - Locales are normalized to lower case: `DE` → `de`, `de_CH` → `de-ch`.
+- Request exactly the exported locales, the gateway has no fallback: `de` does not find `de-de`. The structs and
+  `SimilarSearchService` default to `DE` (= `de`), set the locale explicitly.
 - The collection needs the variable `{"name": "locale", "default": "de", "root": ["_PRODUCT_i18n", "_BLOG_i18n"]}`
   (portal → Schema → Variables). Ask the user to configure it.
 
@@ -243,9 +245,10 @@ $response->getFounds();
 Escape all output except `<mark>` tags of highlighted values. Call the endpoint server side (API key!), e.g. from a
 small JSON endpoint that the browser queries with a debounce of ~150 ms and a minimum of 2 characters.
 
-Further services: `SimilarSearchService::search($query, $locale)`, `HighlightsService::getHighlights()`,
-`RecommendationsService::recommendByIdentifier('1002')` and
-`CartRecommendationsService::recommendByIdentifiers(['1002', '1003'])` (both grouped in `related`, `also`, `together`).
+Further services: `SimilarSearchService::search($query, $locale)`, `HighlightsService::getHighlights($language)`,
+`RecommendationsService::recommendByIdentifier('1002', 'PRODUCT', $language)` and
+`CartRecommendationsService::recommendByIdentifiers(['1002', '1003'], $filters, 'PRODUCT', $language)` (both grouped in
+`related`, `also`, `together`; with a locale the translations are merged into the documents).
 
 ## 9. Verify
 

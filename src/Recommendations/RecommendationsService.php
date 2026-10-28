@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace BatteryIncludedSdk\Recommendations;
 
 use BatteryIncludedSdk\Client\ApiClient;
+use BatteryIncludedSdk\I18n\I18nResolver;
 
 class RecommendationsService
 {
@@ -12,19 +13,22 @@ class RecommendationsService
     {
     }
 
-    public function recommendByIdentifier(string $identifier, string $type = 'PRODUCT'): RecommendationsResponse
+    /**
+     * @param string|null $locale locale of the translated fields, e.g. `de_DE`, sent as `v[locale]`
+     */
+    public function recommendByIdentifier(string $identifier, string $type = 'PRODUCT', ?string $locale = null): RecommendationsResponse
     {
-        $query = http_build_query(
-            [
-                'id' => $type . '-' . $identifier,
-            ]
-        );
+        $parameters = ['id' => $type . '-' . $identifier];
+        if ($locale !== null) {
+            $parameters['v'] = ['locale' => I18nResolver::normalizeLocale($locale)];
+        }
+        $query = http_build_query($parameters);
 
         $response = $this->apiClient->getJson(
             '/documents/recommendations?' . $query,
             []
         );
 
-        return new RecommendationsResponse($response->getRawResponse(), $response->getStatusCode());
+        return new RecommendationsResponse($response->getRawResponse(), $response->getStatusCode(), $locale);
     }
 }

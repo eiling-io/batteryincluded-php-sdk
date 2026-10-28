@@ -94,7 +94,9 @@ $searchStruct = new BrowseSearchStruct();
 $searchStruct->setLocale('en');            // or $searchStruct->addVariable('locale', 'en')
 ```
 
-`SuggestSearchStruct::setLocale()` und `SimilarSearchService::search($query, $locale)` funktionieren genauso.
+`SuggestSearchStruct::setLocale()`, `SimilarSearchService::search($query, $locale)`,
+`HighlightsService::getHighlights($locale)` und das optionale `$locale` der [Empfehlungen](recommendations)
+funktionieren genauso.
 
 Das Gateway löst den Knoten für die angefragte Locale auf:
 
@@ -107,10 +109,13 @@ Das Gateway löst den Knoten für die angefragte Locale auf:
 
 - Ohne `v[locale]` gilt der `default` der Variable.
 - Das Gateway hat keinen Fallback: Fehlt einem Dokument die angefragte Locale, wird der Knoten entfernt.
+- Frage genau die exportierten Locales an: `de` findet keine Dokumente, die mit `de-de` exportiert wurden, und umgekehrt.
 
 {: .achtung }
 Sende an den Suggest-Endpunkt immer eine Locale. Ohne sie bricht das Gateway derzeit mit einem 500 ab, sobald die
-Collection übersetzte Facetten verwendet. Das SDK sendet standardmäßig `DE`.
+Collection übersetzte Facetten verwendet. Die Search Structs und `SimilarSearchService` senden standardmäßig `DE`
+(normalisiert `de`), das passt nur zu Collections, die mit `de` exportiert wurden. Setze die Locale deines Shops, zum
+Beispiel `de_DE` für Dokumente, die mit `de-de` exportiert wurden.
 
 ## Übersetzte Treffer auslesen {#reading-translated-hits}
 
