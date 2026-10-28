@@ -1,4 +1,6 @@
 ---
+lang: en
+permalink: /recommendations.html
 title: Recommendations
 nav_order: 8
 ---

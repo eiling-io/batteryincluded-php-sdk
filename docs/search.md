@@ -1,4 +1,6 @@
 ---
+lang: en
+permalink: /search.html
 title: Search & filters
 nav_order: 6
 ---

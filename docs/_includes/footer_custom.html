@@ -1,4 +1,8 @@
 <p class="text-small mb-0">
   © {{ 'now' | date: '%Y' }} <a href="https://eiling.io">eiling.io</a> ·
+  {% if site.active_lang == 'de' -%}
+  Lizenziert unter der <a href="https://github.com/eiling-io/batteryincluded-php-sdk/blob/main/LICENSE">MIT-Lizenz</a>
+  {%- else -%}
   Licensed under the <a href="https://github.com/eiling-io/batteryincluded-php-sdk/blob/main/LICENSE">MIT License</a>
+  {%- endif %}
 </p>

@@ -1,8 +1,22 @@
 title: BatteryIncluded PHP SDK
 description: Sync your catalog to BatteryIncluded and build search, suggestions and recommendations in PHP.
-remote_theme: just-the-docs/just-the-docs@v0.10.1
+url: https://sdk.batteryincluded.eiling.io
+theme: just-the-docs
 plugins:
-  - jekyll-remote-theme
+  - jekyll-polyglot
+
+# english under /, german under /de/. A german page lives in de/ and has the permalink of its english counterpart
+languages: ["en", "de"]
+default_lang: "en"
+# not copied to /de/, german pages link images with an absolute path
+exclude_from_localization: ["CNAME", "llms.txt", "llms-full.txt", "assets/images"]
+# config values per language, applied by _plugins/localize.rb
+localized:
+  de:
+    description: Synchronisiere deinen Katalog mit BatteryIncluded und baue Suche, Vorschläge und Empfehlungen in PHP.
+    gh_edit_link_text: Diese Seite auf GitHub bearbeiten
+
+exclude: ["Gemfile", "Gemfile.lock", "vendor", ".jekyll-cache"]
 
 color_scheme: eiling
 # logo of the sidebar (variant of logo.svg for the dark background), without logo the title is shown as text
@@ -40,4 +54,14 @@ callouts:
     color: yellow
   warning:
     title: Warning
+    color: red
+  # german pages
+  hinweis:
+    title: Hinweis
+    color: blue
+  wichtig:
+    title: Wichtig
+    color: yellow
+  achtung:
+    title: Achtung
     color: red

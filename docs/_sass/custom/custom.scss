@@ -124,12 +124,40 @@ footer {
 
 // the title of the blue note callout is too dark on the dark background, use the light brand cyan instead
 p.note,
-blockquote.note {
+blockquote.note,
+p.hinweis,
+blockquote.hinweis {
   background: rgba($eiling-cyan, .1) !important;
   border-left-color: $eiling-cyan !important;
 }
 
 p.note::before,
-blockquote.note::before {
+blockquote.note::before,
+p.hinweis::before,
+blockquote.hinweis::before {
   color: lighten($eiling-cyan, 15%) !important;
+}
+
+// language switch in the header, next to the search
+.lang-switch {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  padding: 0 1rem;
+  font-size: .85rem;
+  white-space: nowrap;
+}
+
+.lang-switch-link {
+  color: #d5d5d5;
+  text-decoration: none;
+
+  &:hover {
+    color: $eiling-cyan;
+  }
+
+  &.active {
+    color: $eiling-cyan;
+    font-weight: 600;
+  }
 }

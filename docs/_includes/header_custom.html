@@ -1,0 +1,10 @@
+{%- comment -%} language switch, links to the same page in the other languages (static_href keeps polyglot from prefixing them) {%- endcomment -%}
+<nav class="lang-switch" aria-label="{% if site.active_lang == 'de' %}Sprache{% else %}Language{% endif %}">
+  {%- for lang in site.languages -%}
+    {%- if lang == site.default_lang -%}{%- assign prefix = '' -%}{%- else -%}{%- assign prefix = '/' | append: lang -%}{%- endif -%}
+    <a {% static_href %}href="{{ prefix | append: page.permalink | relative_url }}"{% endstatic_href %} hreflang="{{ lang }}" lang="{{ lang }}"
+       class="lang-switch-link{% if lang == site.active_lang %} active{% endif %}"{% if lang == site.active_lang %} aria-current="page"{% endif %}>
+      {%- if lang == 'de' -%}Deutsch{%- else -%}English{%- endif -%}
+    </a>
+  {%- endfor -%}
+</nav>

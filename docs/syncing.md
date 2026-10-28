@@ -1,4 +1,6 @@
 ---
+lang: en
+permalink: /syncing.html
 title: Syncing documents
 nav_order: 3
 ---
@@ -138,6 +140,9 @@ $product->setInstock(9);
 
 $syncService->partialUpdateOneOrManyElements($product);
 ```
+
+The index is updated asynchronously: the response reports `success` immediately, the change shows up in the search
+after a few seconds.
 
 ### Clearing fields
 

@@ -26,7 +26,7 @@ Package: `batteryincluded/batteryincluded-php-sdk`. Docs: https://sdk.batteryinc
 | `src/Polyfill/mbstring.php` | `mb_trim()` for PHP < 8.4, autoloaded via `composer.json` `files` |
 | `tests/` | Unit tests and live tests; `Helper.php` generates the test data, `DeviceImage.php` its SVG images |
 | `examples/` | One script per service plus a demo shop (`index.php`, `detail.php`, `app/`, `assets/`) |
-| `docs/` | GitHub Pages (Jekyll, just-the-docs, colour scheme `eiling`) |
+| `docs/` | GitHub Pages (Jekyll, just-the-docs, colour scheme `eiling`), English in `docs/`, German in `docs/de/` (jekyll-polyglot), built by `.github/workflows/pages.yml` |
 
 ## Commands
 
@@ -52,6 +52,12 @@ Do not move the secrets back to repository secrets.
 - `phpunit.xml` requires coverage metadata: every test class needs `#[CoversClass]`/`#[UsesClass]` (or
   `#[CoversNothing]`) for each `src/` class it touches.
 - Keep `docs/` and `docs/llms-full.txt` in sync with public API changes.
+- **Docs are always written in English and German.** Every page exists twice: `docs/<page>.md` (`lang: en`) and
+  `docs/de/<page>.md` (`lang: de`, same `permalink` and `nav_order`). Never add, change or remove a page in one language
+  only, update both in the same commit. Code blocks are identical, only the text is translated (German with "du").
+  Headings keep the same order, the German ones carry the English anchor (`## Filter {#filters}`), callouts are
+  `.hinweis`/`.wichtig`/`.achtung`. Run `python3 docs/_tools/check-translations.py` before committing, the pages
+  workflow fails otherwise. `llms.txt` and `llms-full.txt` stay English only.
 - Follow the existing style: short comments that explain *why*, `declare(strict_types=1)` in every file.
 
 ## Domain knowledge

@@ -1,0 +1,6 @@
+source "https://rubygems.org"
+
+# built by .github/workflows/pages.yml, the GitHub Pages branch build does not allow jekyll-polyglot
+gem "jekyll", "~> 4.4"
+gem "just-the-docs", "0.10.1"
+gem "jekyll-polyglot", "~> 1.14"

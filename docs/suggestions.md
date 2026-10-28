@@ -1,4 +1,6 @@
 ---
+lang: en
+permalink: /suggestions.html
 title: Suggestions
 nav_order: 7
 ---

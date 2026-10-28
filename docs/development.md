@@ -1,4 +1,6 @@
 ---
+lang: en
+permalink: /development.html
 title: Development
 nav_order: 10
 ---
@@ -76,10 +78,15 @@ requests from forks get no secrets.
 
 ## Documentation
 
-This documentation lives in `docs/` and is published with GitHub Pages. Preview it locally with Jekyll:
+This documentation lives in `docs/` and is built and published to GitHub Pages by the workflow
+`.github/workflows/pages.yml` (Jekyll with just-the-docs and jekyll-polyglot). The English pages live in `docs/`, their
+German counterparts in `docs/de/` with the same `permalink` and `lang: de`. Change both languages in the same pull
+request. Preview it locally:
 
 ```bash
 cd docs
-bundle init && bundle add github-pages jekyll-remote-theme
+bundle install
 bundle exec jekyll serve
 ```
+
+The English version is then served at `http://127.0.0.1:4000/`, the German one at `http://127.0.0.1:4000/de/`.

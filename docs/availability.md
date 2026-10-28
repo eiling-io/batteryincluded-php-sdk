@@ -1,4 +1,6 @@
 ---
+lang: en
+permalink: /availability.html
 title: Availability
 nav_order: 4.5
 ---

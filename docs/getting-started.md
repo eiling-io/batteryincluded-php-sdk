@@ -1,4 +1,6 @@
 ---
+lang: en
+permalink: /getting-started.html
 title: Getting started
 nav_order: 2
 ---

@@ -1,4 +1,6 @@
 ---
+lang: en
+permalink: /backend-configuration.html
 title: Backend configuration
 nav_order: 5
 ---

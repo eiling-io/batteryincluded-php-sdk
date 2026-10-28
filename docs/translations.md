@@ -1,4 +1,6 @@
 ---
+lang: en
+permalink: /translations.html
 title: Translations (i18n)
 nav_order: 4
 ---

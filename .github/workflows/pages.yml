@@ -1,0 +1,67 @@
+name: pages
+
+# builds the documentation in docs/ and publishes it to GitHub Pages (Settings → Pages → Source: GitHub Actions).
+# The branch build of GitHub Pages does not allow jekyll-polyglot, which serves the German pages under /de/.
+on:
+    push:
+        branches: [ main ]
+        paths: [ 'docs/**', '.github/workflows/pages.yml' ]
+    pull_request:
+        branches: [ main ]
+        paths: [ 'docs/**', '.github/workflows/pages.yml' ]
+    workflow_dispatch:
+
+permissions:
+    contents: read
+
+# one deployment at a time, a running deployment is finished before the next one starts
+concurrency:
+    group: pages
+    cancel-in-progress: false
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        defaults:
+            run:
+                working-directory: docs
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: check translations
+              run: python3 _tools/check-translations.py
+
+            - uses: ruby/setup-ruby@v1
+              with:
+                  ruby-version: '3.3'
+                  bundler-cache: true
+                  working-directory: docs
+
+            - id: pages
+              uses: actions/configure-pages@v5
+
+            - name: build
+              run: bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path }}"
+              env:
+                  JEKYLL_ENV: production
+
+            - uses: actions/upload-pages-artifact@v3
+              with:
+                  path: docs/_site
+
+    # pull requests only build the site, merges to main publish it
+    deploy:
+        if: github.event_name != 'pull_request'
+        needs: build
+        runs-on: ubuntu-latest
+        permissions:
+            pages: write
+            id-token: write
+        environment:
+            name: github-pages
+            url: ${{ steps.deployment.outputs.page_url }}
+
+        steps:
+            - id: deployment
+              uses: actions/deploy-pages@v4

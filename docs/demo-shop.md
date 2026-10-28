@@ -1,4 +1,6 @@
 ---
+lang: en
+permalink: /demo-shop.html
 title: Demo shop
 nav_order: 9
 ---
