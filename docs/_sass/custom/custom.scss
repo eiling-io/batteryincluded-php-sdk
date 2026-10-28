@@ -138,7 +138,7 @@ blockquote.hinweis::before {
   color: lighten($eiling-cyan, 15%) !important;
 }
 
-// language switch in the header, next to the search: flags, the inactive language is dimmed
+// language switch in the header, next to the search: flags, the inactive language is greyed out
 .lang-switch {
   display: flex;
   align-items: center;
@@ -149,12 +149,14 @@ blockquote.hinweis::before {
 .lang-switch-link {
   display: flex;
   border-radius: 3px;
-  opacity: .45;
-  transition: opacity .15s;
+  opacity: .5;
+  filter: grayscale(1);
+  transition: opacity .15s, filter .15s;
 
   &:hover,
   &.active {
     opacity: 1;
+    filter: none;
   }
 
   &.active {
