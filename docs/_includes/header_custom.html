@@ -2,9 +2,10 @@
 <nav class="lang-switch" aria-label="{% if site.active_lang == 'de' %}Sprache{% else %}Language{% endif %}">
   {%- for lang in site.languages -%}
     {%- if lang == site.default_lang -%}{%- assign prefix = '' -%}{%- else -%}{%- assign prefix = '/' | append: lang -%}{%- endif -%}
-    <a {% static_href %}href="{{ prefix | append: page.permalink | relative_url }}"{% endstatic_href %} hreflang="{{ lang }}" lang="{{ lang }}"
+    {%- if lang == 'de' -%}{%- assign name = 'Deutsch' -%}{%- assign flag = 'de' -%}{%- else -%}{%- assign name = 'English' -%}{%- assign flag = 'gb' -%}{%- endif -%}
+    <a {% static_href %}href="{{ prefix | append: page.permalink | relative_url }}"{% endstatic_href %} hreflang="{{ lang }}" lang="{{ lang }}" title="{{ name }}"
        class="lang-switch-link{% if lang == site.active_lang %} active{% endif %}"{% if lang == site.active_lang %} aria-current="page"{% endif %}>
-      {%- if lang == 'de' -%}Deutsch{%- else -%}English{%- endif -%}
+      <img src="{{ '/assets/images/flags/' | append: flag | append: '.svg' | relative_url }}" alt="{{ name }}" width="24" height="16">
     </a>
   {%- endfor -%}
 </nav>

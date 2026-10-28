@@ -138,26 +138,34 @@ blockquote.hinweis::before {
   color: lighten($eiling-cyan, 15%) !important;
 }
 
-// language switch in the header, next to the search
+// language switch in the header, next to the search: flags, the inactive language is dimmed
 .lang-switch {
   display: flex;
   align-items: center;
-  gap: .75rem;
+  gap: .6rem;
   padding: 0 1rem;
-  font-size: .85rem;
-  white-space: nowrap;
 }
 
 .lang-switch-link {
-  color: #d5d5d5;
-  text-decoration: none;
+  display: flex;
+  border-radius: 3px;
+  opacity: .45;
+  transition: opacity .15s;
 
-  &:hover {
-    color: $eiling-cyan;
+  &:hover,
+  &.active {
+    opacity: 1;
   }
 
   &.active {
-    color: $eiling-cyan;
-    font-weight: 600;
+    box-shadow: 0 0 0 2px $eiling-cyan;
+  }
+
+  img {
+    display: block;
+    width: 24px;
+    height: 16px;
+    object-fit: cover;
+    border-radius: 3px;
   }
 }
