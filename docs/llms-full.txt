@@ -25,14 +25,19 @@ use BatteryIncludedSdk\Client\ApiClient;
 use BatteryIncludedSdk\Client\CurlHttpClient;
 
 $apiClient = new ApiClient(
-    new CurlHttpClient(),
+    new CurlHttpClient(readTimeout: 2.0), // defaults: read 10 s, connect 5 s, write (imports) unlimited
     'https://api.batteryincluded.io/api/v1/collections/',
     getenv('BATTERYINCLUDED_COLLECTION'), // e.g. "customer.my-shop"
     getenv('BATTERYINCLUDED_API_KEY')
 );
 ```
 
-Every service takes this client. Every response has `getStatusCode()`, `getBody()` (decoded array) and `getRawResponse()`.
+Every service takes this client. Every response has `isSuccessful()`, `getStatusCode()`, `getBody()` (decoded array,
+`[]` on errors), `getErrorMessage()` and `getRawResponse()`.
+
+Api errors (4xx/5xx) throw nothing, the typed responses are empty so pages still render; check `isSuccessful()` to log
+them. Exceptions (all extend `BatteryIncludedSdk\Exception\BatteryIncludedException`): `NetworkException` if the api is
+unreachable (dns, connection, tls, timeout), `InvalidDocumentException` if a document cannot be encoded (e.g. `NAN`).
 
 ## 3. Map the catalog to DTOs
 
@@ -41,7 +46,7 @@ use BatteryIncludedSdk\Dto\CategoryDto;
 use BatteryIncludedSdk\Dto\ProductBaseDto;
 use BatteryIncludedSdk\Dto\ProductPropertyDto;
 
-$dto = new ProductBaseDto((string) $product->id);   // exported as root id "PRODUCT-<id>", setId() is deprecated
+$dto = new ProductBaseDto((string) $product->id);   // exported as root id "PRODUCT-<id>"; setters are fluent
 $dto->setName($product->name);
 $dto->setDescription($product->description);
 $dto->setOrdernumber($product->sku);
@@ -200,8 +205,8 @@ foreach ($result->getHits() as $hit) {
     $data = $document['_' . $document['type']];
 }
 
-// pass the category field: "_PRODUCT_i18n.categories" with translations, otherwise "_PRODUCT.categories"
-foreach ($result->getFacets('_PRODUCT_i18n.categories') as $facet) {
+// the category tree is detected: "_PRODUCT_i18n.categories" if present, otherwise "_PRODUCT.categories"
+foreach ($result->getFacets() as $facet) {
     $facet->getFieldName();                // filter key for addFilter()
     $facet->getFieldLabel();               // label from the portal
     match (true) {
@@ -216,8 +221,7 @@ foreach ($result->getFacets('_PRODUCT_i18n.categories') as $facet) {
 - Values of one field are combined with OR, different fields with AND. Ranges: `addRangeFilter($field, $from, $till)`.
 - With translations filter on `_PRODUCT_i18n.<field>` without the locale; the gateway adds it.
 - Facets without counts are skipped (the api delivers them without `type`).
-- The response also contains facets of other locales (`_PRODUCT_i18n.de.properties.Color`); hide fields with a locale
-  segment.
+- The api also delivers facets of other locales (`_PRODUCT_i18n.de.properties.Color`); `getFacets()` skips them.
 - Single document (detail page): `addFilter('id', 'PRODUCT-1002')` and `setPerPage(1)`.
 - Merchandising: `getRedirectsExtensions()` (redirect to `getData()['url']`), `getTeaserExtensions()`,
   `getPromotionsExtensions()`, `getCodesExtensions()`.
@@ -238,7 +242,8 @@ $suggest->addFilter('type', 'PRODUCT');
 $response = (new SuggestService($apiClient))->suggestWithFilter($suggest);
 
 $response->getQueryCompletions();          // CompletionDto: getValue(), getHighlighted()
-$response->getDocuments();                 // only the fields selected in the portal; translated fields stay in _PRODUCT_i18n
+$response->getResolvedDocuments();         // fields selected in the portal, translations and availability merged into _PRODUCT
+$response->getDocuments();                 // the same as delivered, translated fields in _PRODUCT_i18n
 $response->getFounds();
 ```
 
@@ -246,9 +251,10 @@ Escape all output except `<mark>` tags of highlighted values. Call the endpoint 
 small JSON endpoint that the browser queries with a debounce of ~150 ms and a minimum of 2 characters.
 
 Further services: `SimilarSearchService::search($query, $locale)`, `HighlightsService::getHighlights($language)`,
-`RecommendationsService::recommendByIdentifier('1002', 'PRODUCT', $language)` and
-`CartRecommendationsService::recommendByIdentifiers(['1002', '1003'], $filters, 'PRODUCT', $language)` (both grouped in
-`related`, `also`, `together`; with a locale the translations are merged into the documents).
+`RecommendationsService::recommendByIdentifier('1002', 'PRODUCT', $language, $country)` and
+`CartRecommendationsService::recommendByIdentifiers(['1002', '1003'], $filters, 'PRODUCT', $language, $country)` (both
+grouped in `related`, `also`, `together`; with a locale/scope the translations and availability are merged into the
+documents).
 
 ## 9. Verify
 

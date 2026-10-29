@@ -62,11 +62,14 @@ The document is exported like this:
 
 - The document id is the identifier from the constructor prefixed with its type (`PRODUCT-1002`), next to `type`
   in the root. Products and blog posts with the same auto increment never collide, and partial updates and deletes
-  address documents by this id. There is no `id` field in `_PRODUCT`; `setId()` is deprecated and no longer exported.
+  address documents by this id. There is no `id` field in `_PRODUCT`, `setId()` was removed in 1.0.0.
   An `_PRODUCT.id` from an earlier export stays in the index until the document is deleted and imported again.
 - All fields live in a type-scoped node (`_PRODUCT`). Filter and sort on them with that prefix, e.g. `_PRODUCT.price`.
 - A category path is exported with all its parents (`Electronics`, `Electronics > TVs`).
 - Fields that are `null` are not exported (see [Clearing fields](#clearing-fields)).
+- Setters return the DTO, so calls can be chained: `(new ProductBaseDto('1002'))->setName('TV')->setPrice(699.0)`.
+- Invalid UTF-8 from your shop data is replaced by `�`. Values json cannot represent (`NAN`, `INF`) throw an
+  `InvalidDocumentException` naming the document id, before anything is sent.
 
 {: .note }
 Keep property names stable and language independent (e.g. always `Color`). Labels are translated in the
@@ -174,9 +177,11 @@ class ProductDto extends ProductBaseDto
 {
     private ?string $keywords = null;
 
-    public function setKeywords(?string $keywords): void
+    public function setKeywords(?string $keywords): static
     {
         $this->keywords = $keywords;
+
+        return $this;
     }
 
     public function jsonSerialize(): array

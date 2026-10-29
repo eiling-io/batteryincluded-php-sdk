@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use BatteryIncludedSdk\Client\ApiClient;
 use BatteryIncludedSdk\Client\CurlHttpClient;
+use BatteryIncludedSdk\Suggest\SuggestSearchStruct;
 use BatteryIncludedSdk\Suggest\SuggestService;
 
 require_once __DIR__ . '/../../vendor/autoload.php';
@@ -17,13 +18,16 @@ $apiClient = new ApiClient(
 );
 
 $service = new SuggestService($apiClient);
-$result = $service->suggest('Mac');
+$searchStruct = (new SuggestSearchStruct())
+    ->setQuery('Mac')
+    ->setLocale('de');
+$result = $service->suggestWithFilter($searchStruct);
 
 echo '<pre>';
 print_r($result->getQueryCompletions());
 echo '</pre>';
 echo '<pre>';
-print_r($result->getDocuments());
+print_r($result->getResolvedDocuments());
 echo '</pre>';
 echo '<pre>';
 print_r($result->getFounds());

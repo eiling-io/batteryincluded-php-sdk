@@ -22,10 +22,7 @@ class SimilarSearchService
             ]
         );
 
-        $response = $this->apiClient->getJson(
-            '/documents/similar-search?' . $query,
-            []
-        );
+        $response = $this->apiClient->getJson('/documents/similar-search?' . $query);
 
         return new SimilarSearchResponse($response->getRawResponse(), $response->getStatusCode());
     }

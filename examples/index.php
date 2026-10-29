@@ -45,7 +45,7 @@ $hits = $result?->getHits() ?? [];
 // translated categories of the language, the untranslated categories as long as the api delivers none
 $facetCounts = $result?->getBody()['facet_counts'] ?? [];
 $categoryField = demoCategoryField($facetCounts);
-$facets = $result instanceof BrowseResponse ? demoVisibleFacets($result->getFacets($categoryField), $lang, $categoryField) : [];
+$facets = $result instanceof BrowseResponse ? demoVisibleFacets($result->getFacets($categoryField), $categoryField) : [];
 $found = $result?->getFound() ?? 0;
 $searchTime = (int) ($result?->getBody()['search_time_ms'] ?? 0);
 

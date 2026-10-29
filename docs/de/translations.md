@@ -133,7 +133,8 @@ $result->getRawHits(); // untouched response including _PRODUCT_i18n
 $result->getLocale();  // locale the hits were resolved for
 ```
 
-Mit `I18nResolver::resolveDocument($document, $locale)` löst du Dokumente aus anderen Quellen auf dieselbe Weise auf.
+`SuggestResponse::getResolvedDocuments()` und die [Empfehlungen](recommendations) mit Locale führen genauso zusammen. Mit
+`I18nResolver::resolveDocument($document, $locale)` löst du Dokumente aus anderen Quellen auf.
 
 ## Filtern und sortieren {#filtering-and-sorting}
 
@@ -146,4 +147,4 @@ $searchStruct->addFilter('_PRODUCT_i18n.properties.Color', 'Black');
 ```
 
 Die Facetten der angefragten Locale heißen genauso (`_PRODUCT_i18n.properties.Color`). Das Gateway liefert außerdem die
-Facetten der anderen Locales aus (`_PRODUCT_i18n.de.properties.Color`), blende sie in deiner Oberfläche aus.
+Facetten der anderen Locales aus (`_PRODUCT_i18n.de.properties.Color`), `getFacets()` überspringt sie.

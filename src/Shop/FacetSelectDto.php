@@ -19,7 +19,10 @@ class FacetSelectDto extends FacetDto
         }
     }
 
-    public function getValues()
+    /**
+     * @return FacetValueDto[]
+     */
+    public function getValues(): array
     {
         return $this->values;
     }

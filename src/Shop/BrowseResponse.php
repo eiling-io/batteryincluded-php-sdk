@@ -22,7 +22,11 @@ class BrowseResponse extends Response
         parent::__construct($responseRaw, $statusCode);
 
         foreach ($this->getBody()['extensions'] ?? [] as $extensionData) {
-            switch ($extensionData['type']) {
+            if (!is_array($extensionData) || !is_array($extensionData['data'] ?? null)) {
+                continue;
+            }
+
+            switch ($extensionData['type'] ?? null) {
                 case 'teaser':
                     $this->teaserExtensions[] = $this->extensions[] = new Extension\TeaserExtension($extensionData['data']);
                     break;
@@ -74,14 +78,24 @@ class BrowseResponse extends Response
     }
 
     /**
+     * Facets of the filters configured in the backend. The gateway also delivers the facets of all other locales
+     * (`_PRODUCT_i18n.de.properties.Color` next to `_PRODUCT_i18n.properties.Color`), they are skipped.
+     *
+     * @param string|null $categoryField field of the category tree, by default `_<TYPE>_i18n.categories` if the
+     *                                   response contains it, otherwise `_<TYPE>.categories`
+     *
      * @return FacetDto[]
      */
-    public function getFacets(string $categoryField = '_PRODUCT.categories'): array
+    public function getFacets(?string $categoryField = null): array
     {
         $result = [];
-        $facets = $this->getBody()['facet_counts'] ?? [];
+        $facets = array_filter(
+            $this->getBody()['facet_counts'] ?? [],
+            fn ($facet) => is_array($facet) && !$this->isFacetOfOtherLocale((string) ($facet['field_name'] ?? ''))
+        );
+        $categoryFields = $categoryField !== null ? [$categoryField] : $this->findCategoryFields($facets);
         foreach ($facets as $facet) {
-            if (($facet['field_name'] ?? null) === $categoryField) {
+            if (in_array($facet['field_name'] ?? null, $categoryFields, true)) {
                 $facet['type'] = 'category';
             }
             // The api omits the type for facets without counts, there is nothing to render then.
@@ -102,6 +116,41 @@ class BrowseResponse extends Response
         }
 
         return $result;
+    }
+
+    /**
+     * Facets of the requested locale have no locale in their name, the other ones do: `_PRODUCT_i18n.de.<field>`.
+     */
+    private function isFacetOfOtherLocale(string $field): bool
+    {
+        if (preg_match('/^_[^.]+' . I18nResolver::SUFFIX . '\.([a-z]{2}(?:-[a-z0-9]{2,8})*)\./', $field, $matches) !== 1) {
+            return false;
+        }
+
+        return $matches[1] !== I18nResolver::normalizeLocale($this->getLocale());
+    }
+
+    /**
+     * One category tree per type, the translated one wins.
+     *
+     * @return string[]
+     */
+    private function findCategoryFields(array $facets): array
+    {
+        $categoryFields = [];
+        foreach ($facets as $facet) {
+            $field = (string) ($facet['field_name'] ?? '');
+            if (preg_match('/^(_[^.]+?)(' . I18nResolver::SUFFIX . ')?\.categories$/', $field, $matches) !== 1) {
+                continue;
+            }
+
+            $isTranslated = isset($matches[2]);
+            if ($isTranslated || !isset($categoryFields[$matches[1]])) {
+                $categoryFields[$matches[1]] = $field;
+            }
+        }
+
+        return array_values($categoryFields);
     }
 
     /**
@@ -134,12 +183,12 @@ class BrowseResponse extends Response
 
     public function getFound(): int
     {
-        return (int) $this->getBody()['found'];
+        return (int) ($this->getBody()['found'] ?? 0);
     }
 
     public function getPages(): int
     {
-        return (int) ceil($this->getBody()['found'] / $this->searchStruct->getPerPage());
+        return (int) ceil($this->getFound() / max(1, $this->searchStruct->getPerPage()));
     }
 
     public function getPage(): int

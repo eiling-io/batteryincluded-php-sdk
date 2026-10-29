@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Suggest;
 
+use BatteryIncludedSdk\Availability\AvailabilityResolver;
+use BatteryIncludedSdk\I18n\I18nResolver;
+use BatteryIncludedSdk\Service\Response;
 use BatteryIncludedSdk\Suggest\CompletionDto;
 use BatteryIncludedSdk\Suggest\SuggestResponse;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -12,11 +15,14 @@ use PHPUnit\Framework\TestCase;
 
 #[UsesClass(CompletionDto::class)]
 #[CoversClass(SuggestResponse::class)]
+#[UsesClass(Response::class)]
+#[UsesClass(I18nResolver::class)]
+#[UsesClass(AvailabilityResolver::class)]
 class SuggestResponseTest extends TestCase
 {
     public function testSuggestResponseInitialization()
     {
-        $responseRaw = json_encode([
+        $responseRaw = (string) json_encode([
             [
                 'kind' => 'document',
                 'found' => 2,
@@ -73,5 +79,30 @@ class SuggestResponseTest extends TestCase
         $this->assertCount(1, $suggestResponse->getFacets());
         $this->assertEquals('facet._PRODUCT.properties.Gerät', $suggestResponse->getFacets()[0]['kind']);
         $this->assertTrue($suggestResponse->isLLM());
+    }
+
+    public function testResolvedDocumentsMergeTranslationsAndAvailability()
+    {
+        // the gateway already resolved the nodes for the requested locale and scope
+        $responseRaw = (string) json_encode([[
+            'kind' => 'document',
+            'found' => 1,
+            'hits' => [['highlighted' => [
+                'id' => 'PRODUCT-1',
+                '_PRODUCT' => ['name' => 'Fernseher', 'price' => 699],
+                '_PRODUCT_i18n' => ['name' => '<mark>TV</mark>'],
+                '_PRODUCT_availability' => ['price' => 749],
+            ]]],
+        ]]);
+
+        $response = new SuggestResponse($responseRaw, 200, 'en', 'ch');
+
+        $this->assertSame(
+            [['id' => 'PRODUCT-1', '_PRODUCT' => ['name' => '<mark>TV</mark>', 'price' => 749]]],
+            $response->getResolvedDocuments()
+        );
+        $this->assertArrayHasKey('_PRODUCT_i18n', $response->getDocuments()[0]);
+        $this->assertSame('en', $response->getLocale());
+        $this->assertSame('ch', $response->getAvailability());
     }
 }

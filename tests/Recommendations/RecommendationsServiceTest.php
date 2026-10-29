@@ -32,10 +32,11 @@ class RecommendationsServiceTest extends TestCase
             ['type' => 'related', 'id' => 5, 'name' => 'Verknüpft 1'],
             ['type' => 'related', 'id' => 6, 'name' => 'Verknüpft 2'],
         ];
-        $jsonResponse = json_encode($rawData);
+        $jsonResponse = (string) json_encode($rawData);
 
         $mockResponse = $this->createMock(Response::class);
         $mockResponse->method('getRawResponse')->willReturn($jsonResponse);
+        $mockResponse->method('getStatusCode')->willReturn(200);
 
         $mockApiClient = $this->createMock(ApiClient::class);
         $mockApiClient->method('getJson')->willReturn($mockResponse);

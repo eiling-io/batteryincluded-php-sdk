@@ -319,23 +319,22 @@ function demoCategoryField(array $facetCounts): string
  * Facets which are shown in the sidebar.
  *
  * The gateway resolves the translated facets for the requested locale (`_PRODUCT_i18n.*`),
- * facets which are still scoped by another locale (`_PRODUCT_i18n.en.*`) are hidden.
+ * the sdk already skips the facets of the other locales (`_PRODUCT_i18n.en.*`).
  *
  * @param FacetDto[] $facets
  *
  * @return array<string, array{facet: FacetDto, label: string}>
  */
-function demoVisibleFacets(array $facets, string $language, string $categoryField): array
+function demoVisibleFacets(array $facets, string $categoryField): array
 {
     $visible = [];
     foreach ($facets as $facet) {
         $field = $facet->getFieldName();
         // the type facet stays visible, e.g. to hide blog posts
         $isTechnicalFacet = str_starts_with($field, '_availability.');
+        // the facets of the other languages are already skipped by the sdk
         $isOtherCategoryFacet = str_ends_with($field, 'categories') && $field !== $categoryField;
-        $isFacetOfOtherLanguage = preg_match('/^_[A-Z]+' . I18nResolver::SUFFIX . '\.([a-z]{2}(-[a-z0-9]+)*)\./', $field, $matches) === 1
-            && $matches[1] !== DEMO_LANGUAGES[$language]['locale'];
-        if ($isTechnicalFacet || $isOtherCategoryFacet || $isFacetOfOtherLanguage) {
+        if ($isTechnicalFacet || $isOtherCategoryFacet) {
             continue;
         }
 

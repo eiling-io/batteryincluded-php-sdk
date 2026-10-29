@@ -36,11 +36,8 @@ class BrowseService
 
         $query = http_build_query($queryArray);
 
-        $response = $this->apiClient->getJson(
-            '/documents/browse?' . $query,
-            []
-        );
+        $response = $this->apiClient->getJson('/documents/browse?' . $query);
 
-        return new BrowseResponse($response->getRawResponse(), $searchStruct);
+        return new BrowseResponse($response->getRawResponse(), $searchStruct, $response->getStatusCode());
     }
 }

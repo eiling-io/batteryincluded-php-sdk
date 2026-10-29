@@ -23,7 +23,7 @@ class HighlightsResponseTest extends TestCase
                 ['suggestion' => 'bar'],
             ],
         ];
-        $json = json_encode($data);
+        $json = (string) json_encode($data);
 
         $response = new HighlightsResponse($json, 200);
 

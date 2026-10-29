@@ -120,8 +120,9 @@ $searchStruct->addVariable('currency', 'EUR');
 ## Facetten {#facets}
 
 Facetten gibt es nur für Felder, die [im Backend als Filter konfiguriert](backend-configuration#filters) sind.
-`getFacets()` macht aus den Facetten-Zählungen typisierte Objekte. Übergib das Feld, das deinen Kategoriebaum enthält,
-zum Beispiel `_PRODUCT_i18n.categories` für [übersetzte Kategorien](translations#filtering-and-sorting):
+`getFacets()` macht aus den Facetten-Zählungen typisierte Objekte. Den Kategoriebaum erkennt es selbst:
+`_PRODUCT_i18n.categories` für [übersetzte Kategorien](translations#filtering-and-sorting), sofern die Antwort ihn
+enthält, sonst `_PRODUCT.categories`. Liegt dein Baum in einem anderen Feld, übergib es als Argument:
 
 ```php
 use BatteryIncludedSdk\Shop\FacetCategoryDto;
@@ -129,7 +130,7 @@ use BatteryIncludedSdk\Shop\FacetRangeDto;
 use BatteryIncludedSdk\Shop\FacetRatingDto;
 use BatteryIncludedSdk\Shop\FacetSelectDto;
 
-foreach ($result->getFacets('_PRODUCT.categories') as $facet) {
+foreach ($result->getFacets() as $facet) {   // or getFacets('_PRODUCT.categories')
     echo $facet->getFieldLabel();   // label from the backend, e.g. "Color"
     $facet->getFieldName();         // filter key, e.g. "_PRODUCT.properties.Color"
     $facet->getFieldUnit();         // e.g. "€"
@@ -149,7 +150,8 @@ foreach ($result->getFacets('_PRODUCT.categories') as $facet) {
 ```
 
 Der Zustand `checked` spiegelt die Filter des Search Structs wider, so renderst du die Seitenleiste direkt aus der
-Antwort. Facetten ohne Treffer im aktuellen Ergebnis werden übersprungen, die API liefert sie ohne Typ aus.
+Antwort. Facetten ohne Treffer im aktuellen Ergebnis werden übersprungen, die API liefert sie ohne Typ aus. Facetten
+anderer Locales werden ebenfalls übersprungen, siehe [Übersetzungen](translations#filtering-and-sorting).
 
 ## Extensions {#extensions}
 

@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace BatteryIncludedSdk\Client;
 
 use BatteryIncludedSdk\Service\Response;
+use Composer\InstalledVersions;
 
 class ApiClient
 {
+    public const PACKAGE = 'batteryincluded/batteryincluded-php-sdk';
+
     public function __construct(
         private HttpClientInterface $httpClient,
         private string $baseUrl,
@@ -16,7 +19,7 @@ class ApiClient
     ) {
     }
 
-    public function getJson(string $urlPart, array $parameters): Response
+    public function getJson(string $urlPart): Response
     {
         $url = $this->baseUrl . $this->collection . $urlPart;
 
@@ -51,11 +54,28 @@ class ApiClient
         return $this->httpClient->send($url, 'DELETE', $this->getHeaders('json'), $data);
     }
 
+    /**
+     * Version of the installed SDK, `dev` outside of composer.
+     */
+    public static function getVersion(): string
+    {
+        try {
+            if (class_exists(InstalledVersions::class) && InstalledVersions::isInstalled(self::PACKAGE)) {
+                return InstalledVersions::getPrettyVersion(self::PACKAGE) ?? 'dev';
+            }
+        } catch (\OutOfBoundsException) {
+        }
+
+        return 'dev';
+    }
+
     private function getHeaders(string $contentType): array
     {
         return [
             'Content-Type: application/' . $contentType,
             'X-BI-API-KEY: ' . $this->apiKey,
+            // lets BatteryIncluded tell which SDK versions are still in use
+            'User-Agent: batteryincluded-php-sdk/' . self::getVersion() . ' php/' . PHP_VERSION,
         ];
     }
 }

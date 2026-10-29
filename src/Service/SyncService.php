@@ -6,6 +6,7 @@ namespace BatteryIncludedSdk\Service;
 
 use BatteryIncludedSdk\Client\ApiClient;
 use BatteryIncludedSdk\Dto\AbstractDto;
+use BatteryIncludedSdk\Exception\InvalidDocumentException;
 
 class SyncService extends AbstractService
 {
@@ -22,7 +23,7 @@ class SyncService extends AbstractService
 
     /**
      * not included elements will be deleted from the index
-     * @throws \Exception
+     * @throws InvalidDocumentException
      */
     public function syncFullElements(AbstractDto ...$dto): Response
     {
@@ -36,19 +37,19 @@ class SyncService extends AbstractService
      * after all products are synced you need to finish your batch sync with $finished = true
      * and the same transactionId from the beginning
      * @param string $transactionId a unique identifier used to group multiple related batch updates
-     * @param bool $finished If 1, drop all data that is not related to the given transactionId
-     * @throws \Exception
+     * @param bool $finished true for the last batch, drops all documents that are not part of the transaction
+     * @throws InvalidDocumentException
      */
     public function syncFullBatchElements(string $transactionId, bool $finished = false, AbstractDto ...$dto): Response
     {
         $json = $this->generateNDJSON($dto);
-        $apiUrl = '/documents/import?transactionId=' . $transactionId;
+        $parameters = ['transactionId' => $transactionId];
 
         if ($finished) {
-            return $this->apiClient->postNDJson($apiUrl . '&transactionCompleted=1', $json);
+            $parameters['transactionCompleted'] = 1;
         }
 
-        return $this->apiClient->postNDJson($apiUrl, $json);
+        return $this->apiClient->postNDJson('/documents/import?' . http_build_query($parameters), $json);
     }
 
     public function partialUpdateOneOrManyElements(AbstractDto ...$dto): Response
@@ -60,6 +61,6 @@ class SyncService extends AbstractService
 
     public function deleteElementsByIds(string ...$elementIds): Response
     {
-        return $this->apiClient->deleteJson('/documents/delete', json_encode($elementIds));
+        return $this->apiClient->deleteJson('/documents/delete', json_encode(array_values($elementIds), self::JSON_FLAGS));
     }
 }

@@ -98,7 +98,7 @@ class BrowseServiceTest extends TestCase
 
     public function testHitsAreResolvedWithRequestedAvailabilityAfterLocale()
     {
-        $raw = json_encode([
+        $raw = (string) json_encode([
             'extensions' => [],
             'hits' => [[
                 'document' => [
@@ -127,7 +127,7 @@ class BrowseServiceTest extends TestCase
 
     public function testUnresolvedAvailabilityWithoutScopeKeepsDefaults()
     {
-        $raw = json_encode([
+        $raw = (string) json_encode([
             'extensions' => [],
             'hits' => [[
                 'document' => [
@@ -148,7 +148,7 @@ class BrowseServiceTest extends TestCase
 
     public function testHitsAreResolvedWithRequestedLocale()
     {
-        $raw = json_encode([
+        $raw = (string) json_encode([
             'extensions' => [],
             'hits' => [[
                 'document' => [
@@ -187,7 +187,7 @@ class BrowseServiceTest extends TestCase
         $mockApiClient = $this->createMock(ApiClient::class);
         $mockApiClient->expects($this->once())
             ->method('getJson')
-            ->with($this->callback(fn ($url) => !str_contains($url, $unexpected)), [])
+            ->with($this->callback(fn ($url) => !str_contains($url, $unexpected)))
             ->willReturn($mockResponse);
 
         (new BrowseService($mockApiClient))->browse($searchStruct);
@@ -202,8 +202,7 @@ class BrowseServiceTest extends TestCase
         $mockApiClient->expects($this->once())
             ->method('getJson')
             ->with(
-                $this->callback(fn ($url) => str_contains($url, $expected)),
-                []
+                $this->callback(fn ($url) => str_contains($url, $expected))
             )
             ->willReturn($mockResponse);
 

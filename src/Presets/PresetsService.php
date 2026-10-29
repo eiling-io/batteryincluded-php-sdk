@@ -14,10 +14,7 @@ class PresetsService
 
     public function getPresets(): PresetsResponse
     {
-        $response = $this->apiClient->getJson(
-            '/documents/presets',
-            []
-        );
+        $response = $this->apiClient->getJson('/documents/presets');
 
         return new PresetsResponse($response->getRawResponse(), $response->getStatusCode());
     }

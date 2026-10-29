@@ -15,7 +15,10 @@ class FacetCategoryDto extends FacetDto
         $this->categories = $this->buildCategoryTree($data['counts'] ?? []);
     }
 
-    private function buildCategoryTree(array $items, $separator = '>')
+    /**
+     * @param non-empty-string $separator
+     */
+    private function buildCategoryTree(array $items, string $separator = '>'): array
     {
         $tree = [];
         foreach ($this->appliedFilterValues[$this->fieldName] ?? [] as $filter) {

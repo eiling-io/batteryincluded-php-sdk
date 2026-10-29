@@ -62,13 +62,16 @@ So wird das Dokument exportiert:
 
 - Die Dokument-ID ist der Identifier aus dem Konstruktor mit dem Typ als Präfix (`PRODUCT-1002`) und steht neben
   `type` im Root. Produkte und Blogbeiträge mit derselben Auto-Increment-ID kollidieren so nie, und Partial-Updates und
-  Löschungen sprechen Dokumente über diese ID an. In `_PRODUCT` gibt es kein Feld `id`; `setId()` ist deprecated und
-  wird nicht mehr exportiert. Ein `_PRODUCT.id` aus einem früheren Export bleibt im Index, bis das Dokument gelöscht
+  Löschungen sprechen Dokumente über diese ID an. In `_PRODUCT` gibt es kein Feld `id`, `setId()` wurde in 1.0.0
+  entfernt. Ein `_PRODUCT.id` aus einem früheren Export bleibt im Index, bis das Dokument gelöscht
   und neu importiert wird.
 - Alle Felder liegen in einem Knoten pro Typ (`_PRODUCT`). Filtere und sortiere mit diesem Präfix, zum Beispiel
   `_PRODUCT.price`.
 - Ein Kategoriepfad wird mit allen übergeordneten Pfaden exportiert (`Electronics`, `Electronics > TVs`).
 - Felder mit dem Wert `null` werden nicht exportiert (siehe [Felder leeren](#clearing-fields)).
+- Setter geben das DTO zurück, Aufrufe lassen sich verketten: `(new ProductBaseDto('1002'))->setName('TV')->setPrice(699.0)`.
+- Ungültiges UTF-8 aus deinen Shopdaten wird durch `�` ersetzt. Werte, die JSON nicht darstellen kann (`NAN`, `INF`),
+  werfen eine `InvalidDocumentException` mit der Dokument-ID, bevor etwas gesendet wird.
 
 {: .hinweis }
 Halte Eigenschaftsnamen stabil und sprachunabhängig (zum Beispiel immer `Color`). Die Bezeichnungen werden im
@@ -178,9 +181,11 @@ class ProductDto extends ProductBaseDto
 {
     private ?string $keywords = null;
 
-    public function setKeywords(?string $keywords): void
+    public function setKeywords(?string $keywords): static
     {
         $this->keywords = $keywords;
+
+        return $this;
     }
 
     public function jsonSerialize(): array

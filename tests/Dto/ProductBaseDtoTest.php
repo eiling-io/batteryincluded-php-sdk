@@ -19,6 +19,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(AbstractTranslatableDto::class)]
 #[CoversClass(AbstractAvailabilityDto::class)]
 #[UsesClass(ProductPropertyDto::class)]
+#[UsesClass(CategoryDto::class)]
 #[UsesClass(I18nResolver::class)]
 #[CoversClass(AvailabilityResolver::class)]
 class ProductBaseDtoTest extends TestCase
@@ -27,7 +28,6 @@ class ProductBaseDtoTest extends TestCase
     {
         $dto = new ProductBaseDto('123', 'PRODUCT');
 
-        $dto->setId('123');
         $dto->setName('Testprodukt');
         $dto->setDescription('Beschreibung');
         $dto->setOrdernumber('A1');
@@ -41,7 +41,6 @@ class ProductBaseDtoTest extends TestCase
         $dto->setRating(2.5);
         $dto->setActive(false);
         $this->assertFalse($dto->getActive());
-        $this->assertSame('123', $dto->getId());
         $this->assertSame('PRODUCT-123', $dto->getIdentifier());
         $this->assertSame('Testprodukt', $dto->getName());
         $this->assertSame('Beschreibung', $dto->getDescription());
@@ -114,7 +113,7 @@ class ProductBaseDtoTest extends TestCase
         $dto->addPropertyTranslation('en', 'Color', 'Red');
         $dto->addPropertyTranslation('en', 'Color.', 'Blue');
 
-        $json = json_decode(json_encode($dto), true);
+        $json = json_decode((string) json_encode($dto), true);
 
         $this->assertSame([['Farbe' => ['Rot']]], $json['_PRODUCT']['properties']);
         $this->assertSame([
@@ -167,7 +166,7 @@ class ProductBaseDtoTest extends TestCase
         $dto->setDescription('Beschreibung');
         $dto->addTranslation('en', 'name', 'iPhone Blue');
 
-        $document = json_decode(json_encode($dto), true);
+        $document = json_decode((string) json_encode($dto), true);
 
         $this->assertSame(
             ['name' => 'iPhone Blue', 'description' => 'Beschreibung'],
@@ -297,10 +296,24 @@ class ProductBaseDtoTest extends TestCase
         $this->assertSame([], $dto->jsonSerialize()['_PRODUCT']);
     }
 
+    public function testSettersAreFluent()
+    {
+        $dto = (new ProductBaseDto('1'))
+            ->setName('Phone')
+            ->setPrice(99.0)
+            ->addCategory((new CategoryDto())->addCategoryNode('Electronics'))
+            ->setProperties((new ProductPropertyDto())->addProperty('Color', 'Black'))
+            ->addTranslation('en', 'name', 'Phone')
+            ->setAvailability('ch', active: false);
+
+        $this->assertSame('Phone', $dto->getName());
+        $this->assertSame(['Electronics'], $dto->getCategories());
+        $this->assertSame(['active' => false], $dto->getAvailability('ch'));
+    }
+
     public function testIdIsOnlyExportedInRoot()
     {
         $dto = new ProductBaseDto('1');
-        $dto->setId('legacy');
         $dto->setName('Name');
 
         $this->assertSame(

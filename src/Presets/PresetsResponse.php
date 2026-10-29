@@ -15,13 +15,20 @@ class PresetsResponse extends Response
         parent::__construct($responseRaw, $statusCode);
         $this->presets = [];
         foreach ($this->getBody() as $preset) {
+            if (!is_array($preset) || !isset($preset['id'], $preset['name'])) {
+                continue;
+            }
+
             $this->presets[] = new PresetsDto(
-                $preset['id'],
-                $preset['name']
+                (string) $preset['id'],
+                (string) $preset['name']
             );
         }
     }
 
+    /**
+     * @return PresetsDto[]
+     */
     public function getPresets(): array
     {
         return $this->presets;

@@ -105,7 +105,7 @@ Use `AvailabilityResolver::resolveDocument($document, $scope)` to resolve docume
 
 `SuggestSearchStruct::setAvailability()` works the same way. The suggest endpoint delivers only the fields selected
 under Suggest in the portal, select `price` (and `active` or `instock` for a status) to show them in the dropdown.
-The documents are returned as delivered, resolve them with the resolver:
+`getResolvedDocuments()` merges the values of the scope into `_PRODUCT`:
 
 ```php
 $suggest = new SuggestSearchStruct();
@@ -113,11 +113,12 @@ $suggest->setQuery('smart');
 $suggest->setLocale('de');
 $suggest->setAvailability('ch');
 
-foreach ((new SuggestService($apiClient))->suggestWithFilter($suggest)->getDocuments() as $document) {
-    $product = AvailabilityResolver::resolveDocument($document, 'ch')['_PRODUCT'];
-    echo $product['price'] ?? '';
+foreach ((new SuggestService($apiClient))->suggestWithFilter($suggest)->getResolvedDocuments() as $document) {
+    echo $document['_PRODUCT']['price'] ?? '';
 }
 ```
+
+[Recommendations](recommendations) take the scope as last argument and resolve it the same way.
 
 {: .note }
 Filters and sortings on `_PRODUCT.price` or `_PRODUCT.active` use the default values. Filter scoped values with their

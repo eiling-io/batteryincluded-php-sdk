@@ -8,14 +8,15 @@ use BatteryIncludedSdk\Service\Response;
 
 class HighlightsResponse extends Response
 {
-    private $querySuggestions;
-    private $searches;
+    private array $querySuggestions;
+    private array $searches;
 
     public function __construct(string $responseRaw, int $statusCode)
     {
         parent::__construct($responseRaw, $statusCode);
-        $this->querySuggestions = $this->getBody()['querySuggestions'] ?? [];
-        $this->searches = $this->getBody()['searches'] ?? [];
+        $body = $this->getBody();
+        $this->querySuggestions = is_array($body['querySuggestions'] ?? null) ? $body['querySuggestions'] : [];
+        $this->searches = is_array($body['searches'] ?? null) ? $body['searches'] : [];
     }
 
     public function getAll(): array
@@ -26,12 +27,12 @@ class HighlightsResponse extends Response
         ];
     }
 
-    public function getSearches()
+    public function getSearches(): array
     {
         return $this->searches;
     }
 
-    public function getQuerySuggestions()
+    public function getQuerySuggestions(): array
     {
         return $this->querySuggestions;
     }

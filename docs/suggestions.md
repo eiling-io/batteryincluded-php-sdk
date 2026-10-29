@@ -33,8 +33,8 @@ foreach ($response->getQueryCompletions() as $completion) {
     $completion->getSource();
 }
 
-foreach ($response->getDocuments() as $document) {
-    echo $document['_PRODUCT_i18n']['name'] ?? $document['_PRODUCT']['name'];  // highlighted name
+foreach ($response->getResolvedDocuments() as $document) {
+    echo $document['_PRODUCT']['name'];  // highlighted name in the requested locale
 }
 
 $response->getFounds();   // number of matching documents
@@ -44,13 +44,11 @@ $response->isLLM();       // true if the api flagged the response with `llm`
 
 - Documents contain the highlighted fields selected under [Suggest in the backend](backend-configuration#suggest). Add
   `id` (the document id in the root, e.g. `PRODUCT-1002`) there if you want to link to detail pages.
-- Translated fields stay in `_PRODUCT_i18n`, there is no merging like in `BrowseResponse`.
+- `getResolvedDocuments()` merges the translations and the availability into `_PRODUCT`, like
+  `BrowseResponse::getHits()`. `getDocuments()` returns the documents as delivered, including `_PRODUCT_i18n`.
 - Always set a locale, see [translations](translations#requesting-a-locale).
 - `setAvailability('ch')` sends `v[availability]` like on the search page. Prices only arrive if `price` is selected
   under Suggest in the portal, see [availability](availability#suggestions).
-
-`suggest(string $query, string $locale = 'DE')` is a shortcut without filters. It is deprecated in favour of
-`suggestWithFilter()`.
 
 {: .note }
 Escape everything except the `<mark>` tags before you output highlighted values.

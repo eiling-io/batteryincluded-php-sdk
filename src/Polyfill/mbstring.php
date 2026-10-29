@@ -11,7 +11,7 @@ if (!function_exists('mb_trim')) {
     function mb_trim(string $string, ?string $characters = null, ?string $encoding = null): string
     {
         if ($encoding !== null && $encoding !== 'UTF-8') {
-            $string = mb_convert_encoding($string, 'UTF-8', $encoding);
+            $string = (string) mb_convert_encoding($string, 'UTF-8', $encoding);
         }
 
         // whitespace characters which are trimmed by the native mb_trim() by default

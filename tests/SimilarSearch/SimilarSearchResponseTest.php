@@ -15,7 +15,7 @@ class SimilarSearchResponseTest extends TestCase
 {
     public function testSimilarSearchesAreParsedCorrectly(): void
     {
-        $responseRaw = json_encode([
+        $responseRaw = (string) json_encode([
             'searches' => [
                 [
                     'q' => 'test1',

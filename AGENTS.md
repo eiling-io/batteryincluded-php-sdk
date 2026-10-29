@@ -15,7 +15,8 @@ Package: `batteryincluded/batteryincluded-php-sdk`. Docs: https://sdk.batteryinc
 
 | Path | Content |
 |---|---|
-| `src/Client/` | `ApiClient` (base url, collection, api key), `CurlHttpClient`, `HttpClientInterface` |
+| `src/Client/` | `ApiClient` (base url, collection, api key, user agent), `CurlHttpClient` (timeouts), `HttpClientInterface` |
+| `src/Exception/` | `BatteryIncludedException` (base), `NetworkException`, `InvalidDocumentException` |
 | `src/Dto/` | `ProductBaseDto`, `BlogBaseDto`, `CategoryDto`, `ProductPropertyDto`, `AbstractTranslatableDto` |
 | `src/Service/` | `SyncService` (import, full/batched import, partial update, delete), `Response` |
 | `src/Shop/` | `BrowseService`, `BrowseSearchStruct`, `BrowseResponse`, facet DTOs, extensions |
@@ -36,11 +37,11 @@ composer install
 ./vendor/bin/phpunit --filter 'Dto|I18n|Polyfill|SearchStruct|BrowseResponse|SyncServiceRequest' # unit tests only
 docker run --rm -v "$PWD":/app -w /app php:8.4-cli \
   php ./tools/php-cs-fixer fix --config=.php-cs-fixer.php              # code style, run on PHP 8.4
-./tools/phpstan analyse -l 5 ./src/ ./tests/                           # static analysis
+./tools/phpstan analyse --memory-limit=1G                              # static analysis, level 8 from phpstan.neon
 make ddev-quality                                                      # all of the above in ddev
 ```
 
-CI runs code style (dry run) and PHPStan on PHP 8.2, 8.3, 8.4 and 8.5. PHPUnit always talks to the live API, so it runs
+CI runs code style (dry run) and PHPStan (`phpstan.neon`, level 8, `src` and `tests`) on PHP 8.2, 8.3, 8.4 and 8.5. PHPUnit always talks to the live API, so it runs
 in the job `tests (live api)` with the secrets of the GitHub environment `testing`, which a maintainer has to approve
 (pushes to `main` use `testing-main`, limited to the branch `main`, without approval).
 Do not move the secrets back to repository secrets.
@@ -59,6 +60,8 @@ Do not move the secrets back to repository secrets.
   `.hinweis`/`.wichtig`/`.achtung`. Run `python3 docs/_tools/check-translations.py` before committing, the pages
   workflow fails otherwise. `llms.txt` and `llms-full.txt` stay English only.
 - Follow the existing style: short comments that explain *why*, `declare(strict_types=1)` in every file.
+- Setters of DTOs and search structs return `static` (fluent). Record every user facing change in `CHANGELOG.md`,
+  breaking changes need an upgrade note.
 
 ## Domain knowledge
 
@@ -73,6 +76,11 @@ Do not move the secrets back to repository secrets.
 - Availability: `_PRODUCT_availability.<scope>.{active,price,instock}` overwrites `_PRODUCT` for `v[availability]`
   (`BrowseSearchStruct::setAvailability()`, sent only when set). It is a separate module next to i18n, do not merge
   the two. `getHits()` resolves i18n first, then availability. No fallback between scopes, `false`/`0` overwrite.
+- Api errors (4xx/5xx) never throw: `Response::getBody()` is `[]`, so every typed response renders empty; callers check
+  `isSuccessful()`. Response classes must tolerate any body (missing keys, scalars). Only unreachable apis
+  (`NetworkException`) and unencodable documents (`InvalidDocumentException`) throw.
+- `BrowseResponse::getFacets()` skips facets of other locales (`_PRODUCT_i18n.<locale>.*`) and detects the category
+  tree (`_<TYPE>_i18n.categories` before `_<TYPE>.categories`) unless a field is passed.
 - Filters, suggest fields and relevance are configured in the BatteryIncluded portal, not in the SDK
   (see `docs/backend-configuration.md`).
 

@@ -107,7 +107,7 @@ auf.
 
 `SuggestSearchStruct::setAvailability()` funktioniert genauso. Der Suggest-Endpunkt liefert nur die Felder, die im
 Portal unter Suggest ausgewählt sind. Wähle `price` (und für einen Status `active` oder `instock`) aus, um sie im
-Dropdown anzuzeigen. Die Dokumente kommen unverändert zurück, löse sie mit dem Resolver auf:
+Dropdown anzuzeigen. `getResolvedDocuments()` führt die Werte des Scopes in `_PRODUCT` zusammen:
 
 ```php
 $suggest = new SuggestSearchStruct();
@@ -115,11 +115,12 @@ $suggest->setQuery('smart');
 $suggest->setLocale('de');
 $suggest->setAvailability('ch');
 
-foreach ((new SuggestService($apiClient))->suggestWithFilter($suggest)->getDocuments() as $document) {
-    $product = AvailabilityResolver::resolveDocument($document, 'ch')['_PRODUCT'];
-    echo $product['price'] ?? '';
+foreach ((new SuggestService($apiClient))->suggestWithFilter($suggest)->getResolvedDocuments() as $document) {
+    echo $document['_PRODUCT']['price'] ?? '';
 }
 ```
+
+[Empfehlungen](recommendations) nehmen den Scope als letztes Argument und lösen ihn genauso auf.
 
 {: .hinweis }
 Filter und Sortierungen auf `_PRODUCT.price` oder `_PRODUCT.active` verwenden die Standardwerte. Filtere Werte eines

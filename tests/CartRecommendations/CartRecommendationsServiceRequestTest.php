@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace BatteryIncludedSdkTests\CartRecommendations;
 
+use BatteryIncludedSdk\Availability\AvailabilityResolver;
 use BatteryIncludedSdk\CartRecommendations\CartRecommendationsResponse;
 use BatteryIncludedSdk\CartRecommendations\CartRecommendationsService;
 use BatteryIncludedSdk\Client\ApiClient;
 use BatteryIncludedSdk\Client\HttpClientInterface;
 use BatteryIncludedSdk\I18n\I18nResolver;
+use BatteryIncludedSdk\Recommendations\RecommendationsResponse;
+use BatteryIncludedSdk\Recommendations\RecommendationsService;
 use BatteryIncludedSdk\Service\Response;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
@@ -18,6 +21,9 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(CartRecommendationsResponse::class)]
 #[UsesClass(ApiClient::class)]
 #[UsesClass(I18nResolver::class)]
+#[UsesClass(AvailabilityResolver::class)]
+#[UsesClass(RecommendationsResponse::class)]
+#[UsesClass(RecommendationsService::class)]
 #[UsesClass(Response::class)]
 class CartRecommendationsServiceRequestTest extends TestCase
 {
@@ -39,6 +45,14 @@ class CartRecommendationsServiceRequestTest extends TestCase
         $this->assertSame('Fernseher', $response->getRecommendations()['together'][0]['document']['_PRODUCT']['name']);
     }
 
+    public function testTheAvailabilityIsSentAndMerged()
+    {
+        $response = $this->createService()->recommendByIdentifiers(['1002'], [], 'product', null, 'CH');
+
+        $this->assertSame('ids[0]=PRODUCT-1002&v[availability]=ch', urldecode((string) parse_url($this->requests[0]['url'], PHP_URL_QUERY)));
+        $this->assertFalse($response->getRecommendations()['together'][0]['document']['_PRODUCT']['active']);
+    }
+
     private function createService(): CartRecommendationsService
     {
         // records the requests instead of sending them, the gateway may deliver every locale
@@ -57,8 +71,9 @@ class CartRecommendationsServiceRequestTest extends TestCase
                     'type' => 'together',
                     'document' => [
                         'id' => 'PRODUCT-1003',
-                        '_PRODUCT' => ['name' => 'TV'],
+                        '_PRODUCT' => ['name' => 'TV', 'active' => true],
                         '_PRODUCT_i18n' => ['de-de' => ['name' => 'Fernseher'], 'en-us' => ['name' => 'TV']],
+                        '_PRODUCT_availability' => ['ch' => ['active' => false]],
                     ],
                 ]]), 200);
             }

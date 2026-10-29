@@ -21,7 +21,7 @@ class RecommendationsResponseTest extends TestCase
             ['type' => 'related', 'id' => 5, 'name' => 'Verknüpft 1'],
             ['type' => 'related', 'id' => 6, 'name' => 'Verknüpft 2'],
         ];
-        $responseRaw = json_encode($data);
+        $responseRaw = (string) json_encode($data);
 
         $recommendations = (new RecommendationsResponse($responseRaw, 200))->getRecommendations();
 

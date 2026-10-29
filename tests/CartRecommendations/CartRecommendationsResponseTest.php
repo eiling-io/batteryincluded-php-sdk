@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace BatteryIncludedSdkTests\CartRecommendations;
 
 use BatteryIncludedSdk\CartRecommendations\CartRecommendationsResponse;
+use BatteryIncludedSdk\Recommendations\RecommendationsResponse;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(CartRecommendationsResponse::class)]
+#[UsesClass(RecommendationsResponse::class)]
 class CartRecommendationsResponseTest extends TestCase
 {
     public function testGetRecommendationsReturnsBody(): void
@@ -21,7 +24,7 @@ class CartRecommendationsResponseTest extends TestCase
             ['type' => 'related', 'id' => 5, 'name' => 'Verknüpft 1'],
             ['type' => 'related', 'id' => 6, 'name' => 'Verknüpft 2'],
         ];
-        $responseRaw = json_encode($data);
+        $responseRaw = (string) json_encode($data);
 
         $recommendations = (new CartRecommendationsResponse($responseRaw, 200))->getRecommendations();
 

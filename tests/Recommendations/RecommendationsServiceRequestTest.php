@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BatteryIncludedSdkTests\Recommendations;
 
+use BatteryIncludedSdk\Availability\AvailabilityResolver;
 use BatteryIncludedSdk\Client\ApiClient;
 use BatteryIncludedSdk\Client\HttpClientInterface;
 use BatteryIncludedSdk\I18n\I18nResolver;
@@ -18,6 +19,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(RecommendationsResponse::class)]
 #[UsesClass(ApiClient::class)]
 #[UsesClass(I18nResolver::class)]
+#[UsesClass(AvailabilityResolver::class)]
 #[UsesClass(Response::class)]
 class RecommendationsServiceRequestTest extends TestCase
 {
@@ -43,6 +45,20 @@ class RecommendationsServiceRequestTest extends TestCase
         $this->assertArrayNotHasKey('_PRODUCT_i18n', $document);
     }
 
+    public function testTheAvailabilityIsSentNormalizedAndMergedAfterTheTranslations()
+    {
+        $response = $this->createService()->recommendByIdentifier('1002', 'product', 'de_DE', 'CH');
+
+        $this->assertSame(
+            'https://api.test/collections/customer.test/documents/recommendations?id=PRODUCT-1002&v%5Blocale%5D=de-de&v%5Bavailability%5D=ch',
+            $this->requests[0]['url']
+        );
+        $this->assertSame('CH', $response->getAvailability());
+        $document = $response->getRecommendations()['related'][0]['document'];
+        $this->assertSame(['name' => 'Fernseher', 'price' => 749], $document['_PRODUCT']);
+        $this->assertArrayNotHasKey('_PRODUCT_availability', $document);
+    }
+
     private function createService(): RecommendationsService
     {
         // records the requests instead of sending them, the gateway may deliver every locale
@@ -63,6 +79,7 @@ class RecommendationsServiceRequestTest extends TestCase
                         'id' => 'PRODUCT-1003',
                         '_PRODUCT' => ['name' => 'TV', 'price' => 699],
                         '_PRODUCT_i18n' => ['de-de' => ['name' => 'Fernseher'], 'en-us' => ['name' => 'TV']],
+                        '_PRODUCT_availability' => ['ch' => ['price' => 749]],
                     ],
                 ]]), 200);
             }

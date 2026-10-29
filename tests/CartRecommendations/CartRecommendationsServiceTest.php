@@ -7,11 +7,16 @@ namespace BatteryIncludedSdkTests\CartRecommendations;
 use BatteryIncludedSdk\CartRecommendations\CartRecommendationsResponse;
 use BatteryIncludedSdk\CartRecommendations\CartRecommendationsService;
 use BatteryIncludedSdk\Client\ApiClient;
+use BatteryIncludedSdk\Recommendations\RecommendationsResponse;
+use BatteryIncludedSdk\Recommendations\RecommendationsService;
 use BatteryIncludedSdk\Service\Response;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(CartRecommendationsResponse::class)]
+#[UsesClass(RecommendationsResponse::class)]
+#[UsesClass(RecommendationsService::class)]
 #[CoversClass(CartRecommendationsService::class)]
 class CartRecommendationsServiceTest extends TestCase
 {
@@ -27,8 +32,7 @@ class CartRecommendationsServiceTest extends TestCase
             ->with(
                 $this->callback(function ($url) {
                     return str_contains($url, 'ids%5B0%5D=PRODUCT-1') && str_contains($url, 'ids%5B1%5D=PRODUCT-2');
-                }),
-                []
+                })
             )
             ->willReturn($mockResponse);
 

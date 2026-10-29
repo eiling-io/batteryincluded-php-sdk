@@ -14,7 +14,7 @@ class ResponseTest extends TestCase
     public function testGetBodyReturnsDecodedArray()
     {
         $data = ['foo' => 'bar', 'baz' => 123];
-        $json = json_encode($data);
+        $json = (string) json_encode($data);
         $response = new Response($json, 200);
 
         $this->assertSame($data, $response->getBody());

@@ -6,8 +6,6 @@ namespace BatteryIncludedSdk\Dto;
 
 class ProductBaseDto extends AbstractAvailabilityDto
 {
-    private ?string $id = null;
-
     private ?string $name = null;
 
     private ?string $description = null;
@@ -41,32 +39,16 @@ class ProductBaseDto extends AbstractAvailabilityDto
         parent::__construct($identifier, $type);
     }
 
-    /**
-     * @deprecated the document is identified by the root id `<TYPE>-<identifier>` from the constructor,
-     *             this value is no longer exported
-     */
-    public function getId(): ?string
-    {
-        return $this->id;
-    }
-
-    /**
-     * @deprecated the document is identified by the root id `<TYPE>-<identifier>` from the constructor,
-     *             this value is no longer exported
-     */
-    public function setId(?string $id): void
-    {
-        $this->id = $id;
-    }
-
     public function getName(): ?string
     {
         return $this->name;
     }
 
-    public function setName(?string $name): void
+    public function setName(?string $name): static
     {
         $this->name = $name;
+
+        return $this;
     }
 
     public function getDescription(): ?string
@@ -74,9 +56,11 @@ class ProductBaseDto extends AbstractAvailabilityDto
         return $this->description;
     }
 
-    public function setDescription(?string $description): void
+    public function setDescription(?string $description): static
     {
         $this->description = $description;
+
+        return $this;
     }
 
     public function getOrdernumber(): ?string
@@ -84,9 +68,11 @@ class ProductBaseDto extends AbstractAvailabilityDto
         return $this->ordernumber;
     }
 
-    public function setOrdernumber(?string $ordernumber): void
+    public function setOrdernumber(?string $ordernumber): static
     {
         $this->ordernumber = $ordernumber;
+
+        return $this;
     }
 
     public function getManufacture(): ?string
@@ -94,9 +80,11 @@ class ProductBaseDto extends AbstractAvailabilityDto
         return $this->manufacture;
     }
 
-    public function setManufacture(?string $manufacture): void
+    public function setManufacture(?string $manufacture): static
     {
         $this->manufacture = $manufacture;
+
+        return $this;
     }
 
     public function getManufactureNumber(): ?string
@@ -104,9 +92,11 @@ class ProductBaseDto extends AbstractAvailabilityDto
         return $this->manufactureNumber;
     }
 
-    public function setManufactureNumber(?string $manufactureNumber): void
+    public function setManufactureNumber(?string $manufactureNumber): static
     {
         $this->manufactureNumber = $manufactureNumber;
+
+        return $this;
     }
 
     public function getEan(): ?string
@@ -114,9 +104,11 @@ class ProductBaseDto extends AbstractAvailabilityDto
         return $this->ean;
     }
 
-    public function setEan(?string $ean): void
+    public function setEan(?string $ean): static
     {
         $this->ean = $ean;
+
+        return $this;
     }
 
     public function getImageUrl(): ?string
@@ -124,9 +116,11 @@ class ProductBaseDto extends AbstractAvailabilityDto
         return $this->imageUrl;
     }
 
-    public function setImageUrl(?string $imageUrl): void
+    public function setImageUrl(?string $imageUrl): static
     {
         $this->imageUrl = $imageUrl;
+
+        return $this;
     }
 
     public function getShopUrl(): ?string
@@ -134,9 +128,11 @@ class ProductBaseDto extends AbstractAvailabilityDto
         return $this->shopUrl;
     }
 
-    public function setShopUrl(?string $shopUrl): void
+    public function setShopUrl(?string $shopUrl): static
     {
         $this->shopUrl = $shopUrl;
+
+        return $this;
     }
 
     public function getPrice(): ?float
@@ -144,9 +140,11 @@ class ProductBaseDto extends AbstractAvailabilityDto
         return $this->price;
     }
 
-    public function setPrice(?float $price): void
+    public function setPrice(?float $price): static
     {
         $this->price = $price;
+
+        return $this;
     }
 
     public function getInstock(): ?int
@@ -154,9 +152,11 @@ class ProductBaseDto extends AbstractAvailabilityDto
         return $this->instock;
     }
 
-    public function setInstock(?int $instock): void
+    public function setInstock(?int $instock): static
     {
         $this->instock = $instock;
+
+        return $this;
     }
 
     public function getActive(): ?bool
@@ -164,9 +164,11 @@ class ProductBaseDto extends AbstractAvailabilityDto
         return $this->active;
     }
 
-    public function setActive(?bool $active): void
+    public function setActive(?bool $active): static
     {
         $this->active = $active;
+
+        return $this;
     }
 
     public function getRating(): ?float
@@ -174,9 +176,11 @@ class ProductBaseDto extends AbstractAvailabilityDto
         return $this->rating;
     }
 
-    public function setRating(?float $rating): void
+    public function setRating(?float $rating): static
     {
         $this->rating = $rating;
+
+        return $this;
     }
 
     public function getCategories(): ?array
@@ -188,9 +192,11 @@ class ProductBaseDto extends AbstractAvailabilityDto
         return array_values(array_unique($this->categories));
     }
 
-    public function addCategory(CategoryDto $category): void
+    public function addCategory(CategoryDto $category): static
     {
         $this->categories = array_merge($this->categories, $category->jsonSerialize());
+
+        return $this;
     }
 
     public function getProperties(): ?ProductPropertyDto
@@ -198,9 +204,11 @@ class ProductBaseDto extends AbstractAvailabilityDto
         return $this->properties;
     }
 
-    public function setProperties(?ProductPropertyDto $properties): void
+    public function setProperties(?ProductPropertyDto $properties): static
     {
         $this->properties = $properties;
+
+        return $this;
     }
 
     protected function getTranslatableFields(): ?array

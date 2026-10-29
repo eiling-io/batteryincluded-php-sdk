@@ -120,8 +120,9 @@ $searchStruct->addVariable('currency', 'EUR');
 ## Facets
 
 Facets exist only for fields that are [configured as filters in the backend](backend-configuration#filters).
-`getFacets()` turns the facet counts into typed objects. Pass the field that holds your category tree, e.g.
-`_PRODUCT_i18n.categories` for [translated categories](translations#filtering-and-sorting):
+`getFacets()` turns the facet counts into typed objects. It detects the category tree: `_PRODUCT_i18n.categories` for
+[translated categories](translations#filtering-and-sorting) if the response contains it, otherwise
+`_PRODUCT.categories`. Pass the field as argument if your tree lives in another field:
 
 ```php
 use BatteryIncludedSdk\Shop\FacetCategoryDto;
@@ -129,7 +130,7 @@ use BatteryIncludedSdk\Shop\FacetRangeDto;
 use BatteryIncludedSdk\Shop\FacetRatingDto;
 use BatteryIncludedSdk\Shop\FacetSelectDto;
 
-foreach ($result->getFacets('_PRODUCT.categories') as $facet) {
+foreach ($result->getFacets() as $facet) {   // or getFacets('_PRODUCT.categories')
     echo $facet->getFieldLabel();   // label from the backend, e.g. "Color"
     $facet->getFieldName();         // filter key, e.g. "_PRODUCT.properties.Color"
     $facet->getFieldUnit();         // e.g. "€"
@@ -149,7 +150,8 @@ foreach ($result->getFacets('_PRODUCT.categories') as $facet) {
 ```
 
 The `checked` state reflects the filters of the search struct, so you can render the sidebar directly from the
-response. Facets without counts for the current result are skipped, the api delivers them without a type.
+response. Facets without counts for the current result are skipped, the api delivers them without a type. Facets of
+other locales are skipped as well, see [translations](translations#filtering-and-sorting).
 
 ## Extensions
 

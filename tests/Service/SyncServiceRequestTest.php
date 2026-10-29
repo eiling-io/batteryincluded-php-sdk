@@ -11,6 +11,7 @@ use BatteryIncludedSdk\Dto\AbstractDto;
 use BatteryIncludedSdk\Dto\AbstractTranslatableDto;
 use BatteryIncludedSdk\Dto\BlogBaseDto;
 use BatteryIncludedSdk\Dto\ProductBaseDto;
+use BatteryIncludedSdk\Exception\InvalidDocumentException;
 use BatteryIncludedSdk\Service\AbstractService;
 use BatteryIncludedSdk\Service\Response;
 use BatteryIncludedSdk\Service\SyncService;
@@ -33,14 +34,13 @@ use PHPUnit\Framework\TestCase;
 class SyncServiceRequestTest extends TestCase
 {
     /**
-     * @var array<int, array{url: string, method: string, header: array, data: string}>
+     * @var array<int, array<string, mixed>>
      */
     private array $requests = [];
 
     public function testImportSendsOneLinePerDocumentWithRootId()
     {
         $product = new ProductBaseDto('1');
-        $product->setId('1');
         $product->setName('Phone');
         $blog = new BlogBaseDto('1');
         $blog->setTitle('News');
@@ -107,6 +107,39 @@ class SyncServiceRequestTest extends TestCase
         $this->assertSame('DELETE', $this->requests[0]['method']);
         $this->assertContains('Content-Type: application/json', $this->requests[0]['header']);
         $this->assertSame('["PRODUCT-240","BLOG-2"]', $this->requests[0]['data']);
+    }
+
+    public function testTransactionIdIsUrlEncoded()
+    {
+        $this->createSyncService()->syncFullBatchElements('tx 1&full=1', true, new ProductBaseDto('1'));
+
+        $this->assertSame(
+            'https://api.test/collections/customer.test/documents/import?transactionId=tx+1%26full%3D1&transactionCompleted=1',
+            $this->requests[0]['url']
+        );
+    }
+
+    public function testInvalidUtf8IsReplacedInsteadOfSendingAnEmptyLine()
+    {
+        $product = new ProductBaseDto('1');
+        $product->setName("Caf\xE9 Crème");
+
+        $this->createSyncService()->syncOneOrManyElements($product);
+
+        $this->assertSame("Caf\u{FFFD} Crème", $this->decodeNdjson($this->requests[0]['data'])[0]['_PRODUCT']['name']);
+        // unescaped unicode and slashes keep the payload small
+        $this->assertStringContainsString('"Caf' . "\u{FFFD}" . ' Crème"', $this->requests[0]['data']);
+    }
+
+    public function testUnencodableDocumentThrowsWithItsId()
+    {
+        $product = new ProductBaseDto('7');
+        $product->setPrice(NAN);
+
+        $this->expectException(InvalidDocumentException::class);
+        $this->expectExceptionMessage('Document PRODUCT-7 cannot be encoded');
+
+        $this->createSyncService()->syncOneOrManyElements(new ProductBaseDto('1'), $product);
     }
 
     private function createSyncService(): SyncService

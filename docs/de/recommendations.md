@@ -38,6 +38,13 @@ $response = (new RecommendationsService($apiClient))->recommendByIdentifier('100
 $response->getRecommendations()['related'][0]['document']['_PRODUCT']['name']; // German name
 ```
 
+Preise, Status und Bestand pro Land oder Vertriebskanal ([Verfügbarkeit](availability)) sind das vierte Argument. Das
+SDK sendet den Scope als `v[availability]` und führt ihn nach den Übersetzungen zusammen:
+
+```php
+$response = (new RecommendationsService($apiClient))->recommendByIdentifier('1002', 'PRODUCT', 'de_CH', 'ch');
+```
+
 ## Warenkorbempfehlungen {#cart-recommendations}
 
 Empfehlungen zum Inhalt eines Warenkorbs:
@@ -53,11 +60,12 @@ $response = (new CartRecommendationsService($apiClient))->recommendByIdentifiers
 $response->getRecommendations();   // grouped like the product recommendations
 ```
 
-Die Locale ist das vierte Argument, `recommendByIdentifiers($ids, $filters, 'PRODUCT', 'de_DE')`. Du brauchst sie, um
+Die Locale ist das vierte Argument und der Verfügbarkeits-Scope das fünfte,
+`recommendByIdentifiers($ids, $filters, 'PRODUCT', 'de_DE', 'ch')`. Die Locale brauchst du, um
 übersetzte Felder wie `_PRODUCT_i18n.categories` zu filtern; sie werden wie bei der
 [Suche](translations#filtering-and-sorting) ohne Locale gefiltert.
 
-Liefert die API keine Empfehlungen, enthalten beide Antworten leere Listen `related`, `also` und `together`.
+Liefert die API keine Empfehlungen oder einen Fehler, enthalten beide Antworten leere Listen `related`, `also` und `together`.
 
 ## Presets {#presets}
 

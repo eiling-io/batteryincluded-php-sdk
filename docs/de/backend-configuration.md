@@ -85,7 +85,8 @@ Der Tab **Variables** des Schemas enthält die Variablen der Collection, zum Bei
 4. Sortiere die Filter mit dem Griff links. `getFacets()` liefert sie in dieser Reihenfolge.
 5. Klicke auf **Save**.
 
-Übergib `getFacets()` das Feld des Kategoriebaums, damit das SDK den Baum aufbaut:
+`getFacets()` baut den Baum aus `_PRODUCT_i18n.categories` auf, ohne Übersetzungen aus `_PRODUCT.categories`. Liegt
+dein Baum in einem anderen Feld, übergib es:
 
 ```php
 $searchStruct = new BrowseSearchStruct();

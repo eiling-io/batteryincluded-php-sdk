@@ -30,7 +30,7 @@ jobs:
               run: ./tools/php-cs-fixer fix --config=.php-cs-fixer.php --dry-run
 
             - name: run phpstan
-              run: ./tools/phpstan analyse -l 5 ./src
+              run: ./tools/phpstan analyse --memory-limit=1G
 
     # the tests talk to the live api, for pull requests the secrets of the environment `testing` are only handed out after
     # a maintainer approved the run (required reviewers of the environment). One job for all php versions, so one approval

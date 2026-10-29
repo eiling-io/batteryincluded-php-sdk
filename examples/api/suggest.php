@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use BatteryIncludedSdk\Availability\AvailabilityResolver;
 use BatteryIncludedSdk\Suggest\SuggestSearchStruct;
 use BatteryIncludedSdk\Suggest\SuggestService;
 
@@ -44,13 +43,12 @@ foreach (array_slice($response->getQueryCompletions(), 0, 5) as $completion) {
 }
 
 $products = [];
-foreach (array_slice($response->getDocuments(), 0, 4) as $document) {
-    // price (and status) of the country, delivered in `_PRODUCT_availability` if selected under Suggest in the portal
-    $product = AvailabilityResolver::resolveDocument($document, $country)['_PRODUCT'] ?? [];
+foreach (array_slice($response->getResolvedDocuments(), 0, 4) as $document) {
+    // translations and the price of the country merged into _PRODUCT, both selected under Suggest in the portal
+    $product = $document['_PRODUCT'] ?? [];
     // the document id in the root (selected under Suggest in the portal), e.g. PRODUCT-720
     $productId = strip_tags((string) ($document['id'] ?? ''));
-    // the highlighted name is part of the _PRODUCT_i18n node, resolved by the gateway for the requested locale
-    $name = (string) ($document['_PRODUCT_i18n']['name'] ?? $product['name'] ?? '');
+    $name = (string) ($product['name'] ?? '');
     $products[] = [
         'html' => highlight($name),
         'image' => (string) ($product['imageUrl'] ?? ''),

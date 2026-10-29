@@ -20,10 +20,7 @@ class HighlightsService
     {
         $query = $locale !== null ? '?' . http_build_query(['v' => ['locale' => I18nResolver::normalizeLocale($locale)]]) : '';
 
-        $response = $this->apiClient->getJson(
-            '/documents/highlights' . $query,
-            []
-        );
+        $response = $this->apiClient->getJson('/documents/highlights' . $query);
 
         return new HighlightsResponse($response->getRawResponse(), $response->getStatusCode());
     }

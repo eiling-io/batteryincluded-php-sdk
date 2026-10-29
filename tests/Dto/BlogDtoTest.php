@@ -22,7 +22,6 @@ final class BlogDtoTest extends TestCase
     {
         $dto = new BlogBaseDto('123');
 
-        $dto->setId('123');
         $dto->setTitle('Test Title');
         $dto->setAuthor('Author');
         $dto->setPublishedAt('2024-06-01');
@@ -33,7 +32,6 @@ final class BlogDtoTest extends TestCase
         $dto->setRelatedArticles('related');
         $dto->setBlogUrl('https://blog.url');
 
-        $this->assertSame('123', $dto->getId());
         $this->assertSame('Test Title', $dto->getTitle());
         $this->assertSame('Author', $dto->getAuthor());
         $this->assertSame('2024-06-01', $dto->getPublishedAt());
@@ -48,7 +46,6 @@ final class BlogDtoTest extends TestCase
     public function testIdIsOnlyExportedInRoot(): void
     {
         $dto = new BlogBaseDto('1');
-        $dto->setId('legacy');
         $dto->setTitle('Title');
 
         $this->assertSame(

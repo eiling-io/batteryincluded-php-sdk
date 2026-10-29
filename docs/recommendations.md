@@ -38,6 +38,13 @@ $response = (new RecommendationsService($apiClient))->recommendByIdentifier('100
 $response->getRecommendations()['related'][0]['document']['_PRODUCT']['name']; // German name
 ```
 
+Prices, status and stock per country or sales channel ([availability](availability)) are the fourth argument. The SDK
+sends the scope as `v[availability]` and merges it after the translations:
+
+```php
+$response = (new RecommendationsService($apiClient))->recommendByIdentifier('1002', 'PRODUCT', 'de_CH', 'ch');
+```
+
 ## Cart recommendations
 
 Recommendations for the content of a cart:
@@ -53,11 +60,12 @@ $response = (new CartRecommendationsService($apiClient))->recommendByIdentifiers
 $response->getRecommendations();   // grouped like the product recommendations
 ```
 
-The locale is the fourth argument, `recommendByIdentifiers($ids, $filters, 'PRODUCT', 'de_DE')`. It is required to
+The locale is the fourth argument and the availability scope the fifth,
+`recommendByIdentifiers($ids, $filters, 'PRODUCT', 'de_DE', 'ch')`. The locale is required to
 filter translated fields like `_PRODUCT_i18n.categories`, they are filtered without locale as in the
 [search](translations#filtering-and-sorting).
 
-If the api returns no recommendations, both responses contain empty `related`, `also` and `together` lists.
+If the api returns no recommendations or an error, both responses contain empty `related`, `also` and `together` lists.
 
 ## Presets
 

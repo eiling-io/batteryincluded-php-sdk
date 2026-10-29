@@ -56,7 +56,6 @@ class SuggestServiceTest extends TestCase
             static fn (SuggestService $service) => $service->suggestWithFilter($searchStruct),
             'v%5Blocale%5D=en'
         );
-        $this->assertSuggestUrlContains(static fn (SuggestService $service) => $service->suggest('iPhone'), 'v%5Blocale%5D=de');
     }
 
     public function testSuggestSendsAvailabilityOnlyWhenSet()
@@ -84,29 +83,10 @@ class SuggestServiceTest extends TestCase
         $mockApiClient = $this->createMock(ApiClient::class);
         $mockApiClient->expects($this->once())
             ->method('getJson')
-            ->with($this->callback(fn ($url) => str_contains($url, $expected) && ($unexpected === null || !str_contains($url, $unexpected))), [])
+            ->with($this->callback(fn ($url) => str_contains($url, $expected) && ($unexpected === null || !str_contains($url, $unexpected))))
             ->willReturn($mockResponse);
 
         $this->assertInstanceOf(SuggestResponse::class, $suggest(new SuggestService($mockApiClient)));
-    }
-
-    public function testSuggestMethodAgainstLiveApi()
-    {
-        $products = Helper::generateProducts(20);
-        $apiClient = Helper::getApiClient();
-        $syncService = new SyncService($apiClient);
-
-        $result = $syncService->syncOneOrManyElements(...$products);
-        $this->assertCount(720, $result->getBody());
-        $browseService = new SuggestService(Helper::getApiClient());
-        $result = $browseService->suggest('12');
-
-        $this->assertContainsOnlyInstancesOf(CompletionDto::class, $result->getQueryCompletions());
-
-        $this->assertInstanceOf(SuggestResponse::class, $result);
-        $this->assertGreaterThanOrEqual(12, $result->getFounds());
-        $this->assertCount(6, $result->getDocuments());
-        $this->assertFalse($result->isLLM());
     }
 
     public function testSuggestWithFilterMethodAgainstLiveApi()

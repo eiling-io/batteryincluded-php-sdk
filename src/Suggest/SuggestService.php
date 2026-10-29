@@ -14,32 +14,15 @@ class SuggestService
     {
     }
 
-    /**
-     * @deprecated will be removed in 1.0.0, use suggestWithFilter instead
-     */
-    public function suggest(string $query, string $locale = 'DE'): SuggestResponse
-    {
-        $query = http_build_query(
-            [
-                'q' => $query,
-                'v' => ['locale' => I18nResolver::normalizeLocale($locale)],
-            ]
-        );
-
-        $response = $this->apiClient->getJson(
-            '/documents/suggest?' . $query,
-            []
-        );
-
-        return new SuggestResponse($response->getRawResponse(), $response->getStatusCode());
-    }
-
     public function suggestWithFilter(SuggestSearchStruct $searchStruct): SuggestResponse
     {
         // the gateway fails without locale as soon as the collection uses translated facets
-        $variables = ['locale' => I18nResolver::normalizeLocale($searchStruct->getLocale())];
-        if ($searchStruct->getAvailability() !== null) {
-            $variables[AvailabilityResolver::VARIABLE] = AvailabilityResolver::normalizeScope($searchStruct->getAvailability());
+        $locale = I18nResolver::normalizeLocale($searchStruct->getLocale());
+        $variables = ['locale' => $locale];
+        $availability = $searchStruct->getAvailability();
+        if ($availability !== null) {
+            $availability = AvailabilityResolver::normalizeScope($availability);
+            $variables[AvailabilityResolver::VARIABLE] = $availability;
         }
 
         $query = http_build_query(
@@ -50,11 +33,8 @@ class SuggestService
             ]
         );
 
-        $response = $this->apiClient->getJson(
-            '/documents/suggest?' . $query,
-            []
-        );
+        $response = $this->apiClient->getJson('/documents/suggest?' . $query);
 
-        return new SuggestResponse($response->getRawResponse(), $response->getStatusCode());
+        return new SuggestResponse($response->getRawResponse(), $response->getStatusCode(), $locale, $availability);
     }
 }

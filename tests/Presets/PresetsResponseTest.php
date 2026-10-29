@@ -19,7 +19,7 @@ class PresetsResponseTest extends TestCase
             ['id' => '1', 'name' => 'Preset 1'],
             ['id' => '2', 'name' => 'Preset 2'],
         ];
-        $json = json_encode($data);
+        $json = (string) json_encode($data);
 
         $response = new PresetsResponse($json, 200);
         $presets = $response->getPresets();

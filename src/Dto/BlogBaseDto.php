@@ -6,8 +6,6 @@ namespace BatteryIncludedSdk\Dto;
 
 class BlogBaseDto extends AbstractTranslatableDto
 {
-    private ?string $id = null;
-
     private ?string $title = null;
 
     private ?string $author = null;
@@ -46,32 +44,16 @@ class BlogBaseDto extends AbstractTranslatableDto
         ];
     }
 
-    /**
-     * @deprecated the document is identified by the root id `<TYPE>-<identifier>` from the constructor,
-     *             this value is no longer exported
-     */
-    public function getId(): ?string
-    {
-        return $this->id;
-    }
-
-    /**
-     * @deprecated the document is identified by the root id `<TYPE>-<identifier>` from the constructor,
-     *             this value is no longer exported
-     */
-    public function setId(?string $id): void
-    {
-        $this->id = $id;
-    }
-
     public function getTitle(): ?string
     {
         return $this->title;
     }
 
-    public function setTitle(?string $title): void
+    public function setTitle(?string $title): static
     {
         $this->title = $title;
+
+        return $this;
     }
 
     public function getAuthor(): ?string
@@ -79,9 +61,11 @@ class BlogBaseDto extends AbstractTranslatableDto
         return $this->author;
     }
 
-    public function setAuthor(?string $author): void
+    public function setAuthor(?string $author): static
     {
         $this->author = $author;
+
+        return $this;
     }
 
     public function getPublishedAt(): ?string
@@ -89,9 +73,11 @@ class BlogBaseDto extends AbstractTranslatableDto
         return $this->publishedAt;
     }
 
-    public function setPublishedAt(?string $publishedAt): void
+    public function setPublishedAt(?string $publishedAt): static
     {
         $this->publishedAt = $publishedAt;
+
+        return $this;
     }
 
     public function getActive(): ?bool
@@ -99,9 +85,11 @@ class BlogBaseDto extends AbstractTranslatableDto
         return $this->active;
     }
 
-    public function setActive(?bool $active): void
+    public function setActive(?bool $active): static
     {
         $this->active = $active;
+
+        return $this;
     }
 
     public function getShortDescription(): ?string
@@ -109,9 +97,11 @@ class BlogBaseDto extends AbstractTranslatableDto
         return $this->shortDescription;
     }
 
-    public function setShortDescription(?string $shortDescription): void
+    public function setShortDescription(?string $shortDescription): static
     {
         $this->shortDescription = $shortDescription;
+
+        return $this;
     }
 
     public function getDescription(): ?string
@@ -119,9 +109,11 @@ class BlogBaseDto extends AbstractTranslatableDto
         return $this->description;
     }
 
-    public function setDescription(?string $description): void
+    public function setDescription(?string $description): static
     {
         $this->description = $description;
+
+        return $this;
     }
 
     public function getPreviewImage(): ?string
@@ -129,9 +121,11 @@ class BlogBaseDto extends AbstractTranslatableDto
         return $this->previewImage;
     }
 
-    public function setPreviewImage(?string $previewImage): void
+    public function setPreviewImage(?string $previewImage): static
     {
         $this->previewImage = $previewImage;
+
+        return $this;
     }
 
     public function getRelatedArticles(): ?string
@@ -139,9 +133,11 @@ class BlogBaseDto extends AbstractTranslatableDto
         return $this->relatedArticles;
     }
 
-    public function setRelatedArticles(?string $relatedArticles): void
+    public function setRelatedArticles(?string $relatedArticles): static
     {
         $this->relatedArticles = $relatedArticles;
+
+        return $this;
     }
 
     public function getBlogUrl(): ?string
@@ -149,9 +145,11 @@ class BlogBaseDto extends AbstractTranslatableDto
         return $this->blogUrl;
     }
 
-    public function setBlogUrl(?string $blogUrl): void
+    public function setBlogUrl(?string $blogUrl): static
     {
         $this->blogUrl = $blogUrl;
+
+        return $this;
     }
 
     public function jsonSerialize(): array

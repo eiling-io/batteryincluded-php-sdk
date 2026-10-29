@@ -162,8 +162,8 @@ class Helper
         return new ApiClient(
             new CurlHttpClient(),
             'https://api.batteryincluded.io/api/v1/collections/',
-            getenv('COLLECTION'),
-            getenv('APIKEY')
+            (string) getenv('COLLECTION'),
+            (string) getenv('APIKEY')
         );
     }
 

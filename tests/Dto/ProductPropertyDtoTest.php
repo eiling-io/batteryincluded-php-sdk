@@ -28,7 +28,7 @@ class ProductPropertyDtoTest extends TestCase
         ];
 
         $this->assertSame($expected, $dto->jsonSerialize());
-        $this->assertSame($expected, json_decode(json_encode($dto), true));
+        $this->assertSame($expected, json_decode((string) json_encode($dto), true));
     }
 
     public function testEmptyProperties()

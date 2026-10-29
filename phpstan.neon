@@ -1,0 +1,12 @@
+parameters:
+    level: 8
+    paths:
+        - src
+        - tests
+    ignoreErrors:
+        # the api answers with free-form json, typing every array shape would not add safety
+        - identifier: missingType.iterableValue
+        # test methods are void by convention
+        -
+            identifier: missingType.return
+            path: tests

@@ -82,7 +82,8 @@ The **Variables** tab of the schema holds the collection variables, e.g. the `lo
 4. Order the filters with the drag handle on the left. `getFacets()` returns them in this order.
 5. Click **Save**.
 
-Pass the field of the category tree to `getFacets()` so the SDK builds the tree:
+`getFacets()` builds the tree from `_PRODUCT_i18n.categories`, or `_PRODUCT.categories` without translations. Pass the
+field if your tree lives in another field:
 
 ```php
 $searchStruct = new BrowseSearchStruct();

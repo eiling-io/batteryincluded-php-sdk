@@ -33,8 +33,8 @@ foreach ($response->getQueryCompletions() as $completion) {
     $completion->getSource();
 }
 
-foreach ($response->getDocuments() as $document) {
-    echo $document['_PRODUCT_i18n']['name'] ?? $document['_PRODUCT']['name'];  // highlighted name
+foreach ($response->getResolvedDocuments() as $document) {
+    echo $document['_PRODUCT']['name'];  // highlighted name in the requested locale
 }
 
 $response->getFounds();   // number of matching documents
@@ -45,13 +45,11 @@ $response->isLLM();       // true if the api flagged the response with `llm`
 - Die Dokumente enthalten die hervorgehobenen Felder, die [im Backend unter Suggest](backend-configuration#suggest)
   ausgewählt sind. Füge dort `id` hinzu (die Dokument-ID im Root, zum Beispiel `PRODUCT-1002`), wenn du auf
   Detailseiten verlinken willst.
-- Übersetzte Felder bleiben in `_PRODUCT_i18n`, anders als bei `BrowseResponse` wird nichts zusammengeführt.
+- `getResolvedDocuments()` führt die Übersetzungen und die Verfügbarkeit in `_PRODUCT` zusammen, wie
+  `BrowseResponse::getHits()`. `getDocuments()` liefert die Dokumente unverändert, inklusive `_PRODUCT_i18n`.
 - Setze immer eine Locale, siehe [Übersetzungen](translations#requesting-a-locale).
 - `setAvailability('ch')` sendet `v[availability]` wie auf der Suchseite. Preise kommen nur an, wenn `price` im Portal
   unter Suggest ausgewählt ist, siehe [Verfügbarkeit](availability#suggestions).
-
-`suggest(string $query, string $locale = 'DE')` ist eine Abkürzung ohne Filter. Sie ist zugunsten von
-`suggestWithFilter()` deprecated.
 
 {: .hinweis }
 Escape alles außer den `<mark>`-Tags, bevor du hervorgehobene Werte ausgibst.
